@@ -2,6 +2,7 @@ package com.java.rendering_with_you_12.Application;
 
 import android.content.Context;
 
+import com.java.rendering_with_you_12.Model.TexturedCube;
 import com.java.rendering_with_you_12.Model.Triangle2DEle;
 import com.java.rendering_with_you_12.renderEngine.MyRenderer;
 
@@ -13,39 +14,91 @@ public class Program extends GLBasicSurfaceView{
 
     public void init(){
         super.init();
-        Triangle2DEle trig;
-        Triangle2DEle trig2;
+
+        TexturedCube cube;
 
         float[] mVerticesData =
                 {
-                        0.0f,  0.5f, 0.0f,        // v0
-                        -0.5f, -0.5f, 0.0f,        // v1
-                        0.5f, -0.5f, 0.0f,        // v2
-                };
+                        -0.5f,0.5f,-0.5f,
+                        -0.5f,-0.5f,-0.5f,
+                        0.5f,-0.5f,-0.5f,
+                        0.5f,0.5f,-0.5f,
 
-        float[] mVerticesData2 =
-                {
-                        0.5f,  1f, 0.5f,        // v0
-                        0f, -0f, 0.5f,        // v1
-                        1f, 0f, 0.5f,        // v2
-                };
+                        -0.5f,0.5f,0.5f,
+                        -0.5f,-0.5f,0.5f,
+                        0.5f,-0.5f,0.5f,
+                        0.5f,0.5f,0.5f,
 
-        float[] mColorData = {
-                1.0f,  0.0f, 0.0f, 1.0f,  // c0
-                0.0f,  1.0f, 0.0f, 1.0f,  // c1
-                0.0f,  0.0f, 1.0f, 1.0f,  // c2
-        };
+                        0.5f,0.5f,-0.5f,
+                        0.5f,-0.5f,-0.5f,
+                        0.5f,-0.5f,0.5f,
+                        0.5f,0.5f,0.5f,
+
+                        -0.5f,0.5f,-0.5f,
+                        -0.5f,-0.5f,-0.5f,
+                        -0.5f,-0.5f,0.5f,
+                        -0.5f,0.5f,0.5f,
+
+                        -0.5f,0.5f,0.5f,
+                        -0.5f,0.5f,-0.5f,
+                        0.5f,0.5f,-0.5f,
+                        0.5f,0.5f,0.5f,
+
+                        -0.5f,-0.5f,0.5f,
+                        -0.5f,-0.5f,-0.5f,
+                        0.5f,-0.5f,-0.5f,
+                        0.5f,-0.5f,0.5f
+
+                };
 
         int[] mIndicesData =
                 {
-                        0, 1, 2
+                        0,1,3,
+                        3,1,2,
+                        4,5,7,
+                        7,5,6,
+                        8,9,11,
+                        11,9,10,
+                        12,13,15,
+                        15,13,14,
+                        16,17,19,
+                        19,17,18,
+                        20,21,23,
+                        23,21,22
                 };
 
-        trig= new Triangle2DEle(m_Context, mVerticesData, mIndicesData, mColorData);
-        trig2 = new Triangle2DEle(m_Context, mVerticesData2, mIndicesData, mColorData);
+        float[] texCoords=
+                {
+                        0,0,
+                        0,1,
+                        1,1,
+                        1,0,
+                        0,0,
+                        0,1,
+                        1,1,
+                        1,0,
+                        0,0,
+                        0,1,
+                        1,1,
+                        1,0,
+                        0,0,
+                        0,1,
+                        1,1,
+                        1,0,
+                        0,0,
+                        0,1,
+                        1,1,
+                        1,0,
+                        0,0,
+                        0,1,
+                        1,1,
+                        1,0
 
-        m_Renderer.render(trig);
-        m_Renderer.render(trig2);
+                };
+
+        cube= new TexturedCube(m_Context, mVerticesData, mIndicesData, texCoords);
+
+        m_Renderer.render(cube);
     }
 
 }

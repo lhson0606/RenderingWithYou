@@ -1,0 +1,13 @@
+#version 300 es
+uniform mat4 uMVPMat;
+
+layout(location = 0) in vec4 a_position;
+layout(location = 1) in vec2 inTexCoords;
+
+out vec2 a_TexCoords;
+
+void main()
+{
+    gl_Position = uMVPMat*a_position;
+    a_TexCoords = inTexCoords;
+}

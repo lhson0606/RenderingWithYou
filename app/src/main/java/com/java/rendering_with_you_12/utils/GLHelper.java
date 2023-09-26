@@ -1,7 +1,14 @@
 package com.java.rendering_with_you_12.utils;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.opengl.GLUtils;
 import android.util.Log;
+
+import com.java.rendering_with_you_12.R;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -97,6 +104,23 @@ public class GLHelper {
         dest[0] = a2*b3 - a3*b2;
         dest[1] = a3*b1 - a1*b3;
         dest[2] = a1*b2 - a2*b1;
+    }
+
+    public static int loadTexture(Context context, int... resID){
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;   // No pre-scaling
+        final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resID[0], options);
+        IntBuffer texID = IntBuffer.allocate(1);
+        GLES30.glGenTextures(1, texID);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texID.get(0));
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+        GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+
+        GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0,  bitmap, 0);
+        bitmap.recycle();
+        return texID.get(0);
     }
 
 }
