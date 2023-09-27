@@ -31,6 +31,60 @@ public class Triangle2DEle implements Entity{
     final int COLOR_ATTRIB_INDEX = 1;
     int m_UniMVPMatIndx;
 
+    public Triangle2DEle(Context context){
+        m_PositionData = DEFAULT_VERTICES_DATA;
+        m_IndicesData = DEFAULT_INDICES_DATA;
+        m_ColorData = DEFAULT_COLOR_DATA;
+
+        InputStream vertexShaderStream;
+        InputStream fragmentShaderStream;
+        try {
+            vertexShaderStream = context.getAssets().open(VERTEX_SHADER_PATH);
+            fragmentShaderStream = context.getAssets().open(FRAGMENT_SHADER_PATH);
+            m_Program = ShaderHelper.getInstance().loadProgram(vertexShaderStream, fragmentShaderStream);
+        } catch (IOException e) {
+            GLHelper.handleException(TAG, e);
+        }
+
+        GLES30.glGenVertexArrays(1, m_VAOIDs, 0);
+        GLES30.glGenBuffers(3, m_VBOIDs, 0);
+
+        GLES30.glBindVertexArray(m_VAOIDs[0]);
+
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_VBOIDs[0]);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,
+                m_PositionData.length*Float.BYTES,
+                GLHelper.createFloatBuffer(m_PositionData),
+                GLES30.GL_STATIC_DRAW);
+        GLES30.glVertexAttribPointer(VERTEX_ATTRIB_INDEX, 3,
+                GLES30.GL_FLOAT,false, 12, 0);
+
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_VBOIDs[1]);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,
+                m_ColorData.length*Float.BYTES,
+                GLHelper.createFloatBuffer(m_ColorData),
+                GLES30.GL_STATIC_DRAW);
+        GLES30.glVertexAttribPointer(COLOR_ATTRIB_INDEX, 4,
+                GLES30.GL_FLOAT,false, 16, 0);
+
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, m_VBOIDs[2]);
+        GLES30.glBufferData(GLES30.GL_ELEMENT_ARRAY_BUFFER,
+                m_IndicesData.length*Integer.BYTES,
+                GLHelper.createIntBuffer(m_IndicesData),
+                GLES30.GL_STATIC_DRAW);
+
+        GLES30.glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
+        GLES30.glEnableVertexAttribArray(COLOR_ATTRIB_INDEX);
+
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
+        GLES30.glBindVertexArray(0);
+        //this has to be below  GLES30.glBindVertexArray(0); IF THIS IS ABOVE then we are telling openGL that we do not use our indices
+        //watch here https://youtu.be/45MIykWJ-C4?si=XvZCooyk1Pc6Dw81&t=1913
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        getAllUniLocations();
+    }
+
     public Triangle2DEle(Context context, float[] positionsData, int[] indicesData, float[] colorData){
         m_PositionData = positionsData;
         m_IndicesData = indicesData;
@@ -76,7 +130,11 @@ public class Triangle2DEle implements Entity{
         GLES30.glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
         GLES30.glEnableVertexAttribArray(COLOR_ATTRIB_INDEX);
 
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
         GLES30.glBindVertexArray(0);
+        //this has to be below  GLES30.glBindVertexArray(0); IF THIS IS ABOVE then we are telling openGL that we do not use our indices
+        //watch here https://youtu.be/45MIykWJ-C4?si=XvZCooyk1Pc6Dw81&t=1913
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
 
         getAllUniLocations();
     }
@@ -100,4 +158,19 @@ public class Triangle2DEle implements Entity{
         GLES30.glDeleteVertexArrays(0, m_VAOIDs, m_VAOIDs.length);
         GLES30.glDeleteProgram(m_Program);
     }
+
+    final float[] DEFAULT_VERTICES_DATA = {
+             0.0f, 0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f,
+             0.5f, -0.5f, 0.0f
+    };
+    //indices data
+    int[] DEFAULT_INDICES_DATA ={
+            0, 1, 2
+    };
+    float[] DEFAULT_COLOR_DATA ={
+            1.0f, 0.0f, 0.0f, 1.0f,//red
+            0.0f, 1.0f, 0.0f, 1.0f,//green
+            0.0f, 0.0f, 1.0f, 1.0f//blue
+    };
 }

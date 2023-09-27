@@ -107,12 +107,19 @@ public class ObjFactory {
                 for(int i = 1 ;i< 4; ++i)
                 {
                     verPerFaceBuffer = buffer[i].split("/");
-                    vIndx = Integer.parseInt(verPerFaceBuffer[0])-1;
-                    vtIndx = Integer.parseInt(verPerFaceBuffer[1])-1;
-                    vnIndx = Integer.parseInt(verPerFaceBuffer[2])-1;
 
+                    vIndx = Integer.parseInt(verPerFaceBuffer[0])-1;
+
+                    if(!verPerFaceBuffer[1].equals("")){
+                        vtIndx = Integer.parseInt(verPerFaceBuffer[1])-1;
+                        texCoordsDst[vIndx] = texCoordsSrc.get(vtIndx);
+                    }else{
+                        texCoordsDst[vIndx] = new Vec2(0.352539f, 1-0.72205625f);
+                    }
+
+                    vnIndx = Integer.parseInt(verPerFaceBuffer[2])-1;
                     normsDst[vIndx] = normsSrc.get(vnIndx);
-                    texCoordsDst[vIndx] = texCoordsSrc.get(vtIndx);
+
                     indices.add(vIndx);
                 }
 
@@ -179,7 +186,10 @@ public class ObjFactory {
         GLES30.glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
         GLES30.glEnableVertexAttribArray(TEX_COORD_ATTRIB_INDEX);//tex coords
 
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
         GLES30.glBindVertexArray(0);
+        //this has to be below  GLES30.glBindVertexArray(0); IF THIS IS ABOVE then we are telling openGL that we do not use our indices
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
 
         int uMVPMatLocation = GLES30.glGetUniformLocation(program, MVP_MAT_NAME);
         int uTransMatLocation = GLES30.glGetUniformLocation(program, TRANS_MAT_NAME);

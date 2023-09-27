@@ -131,7 +131,11 @@ public class TexturedCube implements Entity {
         GLES30.glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
         GLES30.glEnableVertexAttribArray(TEX_COORD_ATTRIB_INDEX);//tex coords
 
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
         GLES30.glBindVertexArray(0);
+        //this has to be below  GLES30.glBindVertexArray(0); IF THIS IS ABOVE then we are telling openGL that we do not use our indices
+        //watch here https://youtu.be/45MIykWJ-C4?si=XvZCooyk1Pc6Dw81&t=1913
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
 
         getAllUniLocations();
 
@@ -156,12 +160,13 @@ public class TexturedCube implements Entity {
 
         GLES30.glBindVertexArray(m_VAOIDs[0]);
 
-        //GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + m_TexPos);
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  m_TexID[0]);
 
         GLES30.glDrawElements(GLES30.GL_TRIANGLES, m_IndicesData.length, GLES30.GL_UNSIGNED_INT, 0);
 
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
+        GLES30.glDisable(GLES30.GL_TEXTURE_2D);
         GLES30.glUseProgram(0);
         GLES30.glBindVertexArray(0);
     }

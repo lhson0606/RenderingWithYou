@@ -45,11 +45,12 @@ public class Obj3D implements Entity{
         //start
         GLES30.glBindVertexArray(m_VAOID);
 
-        //GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + m_TexPos);
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  m_TexID);
         GLES30.glDrawElements(GLES30.GL_TRIANGLES, m_VertexCount, GLES30.GL_UNSIGNED_INT, 0);
 
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
+        GLES30.glDisable(GLES30.GL_TEXTURE_2D);
         GLES30.glUseProgram(0);
         GLES30.glBindVertexArray(0);
     }
