@@ -156,11 +156,12 @@ public class TexturedCube implements Entity {
 
         GLES30.glBindVertexArray(m_VAOIDs[0]);
 
-        GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + m_TexPos);
+        //GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + m_TexPos);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  m_TexID[0]);
 
         GLES30.glDrawElements(GLES30.GL_TRIANGLES, m_IndicesData.length, GLES30.GL_UNSIGNED_INT, 0);
 
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
         GLES30.glUseProgram(0);
         GLES30.glBindVertexArray(0);
     }

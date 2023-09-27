@@ -21,19 +21,20 @@ public class Program extends GLBasicSurfaceView{
 
     public void init(){
         super.init();
+        TexturedCube cube = new TexturedCube(m_Context);
+        m_Renderer.render(cube);
         //TexturedCube cube = new TexturedCube(m_Context);
         //m_Renderer.render(cube);
         try {
             Obj3D objSwitch = ObjFactory.getInstance().load(m_Context, R.raw.switch_wf, R.raw.switch_tex);
             m_Renderer.render(objSwitch);
-            /*Obj3D objStall = ObjFactory.getInstance().load(m_Context, R.raw.stall_wf, R.raw.stall_tex);
-            m_Renderer.render(objStall);*/
+            Obj3D objStall = ObjFactory.getInstance().load(m_Context, R.raw.stall_wf, R.raw.stall_tex);
+            m_Renderer.render(objStall);
         } catch (IOException e) {
             GLHelper.handleException(TAG, e.getMessage());
         }
 
-        /*TexturedCube cube = new TexturedCube(m_Context);
-        m_Renderer.render(cube);*/
+
     }
 
 }
