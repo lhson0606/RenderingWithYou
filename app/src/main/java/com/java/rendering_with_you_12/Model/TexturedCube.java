@@ -104,23 +104,17 @@ public class TexturedCube implements Entity {
         GLES30.glGenVertexArrays(1, m_VAOIDs, 0);
         GLES30.glGenBuffers(3, m_VBOIDs, 0);
 
-        GLES30.glBindVertexArray(m_VAOIDs[0]);
-
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_VBOIDs[0]);
         GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,
                 positionsData.length*Float.BYTES,
                 GLHelper.createFloatBuffer(positionsData),
                 GLES30.GL_STATIC_DRAW);
-        GLES30.glVertexAttribPointer(VERTEX_ATTRIB_INDEX, 3,
-                GLES30.GL_FLOAT,false, 12, 0);
 
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_VBOIDs[1]);
         GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,
                 texCoordData.length*Float.BYTES,
                 GLHelper.createFloatBuffer(texCoordData),
                 GLES30.GL_STATIC_DRAW);
-        GLES30.glVertexAttribPointer(TEX_COORD_ATTRIB_INDEX, 2,
-                GLES30.GL_FLOAT,false, 8, 0);
 
         GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, m_VBOIDs[2]);
         GLES30.glBufferData(GLES30.GL_ELEMENT_ARRAY_BUFFER,
@@ -128,8 +122,20 @@ public class TexturedCube implements Entity {
                 GLHelper.createIntBuffer(indicesData),
                 GLES30.GL_STATIC_DRAW);
 
-        GLES30.glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
-        GLES30.glEnableVertexAttribArray(TEX_COORD_ATTRIB_INDEX);//tex coords
+        GLES30.glBindVertexArray(m_VAOIDs[0]);
+
+
+        GLES30.glVertexAttribPointer(VERTEX_ATTRIB_INDEX, 3,
+                GLES30.GL_FLOAT,false, 12, 0);
+
+
+        GLES30.glVertexAttribPointer(TEX_COORD_ATTRIB_INDEX, 2,
+                GLES30.GL_FLOAT,false, 8, 0);
+
+
+
+        //GLES30.glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
+        //GLES30.glEnableVertexAttribArray(TEX_COORD_ATTRIB_INDEX);//tex coords
 
         GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
         GLES30.glBindVertexArray(0);

@@ -7,6 +7,7 @@ import com.java.rendering_with_you_12.Model.Obj3D;
 import com.java.rendering_with_you_12.Model.TexturedCube;
 import com.java.rendering_with_you_12.Model.Triangle2DEle;
 import com.java.rendering_with_you_12.R;
+import com.java.rendering_with_you_12.glClass.TestingCube;
 import com.java.rendering_with_you_12.renderEngine.MyRenderer;
 import com.java.rendering_with_you_12.utils.GLHelper;
 import com.java.rendering_with_you_12.utils.ObjFactory;
@@ -21,23 +22,24 @@ public class Program extends GLBasicSurfaceView{
 
     public void init(){
         super.init();
-        TexturedCube cube = new TexturedCube(m_Context);
-        m_Renderer.render(cube);
+       /* TexturedCube cube = new TexturedCube(m_Context);
+        m_Renderer.render(cube);*/
         //TexturedCube cube = new TexturedCube(m_Context);
         //m_Renderer.render(cube);
         /*Triangle2DEle trig = new Triangle2DEle(m_Context);
         m_Renderer.render(trig);*/
         try {
             /*Obj3D objSwitch = ObjFactory.getInstance().load(m_Context, R.raw.switch_wf, R.raw.switch_tex);
-            m_Renderer.render(objSwitch);
-            Obj3D objStall = ObjFactory.getInstance().load(m_Context, R.raw.stall_wf, R.raw.stall_tex);
+            m_Renderer.render(objSwitch);*/
+            /*Obj3D objStall = ObjFactory.getInstance().load(m_Context, R.raw.stall_wf, R.raw.stall_tex);
             m_Renderer.render(objStall);*/
             Obj3D obj_Bill_Cipher = ObjFactory.getInstance().load(m_Context, R.raw.bill_cipher_wf, R.raw.bill_cipher_tex);
             m_Renderer.render(obj_Bill_Cipher);
         } catch (IOException e) {
             GLHelper.handleException(TAG, e.getMessage());
         }
-
+        TestingCube cube = new TestingCube(m_Context);
+        m_Renderer.render(cube);
 
     }
 

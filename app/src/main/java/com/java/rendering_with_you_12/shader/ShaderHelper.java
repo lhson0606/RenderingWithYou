@@ -129,6 +129,6 @@ public class ShaderHelper {
     public static ShaderHelper getInstance(){
         return s_Instance = (s_Instance != null)? s_Instance : new ShaderHelper();
     }
-    ShaderHelper(){}
-    static ShaderHelper s_Instance;
+    private ShaderHelper(){}
+    private static ShaderHelper s_Instance;
 }
