@@ -29,6 +29,10 @@ public class Vec3 {
         return dest;
     }
 
+    public float dot(Vec3 v){
+        return x*v.x + y*v.y + z*v.z;
+    }
+
     public float length(){
         return (float)Math.sqrt(x*x + y*y + z*z);
     }
@@ -62,5 +66,9 @@ public class Vec3 {
         dst.y *= s;
         dst.z *= s;
         return dst;
+    }
+
+    public float angle(Vec3 v){
+        return (float)Math.acos(normalize().dot(v.normalize()));
     }
 }

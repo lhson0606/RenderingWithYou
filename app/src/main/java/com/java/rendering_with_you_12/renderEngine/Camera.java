@@ -42,6 +42,7 @@ public class Camera {
     final float MAX_DY = MAX_MOVE_LENGTH;
     final float MIN_DX = -MAX_MOVE_LENGTH;
     final float MIN_DY = -MAX_MOVE_LENGTH;
+    final float MIN_ANGLE_TO_Y = (float)Math.toRadians(5.0f);
 
     public void move(float dx, float dy){
 
@@ -61,6 +62,12 @@ public class Camera {
         Vec3 moveY = vecUp.scale(dy*sensitivity);
         Vec3 dst = new Vec3(xpos, ypos, zpos);
         dst = dst.translate(moveX).translate(moveY).normalize().scale(distance);
+        //if new dst is too close to global y-axis we don't move (return)
+        //references: https://youtu.be/45MIykWJ-C4?si=Tm9ze26qgZA8JVoL&t=4131
+        if(dst.angle(globalY) <= MIN_ANGLE_TO_Y || dst.angle(globalY.scale(-1f)) <= MIN_ANGLE_TO_Y){
+            return;
+        }
+
         xpos = dst.x;
         ypos = dst.y;
         zpos = dst.z;
