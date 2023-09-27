@@ -1,21 +1,14 @@
 package com.java.rendering_with_you_12.Model;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.opengl.GLES20;
 import android.opengl.GLES30;
-import android.opengl.GLUtils;
 
 import com.java.rendering_with_you_12.R;
 import com.java.rendering_with_you_12.shader.ShaderHelper;
 import com.java.rendering_with_you_12.utils.GLHelper;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.IntBuffer;
-import java.nio.channels.FileChannel;
 
 public class TexturedCube implements Entity {
     //positions data
@@ -24,13 +17,13 @@ public class TexturedCube implements Entity {
     int[] m_IndicesData;
     float[] m_ColorData;
     float[] m_TexCoords;
-
+    int m_TexPos;
     int m_Program;
 
     public static final String TAG = "TexturedCube";
 
-    private static final String VERTEX_SHADER_PATH = "dlsl/3D/vertex.dles";
-    private static final String FRAGMENT_SHADER_PATH = "dlsl/3D/fragment.dles";
+    private static final String VERTEX_SHADER_PATH = "dlsl/TexturedCube/vertex.dles";
+    private static final String FRAGMENT_SHADER_PATH = "dlsl/TexturedCube/fragment.dles";
 
     int m_VAOIDs[] = new int[1];
     int m_VBOIDs[] = new int[4];
@@ -39,6 +32,59 @@ public class TexturedCube implements Entity {
     final int VERTEX_ATTRIB_INDEX = 0;
     final int TEX_COORD_ATTRIB_INDEX = 1;
     int m_UniMVPMatIndx;
+
+    public TexturedCube(Context context){
+        m_PositionData = m_DefaultVerticesData;
+        m_IndicesData = m_DefaultIndicesData;
+        m_TexCoords = m_DefaultTexCoordsData;
+
+        InputStream vertexShaderStream;
+        InputStream fragmentShaderStream;
+        try {
+            vertexShaderStream = context.getAssets().open(VERTEX_SHADER_PATH);
+            fragmentShaderStream = context.getAssets().open(FRAGMENT_SHADER_PATH);
+            m_Program = ShaderHelper.getInstance().loadProgram(vertexShaderStream, fragmentShaderStream);
+        } catch (IOException e) {
+            GLHelper.handleException(TAG, e);
+        }
+
+        GLES30.glGenVertexArrays(1, m_VAOIDs, 0);
+        GLES30.glGenBuffers(3, m_VBOIDs, 0);
+
+        GLES30.glBindVertexArray(m_VAOIDs[0]);
+
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_VBOIDs[0]);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,
+                m_PositionData.length*Float.BYTES,
+                GLHelper.createFloatBuffer(m_PositionData),
+                GLES30.GL_STATIC_DRAW);
+        GLES30.glVertexAttribPointer(VERTEX_ATTRIB_INDEX, 3,
+                GLES30.GL_FLOAT,false, 12, 0);
+
+        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, m_VBOIDs[1]);
+        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,
+                m_TexCoords.length*Float.BYTES,
+                GLHelper.createFloatBuffer(m_DefaultTexCoordsData),
+                GLES30.GL_STATIC_DRAW);
+        GLES30.glVertexAttribPointer(TEX_COORD_ATTRIB_INDEX, 2,
+                GLES30.GL_FLOAT,false, 8, 0);
+
+        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, m_VBOIDs[2]);
+        GLES30.glBufferData(GLES30.GL_ELEMENT_ARRAY_BUFFER,
+                m_IndicesData.length*Integer.BYTES,
+                GLHelper.createIntBuffer(m_IndicesData),
+                GLES30.GL_STATIC_DRAW);
+
+        GLES30.glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
+        GLES30.glEnableVertexAttribArray(TEX_COORD_ATTRIB_INDEX);//tex coords
+
+        GLES30.glBindVertexArray(0);
+
+        getAllUniLocations();
+        int texPos[] = {-1};
+        m_TexID[0] = GLHelper.loadTexture(context, R.raw.android_logo, texPos);
+        m_TexPos = texPos[0];
+    }
 
     public TexturedCube(Context context, float[] positionsData, int[] indicesData, float[] texCoordData){
         m_PositionData = positionsData;
@@ -89,8 +135,9 @@ public class TexturedCube implements Entity {
 
         getAllUniLocations();
 
-        m_TexID[0] = GLHelper.loadTexture(context, R.raw.android_logo);
-
+        int texPos[] = {-1};
+        m_TexID[0] = GLHelper.loadTexture(context, R.raw.android_logo, texPos);
+        m_TexPos = texPos[0];
     }
 
     void getAllUniLocations(){
@@ -109,12 +156,13 @@ public class TexturedCube implements Entity {
 
         GLES30.glBindVertexArray(m_VAOIDs[0]);
 
-        GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + m_TexPos);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  m_TexID[0]);
 
         GLES30.glDrawElements(GLES30.GL_TRIANGLES, m_IndicesData.length, GLES30.GL_UNSIGNED_INT, 0);
 
         GLES30.glUseProgram(0);
+        GLES30.glBindVertexArray(0);
     }
 
     @Override
@@ -124,4 +172,83 @@ public class TexturedCube implements Entity {
         GLES30.glDeleteVertexArrays(0, m_VAOIDs, m_VAOIDs.length);
         GLES30.glDeleteProgram(m_Program);
     }
+
+    float[] m_DefaultVerticesData =
+            {
+                    -0.5f,0.5f,-0.5f,
+                    -0.5f,-0.5f,-0.5f,
+                    0.5f,-0.5f,-0.5f,
+                    0.5f,0.5f,-0.5f,
+
+                    -0.5f,0.5f,0.5f,
+                    -0.5f,-0.5f,0.5f,
+                    0.5f,-0.5f,0.5f,
+                    0.5f,0.5f,0.5f,
+
+                    0.5f,0.5f,-0.5f,
+                    0.5f,-0.5f,-0.5f,
+                    0.5f,-0.5f,0.5f,
+                    0.5f,0.5f,0.5f,
+
+                    -0.5f,0.5f,-0.5f,
+                    -0.5f,-0.5f,-0.5f,
+                    -0.5f,-0.5f,0.5f,
+                    -0.5f,0.5f,0.5f,
+
+                    -0.5f,0.5f,0.5f,
+                    -0.5f,0.5f,-0.5f,
+                    0.5f,0.5f,-0.5f,
+                    0.5f,0.5f,0.5f,
+
+                    -0.5f,-0.5f,0.5f,
+                    -0.5f,-0.5f,-0.5f,
+                    0.5f,-0.5f,-0.5f,
+                    0.5f,-0.5f,0.5f
+
+            };
+
+    int[] m_DefaultIndicesData =
+            {
+                    0,1,3,
+                    3,1,2,
+                    4,5,7,
+                    7,5,6,
+                    8,9,11,
+                    11,9,10,
+                    12,13,15,
+                    15,13,14,
+                    16,17,19,
+                    19,17,18,
+                    20,21,23,
+                    23,21,22
+            };
+
+    float[] m_DefaultTexCoordsData=
+            {
+                    0,0,
+                    0,1,
+                    1,1,
+                    1,0,
+                    0,0,
+                    0,1,
+                    1,1,
+                    1,0,
+                    0,0,
+                    0,1,
+                    1,1,
+                    1,0,
+                    0,0,
+                    0,1,
+                    1,1,
+                    1,0,
+                    0,0,
+                    0,1,
+                    1,1,
+                    1,0,
+                    0,0,
+                    0,1,
+                    1,1,
+                    1,0
+
+            };
 }

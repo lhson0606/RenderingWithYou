@@ -36,8 +36,8 @@ public class Camera {
         zpos = 5*(float)Math.cos(t);
     }
 
-    final float sensitivity = 0.03f;
-    final float MAX_MOVE_LENGTH = 10;
+    final float sensitivity = 0.1f;
+    final float MAX_MOVE_LENGTH = 20;
     final float MAX_DX = MAX_MOVE_LENGTH;
     final float MAX_DY = MAX_MOVE_LENGTH;
     final float MIN_DX = -MAX_MOVE_LENGTH;

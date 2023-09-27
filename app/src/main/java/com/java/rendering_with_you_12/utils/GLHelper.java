@@ -9,6 +9,8 @@ import android.opengl.GLUtils;
 import android.util.Log;
 
 import com.java.rendering_with_you_12.R;
+import com.java.rendering_with_you_12.maths.Vec2;
+import com.java.rendering_with_you_12.maths.Vec3;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -16,6 +18,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class GLHelper {
     public static final String m_TAG = "GLHelper";
@@ -99,28 +103,80 @@ public class GLHelper {
         throw new RuntimeException(tag + ": " + msg);
     }
 
-    public static void cross3v(float[] dest, float a1, float a2, float a3, float b1, float b2, float b3)
-    {
-        dest[0] = a2*b3 - a3*b2;
-        dest[1] = a3*b1 - a1*b3;
-        dest[2] = a1*b2 - a2*b1;
-    }
-
-    public static int loadTexture(Context context, int... resID){
+    static int count = 0;
+    public static int loadTexture(Context context, int resID, int[] texPosition){
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;   // No pre-scaling
-        final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resID[0], options);
+        final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resID, options);
         IntBuffer texID = IntBuffer.allocate(1);
         GLES30.glGenTextures(1, texID);
-        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texID.get(0));
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D + count, texID.get(0));
         GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
         GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
         GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
         GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-
         GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0,  bitmap, 0);
         bitmap.recycle();
+        texPosition[0] = count;
+        ++count;
         return texID.get(0);
     }
+
+    public static FloatBuffer createFloatBufferV3(Vector<Vec3> vec){
+        float[] data = new float[vec.size()*3];
+
+        for(int i = 0; i<vec.size(); ++i){
+            data[i*3] = vec.elementAt(i).x;
+            data[i*3 + 1] = vec.elementAt(i).y;
+            data[i*3 + 2] = vec.elementAt(i).z;
+        }
+
+        return createFloatBuffer(data);
+    }
+
+    public static FloatBuffer createFloatBufferV2(Vector<Vec2> vec){
+        float[] data = new float[vec.size()*2];
+
+        for(int i = 0; i<vec.size(); ++i){
+            data[i*2] = vec.elementAt(i).x;
+            data[i*2 + 1] = vec.elementAt(i).y;
+        }
+
+        return createFloatBuffer(data);
+    }
+
+    public static IntBuffer createIntBufferVi(Vector<Integer> vec){
+        int[] data = new int[vec.size()];
+
+        for(int i = 0; i<vec.size(); ++i){
+            data[i] = vec.elementAt(i);
+        }
+
+        return createIntBuffer(data);
+    }
+
+    public static FloatBuffer createFloatBufferV3(Vec3[] vec){
+        float[] data = new float[vec.length*3];
+
+        for(int i = 0; i<vec.length; ++i){
+            data[i*3] = vec[i].x;
+            data[i*3 + 1] = vec[i].y;
+            data[i*3 + 2] = vec[i].z;
+        }
+
+        return createFloatBuffer(data);
+    }
+
+    public static FloatBuffer createFloatBufferV2(Vec2[] vec){
+        float[] data = new float[vec.length*2];
+
+        for(int i = 0; i< vec.length; ++i){
+            data[i*2] = vec[i].x;
+            data[i*2 + 1] = vec[i].y;
+        }
+
+        return createFloatBuffer(data);
+    }
+
 
 }
