@@ -2,18 +2,12 @@ package com.java.rendering_with_you_12.Application;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
-import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintSet;
-
 import com.java.rendering_with_you_12.Model.Entity;
-import com.java.rendering_with_you_12.Model.Triangle2DEle;
 import com.java.rendering_with_you_12.renderEngine.Camera;
 import com.java.rendering_with_you_12.renderEngine.MyRenderer;
-import com.java.rendering_with_you_12.utils.GLHelper;
 import com.java.rendering_with_you_12.utils.ScaleListener;
 
 import java.util.ArrayList;
@@ -25,9 +19,7 @@ public class GLBasicSurfaceView extends GLSurfaceView {
     protected boolean m_IsRunning = false;
     protected List<Entity> m_Entities = new ArrayList<>();
     public  Camera m_Camera = new Camera();
-    public final float[] m_proMat = new float[16];
-    public final float[] m_viewMat = new float[16];
-    public final float[] m_MVPMat = new float[16];
+    //public final float[] m_MVPMat = new float[16];
     protected Context m_Context;
     public GLBasicSurfaceView(Context context){
         super(context);

@@ -1,3 +1,4 @@
+/*
 package com.java.rendering_with_you_12.Model;
 
 import android.opengl.GLES30;
@@ -34,11 +35,11 @@ public class Obj3D implements Entity{
     }
 
     @Override
-    public void draw(float[] MVPMat) {
+    public void draw() {
         //use shader program
         GLES30.glUseProgram(m_Program);
         //load model view projection matrix
-        GLES30.glUniformMatrix4fv(m_UniMVPMatIndx, 1, false, MVPMat, 0);
+        GLES30.glUniformMatrix4fv(m_UniMVPMatIndx, 1, false, null, 0);
         //load transformation matrix
         GLES30.glUniformMatrix4fv(m_UniTransMaIndx, 1, false, m_TransMat, 0);
 
@@ -66,3 +67,4 @@ public class Obj3D implements Entity{
         GLES30.glDeleteProgram(m_Program);
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.java.rendering_with_you_12.glClass;
 
 import android.content.Context;
@@ -182,3 +183,4 @@ public class TestingCube implements Entity {
             };
 }
 
+*/

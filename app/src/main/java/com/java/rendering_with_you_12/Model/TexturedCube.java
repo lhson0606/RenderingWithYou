@@ -1,3 +1,4 @@
+/*
 package com.java.rendering_with_you_12.Model;
 
 import android.content.Context;
@@ -31,7 +32,7 @@ public class TexturedCube implements Entity {
 
     final int VERTEX_ATTRIB_INDEX = 0;
     final int TEX_COORD_ATTRIB_INDEX = 1;
-    int m_UniMVPMatIndx;
+    int m_V;
 
     public TexturedCube(Context context){
         m_PositionData = m_DefaultVerticesData;
@@ -150,17 +151,8 @@ public class TexturedCube implements Entity {
         m_TexPos = texPos[0];
     }
 
-    void getAllUniLocations(){
-        m_UniMVPMatIndx = GLES30.glGetUniformLocation(m_Program, "uMVPMat");
-
-        if(m_UniMVPMatIndx < 0){
-            GLHelper.handleException(TAG, "uniform not found");
-        }
-
-    }
-
     @Override
-    public void draw(float[] MVPMat) {
+    public void draw(float[] viewMat, float[] proMat) {
         GLES30.glUseProgram(m_Program);
         GLES30.glUniformMatrix4fv(m_UniMVPMatIndx, 1, false, MVPMat, 0);
 
@@ -264,3 +256,4 @@ public class TexturedCube implements Entity {
 
             };
 }
+*/

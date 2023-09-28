@@ -1,13 +1,35 @@
 #version 300 es
 precision mediump float;
 
-uniform sampler2D uTexSampler;
+in vec2 bTexCoords;
+in vec3 bUnitNormalVec;
+in vec3 bUnitToLightDirVec;
+in vec3 bUnitVecToCameraVec;
 
-in vec2 a_TexCoords;
+out vec4 finalColor;
 
-out vec4 o_fragColor;
+uniform sampler2D uTex2D0;
+uniform vec3 uLightColor;
+uniform float uShineDampener;
+uniform float uReflectivity;
+uniform float uAmbientFactor;
 
 void main()
 {
-    o_fragColor = texture(uTexSampler, a_TexCoords);
+    //handle light diffusion aka lighting
+	float lightAngleFactor = dot(bUnitToLightDirVec, bUnitNormalVec);
+	float ligthDiffusion = max(lightAngleFactor, uAmbientFactor);
+	vec3 lightingColor = ligthDiffusion*uLightColor;
+	//handle reflection
+	vec3 reflectedDir = normalize(reflect(bUnitToLightDirVec, bUnitNormalVec));
+	float lightReflectionFactor = dot(reflectedDir, bUnitVecToCameraVec);
+	lightReflectionFactor = max(lightReflectionFactor, 0.0);
+	float specularFactor = pow(lightReflectionFactor, uShineDampener);
+	vec4 specularColor = vec4(specularFactor*uReflectivity*uLightColor, 1.0);
+	//final color
+	vec4 brightness = vec4(lightingColor, 1.0);
+	vec4 textureColor = texture(uTex2D0, bTexCoords);
+	
+	finalColor = brightness*textureColor + specularColor;
+
 }

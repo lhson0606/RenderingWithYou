@@ -1,3 +1,4 @@
+/*
 package com.java.rendering_with_you_12.Model;
 
 import android.content.Context;
@@ -174,3 +175,4 @@ public class Triangle2DEle implements Entity{
             0.0f, 0.0f, 1.0f, 1.0f//blue
     };
 }
+*/

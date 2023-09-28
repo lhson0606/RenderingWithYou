@@ -1,5 +1,7 @@
 package com.java.rendering_with_you_12.renderEngine;
 
+import android.opengl.Matrix;
+
 import com.java.rendering_with_you_12.maths.Vec3;
 
 public class Camera {
@@ -15,6 +17,7 @@ public class Camera {
     public int offSet;
     float distance;
     final Vec3 globalY = new Vec3(0, 1, 0);
+    public final float[] m_viewMat = new float[16];
 
     public Camera(){
         xpos = ypos = 0f;
@@ -28,12 +31,18 @@ public class Camera {
         vecUp = pos.normalize();
         Vec3 vecFor = (new Vec3(xpos, ypos, zpos)).normalize();
         vecRight = (vecFor.cross(vecUp)).scale(-1).normalize();
+        updateViewMatrix();
     }
 
     public void update(float t){
-        xpos = 5*(float)Math.sin(t);
-        ypos = 0;
-        zpos = 5*(float)Math.cos(t);
+        updateViewMatrix();
+    }
+
+    public void updateViewMatrix(){
+        Matrix.setLookAtM(m_viewMat, offSet,
+                xpos, ypos, zpos,
+                0, 0, 0,
+                xUp, yUp, zUp);
     }
 
     final float sensitivity = 0.1f;
@@ -84,5 +93,9 @@ public class Camera {
         xpos *= s;
         ypos *= s;
         zpos *= s;
+    }
+
+    public float[] getViewMat() {
+        return m_viewMat;
     }
 }

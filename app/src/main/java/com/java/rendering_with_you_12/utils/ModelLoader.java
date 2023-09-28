@@ -1,29 +1,30 @@
-/*
 package com.java.rendering_with_you_12.utils;
 
 import android.content.Context;
-import android.opengl.GLES30;
 
-import com.java.rendering_with_you_12.Model.Obj3D;
+import com.java.rendering_with_you_12.Model.Mesh;
+import com.java.rendering_with_you_12.glClass.Texture;
 import com.java.rendering_with_you_12.maths.Vec2;
 import com.java.rendering_with_you_12.maths.Vec3;
+import com.java.rendering_with_you_12.renderEngine.Camera;
+import com.java.rendering_with_you_12.renderEngine.MyRenderer;
+import com.java.rendering_with_you_12.shader.Shader;
 import com.java.rendering_with_you_12.shader.ShaderHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.Vector;
 
-public class ObjFactory {
+public class ModelLoader {
     public final String VERTEX_NORMALS_PATTERN = "vn ";
     public final String VERTEX_TEXTURE_PATTERN = "vt ";
     public final String FACE_PATTERN = "f ";
     public final String VERTEX_PATTERN = "v ";
     public final static String TAG = "ObjFactory";
-    public Obj3D load(Context context,int objRes, int texRes) throws IOException {
+    public Mesh load(Context context, MyRenderer renderer, Camera camera, int objRes, int texRes) throws IOException {
         //calculate
         int vCount = 0;
         int vnCount = 0;
@@ -55,10 +56,10 @@ public class ObjFactory {
         }
 
         reader.close();
-        return processLoading(context,vCount, vnCount, vtCount, fCount, texRes, objRes);
+        return processLoading(context, renderer, camera,vCount, vnCount, vtCount, fCount, texRes, objRes);
     }
 
-    Obj3D processLoading(Context context, int vCount, int vnCount, int vtCount, int fCount, int texRes, int objRes) throws IOException {
+    Mesh processLoading(Context context,MyRenderer renderer, Camera camera, int vCount, int vnCount, int vtCount, int fCount, int texRes, int objRes) throws IOException {
         int texID = -1;
         int texPos[] = {-1};
         texID = GLHelper.loadTexture(context, texRes, texPos);
@@ -135,89 +136,54 @@ public class ObjFactory {
         reader.close();
 
         int shaderProgram = -1;
+        String vertSource = new String();
+        String fragSource = new String();
         try {
             InputStream vertexShaderStream = context.getAssets().open(VERTEX_SHADER_PATH);
             InputStream fragmentShaderStream = context.getAssets().open(FRAGMENT_SHADER_PATH);
-            shaderProgram = ShaderHelper.getInstance().loadProgram(vertexShaderStream, fragmentShaderStream);
+            vertSource = ShaderHelper.getInstance().readShader(vertexShaderStream);
+            fragSource = ShaderHelper.getInstance().readShader(fragmentShaderStream);
         } catch (IOException e) {
             GLHelper.handleException(TAG, e);
         }
 
-        return createObj(shaderProgram,
-                    GLHelper.createFloatBufferV3(vertices),
-                    GLHelper.createIntBufferVi(indices),
-                    GLHelper.createFloatBufferV2(texCoordsDst),
-                    GLHelper.createFloatBufferV3(normsDst),
-                    texID,
-                    texPos[0]
-                );
+        Shader shader = new Shader(vertSource, fragSource);
+
+        float texCoords[] = new float[texCoordsDst.length*2];
+        for(int i = 0;i<texCoordsDst.length; ++i){
+            texCoords[i*2] = texCoordsDst[i].x;
+            texCoords[i*2 + 1] = texCoordsDst[i].y;
+        }
+
+        float normals[] = new float[normsDst.length*3];
+        for(int i = 0;i<normsDst.length; ++i){
+            normals[i*3] = normsDst[i].x;
+            normals[i*3 + 1] = normsDst[i].y;
+            normals[i*3 + 2] = normsDst[i].z;
+        }
+
+        Texture texture = new Texture(texID, 0.1f, 0.5f, 10);
+
+        return new Mesh(shader,
+                GLHelper.toFloatArrayV3(vertices),
+                texCoords,
+                normals,
+                GLHelper.toIntArrayi(indices),
+                texture,
+                camera.getViewMat(),
+                renderer.getPproMat()
+        );
     }
 
-    Obj3D createObj(int program, FloatBuffer vertices, IntBuffer indices, FloatBuffer txtCoords, FloatBuffer norms, int texID, int texPos){
-        int VAOID[] = {-1};
-        int VBOIDs[] = new int[3];
-
-        GLES30.glGenVertexArrays(1, VAOID, 0);
-        GLES30.glGenBuffers(3, VBOIDs, 0);
-
-        GLES30.glBindVertexArray(VAOID[0]);
-
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, VBOIDs[0]);
-        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,
-                vertices.capacity()*Float.BYTES,
-                vertices,
-                GLES30.GL_STATIC_DRAW);
-        GLES30.glVertexAttribPointer(VERTEX_ATTRIB_INDEX, 3,
-                GLES30.GL_FLOAT,false, 12, 0);
-
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, VBOIDs[1]);
-        GLES30.glBufferData(GLES30.GL_ARRAY_BUFFER,
-                txtCoords.capacity()*Float.BYTES,
-                txtCoords,
-                GLES30.GL_STATIC_DRAW);
-        GLES30.glVertexAttribPointer(TEX_COORD_ATTRIB_INDEX, 2,
-                GLES30.GL_FLOAT,false, 8, 0);
-
-        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, VBOIDs[2]);
-        GLES30.glBufferData(GLES30.GL_ELEMENT_ARRAY_BUFFER,
-                indices.capacity()*Integer.BYTES,
-                indices,
-                GLES30.GL_STATIC_DRAW);
-
-        GLES30.glEnableVertexAttribArray(VERTEX_ATTRIB_INDEX);
-        GLES30.glEnableVertexAttribArray(TEX_COORD_ATTRIB_INDEX);//tex coords
-
-        GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, 0);
-        GLES30.glBindVertexArray(0);
-        //this has to be below  GLES30.glBindVertexArray(0); IF THIS IS ABOVE then we are telling openGL that we do not use our indices
-        GLES30.glBindBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, 0);
-
-        int uMVPMatLocation = GLES30.glGetUniformLocation(program, MVP_MAT_NAME);
-        int uTransMatLocation = GLES30.glGetUniformLocation(program, TRANS_MAT_NAME);
-
-        return new Obj3D(
-                program,
-                indices.capacity(),
-                VAOID[0],
-                VBOIDs,
-                texID,
-                texPos,
-                uMVPMatLocation,
-                uTransMatLocation
-                );
-    }
 
     public final String VERTEX_SHADER_PATH = "dlsl/BasicObj/vertex.dles";
     public final String FRAGMENT_SHADER_PATH = "dlsl/BasicObj/fragment.dles";
     public final int VERTEX_ATTRIB_INDEX =  0;
     public final int TEX_COORD_ATTRIB_INDEX =  1;
-    public final String MVP_MAT_NAME = "uMVPMat";
-    public final String TRANS_MAT_NAME = "uTransMat";
 
-    public static ObjFactory getInstance(){
-        return s_ObjFactory = (s_ObjFactory != null)? s_ObjFactory: new ObjFactory();
+    public static ModelLoader getInstance(){
+        return s_ObjFactory = (s_ObjFactory != null)? s_ObjFactory: new ModelLoader();
     }
-    ObjFactory (){};
-    static ObjFactory s_ObjFactory = null;
+    ModelLoader (){};
+    private static ModelLoader s_ObjFactory = null;
 }
-*/

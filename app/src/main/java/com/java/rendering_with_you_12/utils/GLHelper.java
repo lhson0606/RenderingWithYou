@@ -180,4 +180,47 @@ public class GLHelper {
     }
 
 
+    public static int getUniLocation(int program, String name) {
+        int location;
+        location = GLES30.glGetUniformLocation(program, name);
+
+        if(location < 0){
+            handleException(m_TAG, name+" uniform not found");
+        }
+
+        return location;
+    }
+
+    public static float[] toFloatArrayV3(Vector<Vec3> vec){
+        float[] data = new float[vec.size()*3];
+
+        for(int i = 0; i<vec.size(); ++i){
+            data[i*3] = vec.elementAt(i).x;
+            data[i*3 + 1] = vec.elementAt(i).y;
+            data[i*3 + 2] = vec.elementAt(i).z;
+        }
+
+        return data;
+    }
+
+    public static float[] toFloatArrayV2(Vector<Vec2> vec){
+        float[] data = new float[vec.size()*2];
+
+        for(int i = 0; i<vec.size(); ++i){
+            data[i*2] = vec.elementAt(i).x;
+            data[i*2 + 1] = vec.elementAt(i).y;
+        }
+
+        return data;
+    }
+
+    public static int[] toIntArrayi(Vector<Integer> vec){
+        int[] data = new int[vec.size()];
+
+        for(int i = 0; i<vec.size(); ++i){
+            data[i] = vec.elementAt(i);
+        }
+
+        return data;
+    }
 }

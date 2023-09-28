@@ -1,15 +1,11 @@
 package com.java.rendering_with_you_12.renderEngine;
 
-import android.content.Context;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
 import com.java.rendering_with_you_12.Application.GLBasicSurfaceView;
-import com.java.rendering_with_you_12.Application.Program;
 import com.java.rendering_with_you_12.Model.Entity;
-import com.java.rendering_with_you_12.Model.Triangle2DEle;
-import com.java.rendering_with_you_12.utils.GLHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +19,13 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     protected int m_Height;
     protected GLBasicSurfaceView m_Program;
     protected Camera m_Camera;
+    public final float[] m_proMat = new float[16];
 
     public MyRenderer(GLBasicSurfaceView program){
 
         m_Program = program;
         m_Camera = program.m_Camera;
+        Matrix.frustumM(m_proMat, 0, -0.496f, 0.496f, -1, 1, 3f, 50 );
     }
 
     public void render(Entity entity){
@@ -48,23 +46,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         m_Height = height;
         GLES30.glViewport(0,0, m_Width, m_Height);
         float aspectRatio = (float)width/height;
-        Matrix.frustumM(m_Program.m_proMat, 0, -aspectRatio, aspectRatio, -1, 1, 3f, 50 );
+        Matrix.frustumM(m_proMat, 0, -aspectRatio, aspectRatio, -1, 1, 3f, 50 );
     }
     float t = 0;
     public float dx =0f;
     public float dy =0f;
 
     void calculate(){
-
-
-
-        Matrix.setLookAtM(m_Program.m_viewMat, m_Camera.offSet,
-                m_Camera.xpos, m_Camera.ypos, m_Camera.zpos,
-                0, 0, 0,
-                m_Camera.xUp, m_Camera.yUp, m_Camera.zUp);
-
-        Matrix.multiplyMM(m_Program.m_MVPMat, 0, m_Program.m_proMat, 0, m_Program.m_viewMat, 0);
-
+        float deltaT = 0.2f;
+        m_Camera.update(deltaT);
 
     }
     @Override
@@ -74,7 +64,11 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         calculate();
 
         for(Entity entity : entities){
-            entity.draw(m_Program.m_MVPMat);
+            entity.draw();
         }
+    }
+
+    public float[] getPproMat() {
+        return m_proMat;
     }
 }
