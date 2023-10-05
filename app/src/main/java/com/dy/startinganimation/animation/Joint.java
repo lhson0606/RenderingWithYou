@@ -12,23 +12,52 @@ import java.util.Vector;
 
 public class Joint {
     public String mName;
-    public List<Joint> mChildren;
+
     //index
     public int mID;
 
     //inverse bind shape matrix bind shape matrix
     //see https://www.khronos.org/files/collada_spec_1_4.pdf page 33
-    Mat4 mIBPM;
-    // aka interpolated Transform matrix (Translate * Quaternion Rotate)
-    Mat4 mTransformMat;
-    KeyFrame[] mKeyFrames;
+    public Mat4 mInverseBindPoseMatrix;
+    public Mat4 mLocalBindTransform;
+    public Joint mParent;
+    public List<Joint> mChildren;
+    public Mat4 mFinalAnimatedTransform;
+    public Mat4 mBoneInstantAnimatedTransform;
+    public Mat4 mWorldTransform;
+    public KeyFrame[] mKeyFrames;
 
-    public Joint(String name, int id, Mat4 IBPM, KeyFrame keyFrames[]){
+    public Joint(String name, int id, KeyFrame keyFrames[]){
         mName = name;
         mID = id;
-        mIBPM = IBPM;
         mKeyFrames = keyFrames;
-        update(0);
+        mChildren = new Vector<>();
+    }
+
+    public void setInverseBindPoseMatrix(Mat4 IBPM){
+        mInverseBindPoseMatrix = IBPM;
+    }
+
+    public boolean isRoot(){
+        return mParent == null;
+    }
+
+    private Mat4 initWorldTransform(){
+        if(isRoot()){
+            Mat4 ret = new Mat4();
+            ret.setIdentityMat();
+            return ret;
+        }else{
+            return mLocalBindTransform.multiplyMM(mParent.getWorldTransform());
+        }
+    }
+
+    public Mat4 getWorldTransform(){
+        if(mWorldTransform == null){
+            mWorldTransform = initWorldTransform();
+        }
+
+        return mWorldTransform;
     }
 
     private int mCurrentFrameIndx = 0;
@@ -37,9 +66,9 @@ public class Joint {
 
     public void update(float dt){
         mProgress += dt;
-        updateAnim();
+        updateAnim(dt);
     }
-    public void updateAnim(){
+    public void updateAnim(float dt){
         //case
         //First------------------------>LastTimeStamp-------------->Progress------->
         //reset process to zero if this happened
@@ -54,7 +83,7 @@ public class Joint {
         }
         //First--------->currentFrame----------->progress---------->nextFrame------>LastTimeStamp
         //update current frame index
-        for(int i = mCurrentFrameIndx; i < mKeyFrames.length; ++i){
+        for(int i = mKeyFrames.length-1; i >=mCurrentFrameIndx ; --i){
 
             if(mProgress>=mKeyFrames[i].mTimeStamp){
                 mCurrentFrameIndx = i;
@@ -74,18 +103,46 @@ public class Joint {
         alpha /= duration;
         beta /= duration;
 
-        /*mTransformMat = interpolateTransformMat(
+       /* mBoneInstantAnimatedTransform = interpolateTransformMat(
                 mKeyFrames[mCurrentFrameIndx].mJointTransforms, alpha,
                 mKeyFrames[mNextFrameIndx].mJointTransforms, beta
                 );*/
-       mTransformMat = new Mat4();
-       mTransformMat.setIdentityMat();
+        if(mCurrentFrameIndx == mKeyFrames.length-1)
+            mCurrentFrameIndx = 0;
+        mBoneInstantAnimatedTransform = mKeyFrames[mCurrentFrameIndx++].mJointTransforms.mTransform;
+        //Animation_Bone = Parent_World_Matrix * Animation_Parent * Local_Transformation * Bone_Instant_Animation * Inverse_Bind_Pose_Matrix
+
+        /*if(isRoot()){
+            mFinalAnimatedTransform = mLocalBindTransform.
+                    multiplyMM(mBoneInstantAnimatedTransform).
+                    multiplyMM(mInverseBindPoseMatrix);
+        }else{
+            mFinalAnimatedTransform = mParent.getWorldTransform().
+                    multiplyMM(mParent.getAnimationTransform()).
+                    multiplyMM(mLocalBindTransform).
+                    multiplyMM(mBoneInstantAnimatedTransform).
+                    multiplyMM(mInverseBindPoseMatrix);
+        }*/
+
+        if(isRoot()){
+            //Animation_Bone = Local_Transformation * Bone_Instant_Animation * Inverse_Bind_Pose_Matrix
+            mFinalAnimatedTransform =
+                    mBoneInstantAnimatedTransform;
+        }else{
+            mFinalAnimatedTransform =
+                    mParent.getAnimationTransform().
+                    multiplyMM(mBoneInstantAnimatedTransform);
+        }
+
+        for(Joint child : mChildren){
+            child.updateAnim(dt);
+        }
     }
 
     private Mat4 interpolateTransformMat(JointTransform jointTransformA, float alpha,JointTransform jointTransformB, float beta){
 
         Mat4 interpolatedTranslateMat = interpolateMat(jointTransformA.getTranslateVec(), 1-alpha, jointTransformB.getTranslateVec(), 1-beta);
-        Quat interpolatedRotateQuat = Quat.interpolate(jointTransformA.getQuat(), 1-alpha, jointTransformB.getQuat(),  1-beta);
+        Quat interpolatedRotateQuat = Quat.interpolate(jointTransformA.getQuat(), alpha, jointTransformB.getQuat(),  beta);
 
         return interpolatedTranslateMat.multiplyMM(interpolatedRotateQuat.toMat());
     }
@@ -106,9 +163,21 @@ public class Joint {
         return ret;
     }
 
-    public Mat4 getSpaceTransformMat(){
-        //
-        //return mIBPM.multiplyMM(mTransformMat);
-        return mTransformMat;
+    public Mat4 getAnimationTransform(){
+        //return mIBPM.multiplyMM(mKeyFrames[0].mJointTransforms.mTransform);
+        //return mKeyFrames[0].mJointTransforms.mTransform.multiplyMM(mIBPM);
+        /*Mat4 identity = new Mat4();
+        identity.setIdentityMat();
+        return  identity;*/
+        return mFinalAnimatedTransform;
+    }
+
+    public void calculateInverseBindPoseMatrices(Mat4 parentBindTransform){
+        Mat4 bindTransform = parentBindTransform.multiplyMM(mLocalBindTransform);
+        mInverseBindPoseMatrix = bindTransform.invert();
+
+        for(Joint child : mChildren){
+            child.calculateInverseBindPoseMatrices(bindTransform);
+        }
     }
 }

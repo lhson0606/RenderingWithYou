@@ -2,6 +2,7 @@ package com.dy.startinganimation.parser;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.opengl.Matrix;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,10 +31,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class AnimParser {
-
+    static Mat4 CORRECTION;
     static Context mContext;
     static String mLocalPath = "models/";
     public static Scene parse(Context context, InputStream inputStream) throws ParserConfigurationException, IOException, SAXException {
+        CORRECTION = new Mat4();
+        CORRECTION.setIdentityMat();
+        Matrix.setRotateM(CORRECTION.mData, 0, -90, 1, 0, 0);
+
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
 
         Node root = doc.getFirstChild();
@@ -60,11 +65,40 @@ public class AnimParser {
                 extractAnimations(scene, tempNode);
             }else if(name.equals("library_controllers")){
                 extractControllers(scene, tempNode);
+            }else if(name.equals("library_visual_scenes")) {
+                extractVisualScenes(scene, tempNode);
             }
 
         }
         //#TODO
         return scene;
+    }
+
+    private static void extractVisualScenes(Scene scene, Node tempNode) {
+        Node visualSceneNodes = getChildNode("visual_scene", tempNode);
+        Node armature_node = getChildNodeByID("node", "Armature", visualSceneNodes);
+        Node root_node = getChildNode("node", armature_node);
+        extractSingleJoint(scene, null, root_node);
+    }
+
+    private static Joint extractSingleJoint(Scene scene, Joint parent, Node joint_node){
+        String jointID = getAttribute("id", joint_node);
+        Joint joint = scene.getJoints()[scene.getJointIndexByName(jointID)];
+        joint.mParent = parent;
+        Node matrix_node = getChildNode("matrix", joint_node);
+        float matrix_data[] = extractFloatArray(matrix_node, 16);
+        joint.mLocalBindTransform = new Mat4(matrix_data);
+        joint.mLocalBindTransform = joint.mLocalBindTransform.transpose();
+
+        if(getChildNode("node", joint_node) == null){
+            return joint;
+        }
+
+        for(Node child_node : getAllChildNodeByType("node", joint_node)){
+            joint.mChildren.add(extractSingleJoint(scene, joint, child_node));
+        }
+
+        return joint;
     }
 
     private static void extractControllers(Scene scene, Node parent) {
@@ -102,7 +136,7 @@ public class AnimParser {
                 joints[i] = new Joint(
                         jointsID[i],
                         i,
-                        IBPMs[i],
+                        //IBPMs[i],
                         scene.getJointKeyFrames().get(jointsID[i]+"/transform")
                 );
             }
@@ -216,6 +250,7 @@ public class AnimParser {
                 }
 
                 JointTransform jointTransform = new JointTransform(new Mat4(matData));
+                jointTransform.mTransform = jointTransform.mTransform.transpose();
                 keyFrames[i] = new KeyFrame(
                         jointTransform,
                         timeStampData[i]
@@ -276,7 +311,7 @@ public class AnimParser {
                 p[i] = Integer.parseInt(p_data[i]);
             }*/
 
-            int p[] = extracAllP(geometry);
+            int p[] = extractAllP(geometry);
 
             int count = 0;
 
@@ -353,7 +388,7 @@ public class AnimParser {
         return max+1;
     }
 
-    private static int[] extracAllP(Node parent){
+    private static int[] extractAllP(Node parent){
         Vector<Node> all_polylist_nodes = getAllChildNodeByType("polylist", parent);
         int count = 0;
        /* for(Node polylist_node : all_polylist_nodes){

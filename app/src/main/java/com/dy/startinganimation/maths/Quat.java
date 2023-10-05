@@ -83,7 +83,7 @@ public class Quat {
         mat.mData[3*4 + 1] = 0;
         mat.mData[3*4 + 2] = 0;
         mat.mData[3*4 + 3] = 1;
-        return new Mat4();
+        return mat;
     }
 
     public Quat normalize(){

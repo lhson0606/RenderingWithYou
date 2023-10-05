@@ -54,4 +54,29 @@ public class Mat4 {
                 mData[2*4+3]
         );
     }
+
+    public Mat4 invert(){
+        Mat4 ret = new Mat4();
+        Matrix.invertM(ret.mData, ret.mOffset, mData, mOffset);
+        return ret;
+    }
+
+    public Mat4 transpose(){
+        Mat4 ret = new Mat4();
+        Matrix.transposeM(ret.mData, ret.mOffset, mData, mOffset);
+        return ret;
+    }
+
+    public Mat4 translate(float angle, Vec3 axis){
+        Mat4 ret = new Mat4();
+        Matrix.setRotateM(ret.mData, ret.mOffset, angle, axis.x, axis.y, axis.z);
+        return ret;
+    }
+
+    public static Mat4 createIdentityMatrix(){
+        Mat4 ret = new Mat4();
+        ret.setIdentityMat();
+        return ret;
+    }
+
 }

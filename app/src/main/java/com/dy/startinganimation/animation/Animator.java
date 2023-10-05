@@ -46,8 +46,8 @@ public class Animator implements Entity {
         mVBOVertices = new VBO(mAnimatedModel.mMesh.getVertexPosData(), 3, 3*Float.BYTES, false);
         mVBOTexCoords = new VBO(mAnimatedModel.mMesh.getTexCoordsData(), 2, 2*Float.BYTES, false);
         mVBONormals = new VBO(mAnimatedModel.mMesh.getNormalsData(), 3, 3*Float.BYTES, false);
-        //mVBOiBonesIndx = new VBOi(mAnimatedModel.mMesh.getBonesIndicesData(), Vertex.MAX_JOINTS, Vertex.MAX_JOINTS*Integer.BYTES);
-        //mVBOBonesWeights = new VBO(mAnimatedModel.mMesh.getBonesWeightsData(), Vertex.MAX_JOINTS, Vertex.MAX_JOINTS*Float.BYTES, false);
+        mVBOiBonesIndx = new VBOi(mAnimatedModel.mMesh.getBonesIndicesData(), Vertex.MAX_JOINTS, Vertex.MAX_JOINTS*Integer.BYTES);
+        mVBOBonesWeights = new VBO(mAnimatedModel.mMesh.getBonesWeightsData(), Vertex.MAX_JOINTS, Vertex.MAX_JOINTS*Float.BYTES, false);
 
         mEBOIndices = new EBO(mAnimatedModel.mMesh.mIndices);
         bindAndEnableAttrib();
@@ -63,13 +63,13 @@ public class Animator implements Entity {
         mVAO.linkBufferAttribute(Shader.VERTEX_INDEX, mVBOVertices, 0);
         mVAO.linkBufferAttribute(Shader.TEXTURE_COORD_INDEX, mVBOTexCoords, 0);
         mVAO.linkBufferAttribute(Shader.NORMAL_INDEX, mVBONormals, 0);
-        //mVAO.linkBufferAttribute(3, mVBOiBonesIndx, 0);
-        //mVAO.linkBufferAttribute(4, mVBONormals, 0);
+        mVAO.linkBufferAttribute(3, mVBOiBonesIndx, 0);
+        mVAO.linkBufferAttribute(4, mVBOBonesWeights, 0);
         GLES30.glEnableVertexAttribArray(Shader.VERTEX_INDEX);
         GLES30.glEnableVertexAttribArray(Shader.TEXTURE_COORD_INDEX);
         GLES30.glEnableVertexAttribArray(Shader.NORMAL_INDEX);
-        //GLES30.glEnableVertexAttribArray(3);
-        //GLES30.glEnableVertexAttribArray(4);
+        GLES30.glEnableVertexAttribArray(3);
+        GLES30.glEnableVertexAttribArray(4);
         mVAO.unbind();
 
         mVAO.enableElements(mEBOIndices);
@@ -92,14 +92,14 @@ public class Animator implements Entity {
         mShader.loadViewMat(mViewMat.mData);
         mShader.loadProjectionMat(mProjMat.mData);
         mShader.loadLight(light);
-        //mShader.loadJointsTransform(mAnimatedModel.getCurrentJointsTransformData());
+        mShader.loadJointsTransform(mAnimatedModel.getCurrentJointsTransformData());
 
         mVAO.bind();
         GLES30.glEnableVertexAttribArray(Shader.VERTEX_INDEX);
         GLES30.glEnableVertexAttribArray(Shader.TEXTURE_COORD_INDEX);
         GLES30.glEnableVertexAttribArray(Shader.NORMAL_INDEX);
-        //GLES30.glEnableVertexAttribArray(3);
-        //GLES30.glEnableVertexAttribArray(4);
+        GLES30.glEnableVertexAttribArray(3);
+        GLES30.glEnableVertexAttribArray(4);
 
         if(mAnimatedModel.mMesh.mTexture != null){
             GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
@@ -110,6 +110,13 @@ public class Animator implements Entity {
 
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
         GLES30.glDisable(GLES30.GL_TEXTURE_2D);
+
+        GLES30.glDisableVertexAttribArray(Shader.VERTEX_INDEX);
+        GLES30.glDisableVertexAttribArray(Shader.TEXTURE_COORD_INDEX);
+        GLES30.glDisableVertexAttribArray(Shader.NORMAL_INDEX);
+        GLES30.glDisableVertexAttribArray(3);
+        GLES30.glDisableVertexAttribArray(4);
+
         mShader.stop();
         mVAO.unbind();
     }

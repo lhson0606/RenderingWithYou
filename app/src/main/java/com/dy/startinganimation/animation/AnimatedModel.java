@@ -1,24 +1,29 @@
 package com.dy.startinganimation.animation;
 
+import android.graphics.Paint;
+
 import com.dy.startinganimation.maths.Mat4;
 import com.dy.startinganimation.model.Mesh;
 
 import java.util.Vector;
 
 public class AnimatedModel {
+    public static final int MAX_BONES = 50;
     public Mesh mMesh;
     //bind pose matrix see https://www.khronos.org/files/collada_spec_1_4.pdf page 33
-    private Mat4 mBPM;
+    private Mat4 mBindShapeMatrix;
     public Joint[] mJoints;
+    private Joint mRootJoint;
     public AnimatedModel(Mesh mesh, Mat4 BPM, Joint[] joints){
         mMesh = mesh;
-        mBPM = BPM;
+        mBindShapeMatrix = BPM;
         mJoints = joints;
+        mRootJoint = joints[0];
+        mRootJoint.calculateInverseBindPoseMatrices(Mat4.createIdentityMatrix());
     }
+
     void update(float dt){
-        for(Joint joint:mJoints){
-            joint.update(dt);
-        }
+        mRootJoint.update(dt);
     }
 
     public Mat4[] getCurrentJointsTransformData(){
@@ -26,8 +31,10 @@ public class AnimatedModel {
 
         for(int i = 0; i<mJoints.length; i++){
 
-            ret[i] = mBPM.multiplyMM(mJoints[i].getSpaceTransformMat());
-
+            Mat4 inverseBindTransform =mJoints[i].mInverseBindPoseMatrix;
+            Mat4 animTransform = mJoints[i].getAnimationTransform();
+            Mat4 currentTransform = mBindShapeMatrix.multiplyMM(animTransform.multiplyMM(inverseBindTransform));
+            ret[i] = currentTransform;
         }
 
         return ret;

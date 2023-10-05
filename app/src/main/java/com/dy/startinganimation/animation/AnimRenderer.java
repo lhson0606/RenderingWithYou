@@ -62,7 +62,7 @@ public class AnimRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl10) {
         GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
         camera.updateViewMatrix();
-        animator.update(0.00f);
+        animator.update(0.0002f);
         animator.draw();
     }
 

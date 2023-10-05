@@ -3,6 +3,8 @@ package com.dy.startinganimation.shader;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 
+import com.dy.startinganimation.animation.AnimatedModel;
+import com.dy.startinganimation.gl.Vertex;
 import com.dy.startinganimation.maths.Mat4;
 import com.dy.startinganimation.maths.Vec3;
 import com.dy.startinganimation.utils.GLHelper;
@@ -35,10 +37,13 @@ public class Shader {
         getAllUniLocations();
     }
     public void loadJointsTransform(Mat4[] mats) {
-        int count = mats.length;
         int location;
 
-        for(int i = 0; i<count; ++i){
+        if(mats.length > AnimatedModel.MAX_BONES){
+            GLHelper.handleException(TAG, "loading too many joints");
+        }
+
+        for(int i = 0; i<mats.length; ++i){
             location = GLHelper.getUniLocation(mProgram, JOINT_TRANSFORM_NAME + "[" + i+"]");
             loadMat4(location, mats[i].mData);
         }
