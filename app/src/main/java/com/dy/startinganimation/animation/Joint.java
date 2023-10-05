@@ -2,6 +2,7 @@ package com.dy.startinganimation.animation;
 
 import android.graphics.Paint;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.dy.startinganimation.maths.Mat4;
 import com.dy.startinganimation.maths.Quat;
@@ -32,6 +33,8 @@ public class Joint {
         mID = id;
         mKeyFrames = keyFrames;
         mChildren = new Vector<>();
+        mCurrentFrameIndx = 0;
+        mNextFrameIndx = 1;
     }
 
     public void setInverseBindPoseMatrix(Mat4 IBPM){
@@ -65,11 +68,10 @@ public class Joint {
     private float mProgress;
 
     public void update(float dt){
-        mProgress += dt;
         updateAnim(dt);
     }
     public void updateAnim(float dt){
-        //case
+        mProgress += dt;
         //First------------------------>LastTimeStamp-------------->Progress------->
         //reset process to zero if this happened
         if(mProgress>mKeyFrames[mKeyFrames.length-1].mTimeStamp){
@@ -83,46 +85,24 @@ public class Joint {
         }
         //First--------->currentFrame----------->progress---------->nextFrame------>LastTimeStamp
         //update current frame index
-        for(int i = mKeyFrames.length-1; i >=mCurrentFrameIndx ; --i){
-
-            if(mProgress>=mKeyFrames[i].mTimeStamp){
-                mCurrentFrameIndx = i;
-                break;
-            }
-
+        if(mProgress >= mKeyFrames[mNextFrameIndx].mTimeStamp){
+            mCurrentFrameIndx++;
         }
         //calculate next frame index
         mNextFrameIndx = (mCurrentFrameIndx+1)%mKeyFrames.length;
-
+        //case
         //Start interpolating
         //currentFrame--------alpha------>progress--------beta------->nextFrame
         //the duration between two frames
-        float duration = mKeyFrames[mNextFrameIndx].mTimeStamp - mKeyFrames[mCurrentFrameIndx].mTimeStamp;
-        float alpha = mProgress - mKeyFrames[mCurrentFrameIndx].mTimeStamp;
-        float beta = mKeyFrames[mNextFrameIndx].mTimeStamp - mProgress;
-        alpha /= duration;
-        beta /= duration;
+        float t = (mProgress - mKeyFrames[mCurrentFrameIndx].mTimeStamp)/(mKeyFrames[mNextFrameIndx].mTimeStamp - mKeyFrames[mCurrentFrameIndx].mTimeStamp);
 
-       /* mBoneInstantAnimatedTransform = interpolateTransformMat(
-                mKeyFrames[mCurrentFrameIndx].mJointTransforms, alpha,
-                mKeyFrames[mNextFrameIndx].mJointTransforms, beta
-                );*/
-        if(mCurrentFrameIndx == mKeyFrames.length-1)
-            mCurrentFrameIndx = 0;
-        mBoneInstantAnimatedTransform = mKeyFrames[mCurrentFrameIndx++].mJointTransforms.mTransform;
-        //Animation_Bone = Parent_World_Matrix * Animation_Parent * Local_Transformation * Bone_Instant_Animation * Inverse_Bind_Pose_Matrix
+        if(t<0) t= -t;
 
-        /*if(isRoot()){
-            mFinalAnimatedTransform = mLocalBindTransform.
-                    multiplyMM(mBoneInstantAnimatedTransform).
-                    multiplyMM(mInverseBindPoseMatrix);
-        }else{
-            mFinalAnimatedTransform = mParent.getWorldTransform().
-                    multiplyMM(mParent.getAnimationTransform()).
-                    multiplyMM(mLocalBindTransform).
-                    multiplyMM(mBoneInstantAnimatedTransform).
-                    multiplyMM(mInverseBindPoseMatrix);
-        }*/
+        mBoneInstantAnimatedTransform = interpolateTransformMat(
+                mKeyFrames[mCurrentFrameIndx].mJointTransforms,
+                mKeyFrames[mNextFrameIndx].mJointTransforms, t
+                );
+
 
         if(isRoot()){
             //Animation_Bone = Local_Transformation * Bone_Instant_Animation * Inverse_Bind_Pose_Matrix
@@ -139,28 +119,14 @@ public class Joint {
         }
     }
 
-    private Mat4 interpolateTransformMat(JointTransform jointTransformA, float alpha,JointTransform jointTransformB, float beta){
+    private Mat4 interpolateTransformMat(JointTransform jointTransformA, JointTransform jointTransformB, float t){
 
-        Mat4 interpolatedTranslateMat = interpolateMat(jointTransformA.getTranslateVec(), 1-alpha, jointTransformB.getTranslateVec(), 1-beta);
-        Quat interpolatedRotateQuat = Quat.interpolate(jointTransformA.getQuat(), alpha, jointTransformB.getQuat(),  beta);
-
-        return interpolatedTranslateMat.multiplyMM(interpolatedRotateQuat.toMat());
-    }
-
-    private Mat4 interpolateMat(Vec3 mA, float alpha, Vec3 mB, float beta){
-        Vec3 interpolatedVec = new Vec3(
-                mA.x*alpha + mB.x*beta,
-                mA.y*alpha + mB.y*beta,
-                mA.z*alpha + mB.z*beta
-        );
-
-        Mat4 ret = new Mat4();
-        ret.setIdentityMat();
-        ret.mData[0*4 + 3] = interpolatedVec.x;
-        ret.mData[1*4 + 3] = interpolatedVec.y;
-        ret.mData[2*4 + 3] = interpolatedVec.z;
-
-        return ret;
+        Mat4 interpolatedTranslateMat = Mat4.interpolateTranslateMat(jointTransformA.mTransform.transpose().getTranslateVec(), jointTransformB.mTransform.transpose().getTranslateVec(), t);
+        Vec3 posA = jointTransformA.mTransform.transpose().getTranslateVec();
+        Quat interpolatedRotateQuat = Quat.slerp(jointTransformA.getQuat().normalize(), jointTransformB.getQuat().normalize(), t);
+        Mat4 interpolatedRotateMat = interpolatedRotateQuat.toMat();
+        Mat4 interpolatedMat = interpolatedTranslateMat.transpose().multiplyMM(interpolatedRotateMat);
+        return interpolatedMat;
     }
 
     public Mat4 getAnimationTransform(){
@@ -170,6 +136,10 @@ public class Joint {
         identity.setIdentityMat();
         return  identity;*/
         return mFinalAnimatedTransform;
+    }
+
+    public Mat4 getWorldAnimatedTransform(){
+        return mFinalAnimatedTransform.multiplyMM(mInverseBindPoseMatrix);
     }
 
     public void calculateInverseBindPoseMatrices(Mat4 parentBindTransform){

@@ -1,6 +1,7 @@
 package com.dy.startinganimation.maths;
 
 import android.opengl.Matrix;
+import android.renderscript.Matrix4f;
 
 public class Mat4 {
 
@@ -40,7 +41,7 @@ public class Mat4 {
 
     public Mat4 multiplyMM(Mat4 m){
         Mat4 ret = new Mat4(this);
-        Matrix.multiplyMM(ret.mData, ret.mOffset, ret.mData, ret.mOffset, m.mData, m.mOffset);
+        Matrix.multiplyMM(ret.mData, ret.mOffset, mData, mOffset, m.mData, m.mOffset);
         return ret;
     }
 
@@ -53,6 +54,7 @@ public class Mat4 {
                 mData[1*4+3],
                 mData[2*4+3]
         );
+
     }
 
     public Mat4 invert(){
@@ -67,15 +69,26 @@ public class Mat4 {
         return ret;
     }
 
-    public Mat4 translate(float angle, Vec3 axis){
+    public Mat4 translate(Vec3 axis){
         Mat4 ret = new Mat4();
-        Matrix.setRotateM(ret.mData, ret.mOffset, angle, axis.x, axis.y, axis.z);
+        ret.mData[0*4+3] = axis.x;
+        ret.mData[1*4+3] = axis.y;
+        ret.mData[2*4+3] = axis.z;
         return ret;
     }
 
     public static Mat4 createIdentityMatrix(){
         Mat4 ret = new Mat4();
         ret.setIdentityMat();
+        return ret;
+    }
+
+    public static Mat4 interpolateTranslateMat(Vec3 mA, Vec3 mB, float t){
+        Vec3 interpolatedVec =mA.interpolate(mB, t);
+        Mat4 ret =Mat4.createIdentityMatrix();
+        ret.mData[0*4+3] = interpolatedVec.x;
+        ret.mData[1*4+3] = interpolatedVec.y;
+        ret.mData[2*4+3] = interpolatedVec.z;
         return ret;
     }
 

@@ -13,18 +13,11 @@ public class Quat {
         this.y = y;
         this.z = z;
         this.w = w;
-        //normalize
-        float mag = (float)Math.sqrt(x*x + y*y + z*z + w*w);
-        this.x /= mag;
-        this.y /= mag;
-        this.z /= mag;
-        this.w /= mag;
     }
 
     //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
     //code: https://github.com/TheThinMatrix/OpenGL-Animation
     public Quat(Mat4 m){
-        float w, x, y, z;
         float diagonal = m.mData[0*4 + 0] + m.mData[1*4+1] + m.mData[2*4 + 2];
 
         if(diagonal>0){
@@ -56,44 +49,47 @@ public class Quat {
 
     //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
     //code: https://github.com/TheThinMatrix/OpenGL-Animation
-    public Mat4 toMat() {
-        Mat4 mat = new Mat4();
-        final float xy = x * y;
-        final float xz = x * z;
-        final float xw = x * w;
-        final float yz = y * z;
-        final float yw = y * w;
-        final float zw = z * w;
-        final float xSquared = x * x;
-        final float ySquared = y * y;
-        final float zSquared = z * z;
-        mat.mData[0*4 + 0] = 1 - 2 * (ySquared + zSquared);
-        mat.mData[0*4 + 1] = 2 * (xy - zw);
-        mat.mData[0*4 + 2] = 2 * (xz + yw);
-        mat.mData[0*4 + 3] = 0;
-        mat.mData[1*4 + 0] = 2 * (xy + zw);
-        mat.mData[1*4 + 1] = 1 - 2 * (xSquared + zSquared);
-        mat.mData[1*4 + 2] = 2 * (yz - xw);
-        mat.mData[1*4 + 3] = 0;
-        mat.mData[2*4 + 0] = 2 * (xz - yw);
-        mat.mData[2*4 + 1] = 2 * (yz + xw);
-        mat.mData[2*4 + 2] = 1 - 2 * (xSquared + ySquared);
-        mat.mData[2*4 + 3] = 0;
-        mat.mData[3*4 + 0] = 0;
-        mat.mData[3*4 + 1] = 0;
-        mat.mData[3*4 + 2] = 0;
-        mat.mData[3*4 + 3] = 1;
-        return mat;
+    public Mat4 toMat(){
+        Mat4 ret = new Mat4();
+        float x2 = x*x;
+        float y2 = y*y;
+        float z2 = z*z;
+        float xy = x*y;
+        float xz = x*z;
+        float yz = y*z;
+        float wx = w*x;
+        float wy = w*y;
+        float wz = w*z;
+
+        ret.mData[0*4+0] = 1f - 2f*(y2 + z2);
+        ret.mData[0*4+1] = 2f*(xy - wz);
+        ret.mData[0*4+2] = 2f*(xz + wy);
+
+        ret.mData[1*4+0] = 2f*(xy + wz);
+        ret.mData[1*4+1] = 1f - 2f*(x2 + z2);
+        ret.mData[1*4+2] = 2f*(yz - wx);
+
+        ret.mData[2*4+0] = 2f*(xz - wy);
+        ret.mData[2*4+1] = 2f*(yz + wx);
+        ret.mData[2*4+2] = 1f - 2f*(x2 + y2);
+
+        ret.mData[3*4+3] = 1f;
+
+        return ret;
     }
 
     public Quat normalize(){
         float mag = (float)Math.sqrt(x*x + y*y + z*z + w*w);
-        return new Quat(x/mag, y/mag, z/mag, w/mag);
+        x /= mag;
+        y /= mag;
+        z /= mag;
+        w /= mag;
+        return this;
     }
 
     //http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/
     //code: https://github.com/TheThinMatrix/OpenGL-Animation
-    public static Quat interpolate(Quat a, float alpha, Quat b, float beta) {
+    /*public static Quat interpolate(Quat a, float alpha, Quat b, float beta) {
         Quat ret = new Quat(0, 0, 0, 1);
         float dot = a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z;
 
@@ -111,5 +107,71 @@ public class Quat {
 
         ret.normalize();
         return ret;
+    }*/
+
+    public static Quat slerp(Quat q1, Quat q2, float t) {
+        Quat ret = new Quat(0, 0, 0, 1);
+        float dot = q1.dot(q2);
+
+        if (dot < 0) {
+            q2 = q2.multiply(-1);
+            dot = -dot;
+        }
+
+        if (dot > 0.9995) {
+            ret = q2.subtract(q1);
+            ret = ret.multiply(t);
+            ret = q1.add(ret);
+            ret.normalize();
+            return ret;
+        }
+
+        float theta = (float)Math.acos(dot);
+        ret = q1.multiply((float)Math.sin(theta * (1 - t)));
+        ret = ret.add(q2.multiply((float)Math.sin(theta * t)));
+        ret = ret.multiply(1f / (float)Math.sin(theta));
+        return ret;
+
     }
+
+    public float dot(Quat q){
+        return x*q.x + y*q.y + z*q.z + w*q.w;
+    }
+
+    public Quat multiply(float f){
+        return new Quat(x*f, y*f, z*f, w*f);
+    }
+
+    public Quat add(Quat q){
+        return new Quat(x+q.x, y+q.y, z+q.z, w+q.w);
+    }
+
+    public Quat subtract(Quat q){
+        return new Quat(x-q.x, y-q.y, z-q.z, w-q.w);
+    }
+
+    public Quat slerp(Quat q, float t){
+        float dot = dot(q);
+        float theta = (float)Math.acos(dot)*t;
+        Quat ret = new Quat(q.x, q.y, q.z, q.w);
+        ret = ret.subtract(this.multiply(dot));
+        ret = ret.normalize();
+        ret = ret.multiply((float)Math.sin(theta));
+        ret = ret.add(this.multiply((float)Math.cos(theta)));
+        return ret;
+    }
+
+    public Quat negate(){
+        return new Quat(-x, -y, -z, -w);
+    }
+
+    public Quat conjugate(){
+        return new Quat(-x, -y, -z, w);
+    }
+
+    public Quat inverse(){
+        return conjugate().multiply(1f/(x*x + y*y + z*z + w*w));
+    }
+
+
 }

@@ -36,18 +36,17 @@ public class Vec3 {
     }
     public float sqrLength() {return x*x + y*y + z*z;}
     public Vec3 normalize(){
-        Vec3 dst = new Vec3(x,y,z);
-        float l = dst.length();
+        float l = length();
 
         if(l == 0){
-            return dst;
+            return this;
         }
 
-        dst.x /= l;
-        dst.y /= l;
-        dst.z /= l;
+        x /= l;
+        y /= l;
+        z /= l;
 
-        return dst;
+        return this;
     }
 
     public Vec3 translate(Vec3 v){
@@ -66,5 +65,29 @@ public class Vec3 {
     }
     public float angle(Vec3 v){
         return (float)Math.acos(normalize().dot(v.normalize()));
+    }
+
+    public Vec3 interpolate(Vec3 v, float t){
+        return new Vec3(
+                x + (v.x - x)*t,
+                y + (v.y - y)*t,
+                z + (v.z - z)*t
+        );
+    }
+
+    public Vec3 subtract(Vec3 v){
+        Vec3 ret = new Vec3(x, y, z);
+        ret.x -= v.x;
+        ret.y -= v.y;
+        ret.z -= v.z;
+        return ret;
+    }
+
+    public Vec3 add(Vec3 v){
+        Vec3 ret = new Vec3(x, y, z);
+        ret.x += v.x;
+        ret.y += v.y;
+        ret.z += v.z;
+        return ret;
     }
 }

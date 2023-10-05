@@ -31,9 +31,8 @@ public class AnimatedModel {
 
         for(int i = 0; i<mJoints.length; i++){
 
-            Mat4 inverseBindTransform =mJoints[i].mInverseBindPoseMatrix;
-            Mat4 animTransform = mJoints[i].getAnimationTransform();
-            Mat4 currentTransform = mBindShapeMatrix.multiplyMM(animTransform.multiplyMM(inverseBindTransform));
+            Mat4 animTransform = mJoints[i].getWorldAnimatedTransform();
+            Mat4 currentTransform = mBindShapeMatrix.multiplyMM(animTransform);
             ret[i] = currentTransform;
         }
 
