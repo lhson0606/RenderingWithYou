@@ -47,6 +47,7 @@ public class GLHelper {
         bb.order(ByteOrder.nativeOrder());
         res = bb.asIntBuffer();
         res.put(data);
+        res.flip();
         res.position(0);
         return res;
     }
@@ -56,6 +57,7 @@ public class GLHelper {
         bb.order(ByteOrder.nativeOrder());
         res = bb.asFloatBuffer();
         res.put(data);
+        res.flip();
         res.position(0);
         return res;
     }

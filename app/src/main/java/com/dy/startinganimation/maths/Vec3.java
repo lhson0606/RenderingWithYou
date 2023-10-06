@@ -90,4 +90,12 @@ public class Vec3 {
         ret.z += v.z;
         return ret;
     }
+
+    public Vec3 sub(Vec3 mPos) {
+        Vec3 ret = new Vec3(x, y, z);
+        ret.x -= mPos.x;
+        ret.y -= mPos.y;
+        ret.z -= mPos.z;
+        return ret;
+    }
 }

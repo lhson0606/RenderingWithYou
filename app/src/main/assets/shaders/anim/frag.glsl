@@ -16,7 +16,7 @@ void main(){
 
     vec4 diffuseColor = texture(diffuseMap, bTexCoord);
     vec3 unitNormal = normalize(bNormal);
-    float diffuseLight = max(dot(-lightDirection, unitNormal), 0.5);
+    float diffuseLight = max(dot(-lightDirection, unitNormal), 1.0);
     fragColor = diffuseLight*diffuseColor*LIGHT_COLOR;
 
 }

@@ -16,6 +16,8 @@ public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
         setEGLContextClientVersion(3);
         mRenderer = new AnimRenderer(context);
         setRenderer(mRenderer);
+        mScaleListener = new ScaleListener(mRenderer.camera);
+        mScaleDetector = new ScaleGestureDetector(context, mScaleListener);
     }
 
     public DyGLSurfaceView(Context context, AttributeSet attrs) {
@@ -27,13 +29,13 @@ public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
     float preX;
     float preY;
     boolean isOnScale = false;
-    ScaleGestureDetector m_ScaleDetector;
-    ScaleListener m_ScaleListener;
+    private ScaleGestureDetector mScaleDetector;
+    private ScaleListener mScaleListener;
 
     @Override
     public boolean onTouchEvent(MotionEvent e){
-        m_ScaleDetector.onTouchEvent(e);
-        if(m_ScaleListener.isOnScale){
+        mScaleDetector.onTouchEvent(e);
+        if(mScaleListener.isOnScale){
             return true;
         }
 
@@ -44,8 +46,7 @@ public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
 
         switch(e.getAction()){
             case MotionEvent.ACTION_MOVE:
-                //AnimRenderer.camera.move(-(x-preX), y-preY);
-
+                AnimRenderer.camera.move(x-preX, y-preY);
                 break;
         }
 

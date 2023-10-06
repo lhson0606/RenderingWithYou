@@ -31,13 +31,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class AnimParser {
-    static Mat4 CORRECTION;
     static Context mContext;
     static String mLocalPath = "models/";
     public static Scene parse(Context context, InputStream inputStream) throws ParserConfigurationException, IOException, SAXException {
-        CORRECTION = new Mat4();
-        CORRECTION.setIdentityMat();
-        Matrix.setRotateM(CORRECTION.mData, 0, -90, 1, 0, 0);
 
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);
 
@@ -303,13 +299,6 @@ public class AnimParser {
             final int texCoord_offset = getAttribValI("offset", input_node);
             final int tex_set = getAttribValI("set", input_node);
 
-            Node p_node = getChildNode("p", polylist_node);
-            //String p_data[] = p_node.getTextContent().split(" ");
-            /*int[] p = new int[p_data.length];
-
-            for (int i = 0; i < p_data.length; ++i) {
-                p[i] = Integer.parseInt(p_data[i]);
-            }*/
 
             int p[] = extractAllP(geometry);
 
@@ -319,9 +308,6 @@ public class AnimParser {
             int stride = findPolylistStride(geometry);
             Vertex vertices[] = new Vertex[positionsData.length / 3];
             int indices[] = new int[p.length/stride];
-
-
-
 
             for (int i = 0; i < p.length/stride; ++i) {
 

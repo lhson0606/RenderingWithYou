@@ -40,6 +40,7 @@ public class AnimRenderer implements GLSurfaceView.Renderer {
 
     public AnimRenderer(Context context){
         mContext = context;
+        camera = new Camera();
     }
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
@@ -51,17 +52,15 @@ public class AnimRenderer implements GLSurfaceView.Renderer {
     boolean isInit = false;
     @Override
     public void onSurfaceChanged(GL10 gl10, int w, int h) {
-        if(!isInit){
-            camera = new Camera(w, h);
-        }
-        camera.updateViewMatrix();
+        camera.setWidth(w);
+        camera.setHeight(h);
         init();
     }
 
     @Override
     public void onDrawFrame(GL10 gl10) {
         GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
-        camera.updateViewMatrix();
+        camera.update();
         animator.update(0.015f);
         animator.draw();
     }
