@@ -317,7 +317,7 @@ public class AnimParser {
 
                 indices[i] = verIndx;
 
-                if(i == p.length/stride-1){
+                if(verIndx == 255){
                     Log.d("Hello", "World");
                 }
 

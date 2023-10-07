@@ -63,13 +63,13 @@ public class Animator implements Entity {
         mVAO.linkBufferAttribute(Shader.VERTEX_INDEX, mVBOVertices, 0);
         mVAO.linkBufferAttribute(Shader.TEXTURE_COORD_INDEX, mVBOTexCoords, 0);
         mVAO.linkBufferAttribute(Shader.NORMAL_INDEX, mVBONormals, 0);
-        mVAO.linkBufferAttribute(3, mVBOiBonesIndx, 0);
-        mVAO.linkBufferAttribute(4, mVBOBonesWeights, 0);
+        mVAO.linkBufferAttribute(Shader.JOINT_INDEX, mVBOiBonesIndx, 0);
+        mVAO.linkBufferAttribute(Shader.WEIGHT_INDEX, mVBOBonesWeights, 0);
         GLES30.glEnableVertexAttribArray(Shader.VERTEX_INDEX);
         GLES30.glEnableVertexAttribArray(Shader.TEXTURE_COORD_INDEX);
         GLES30.glEnableVertexAttribArray(Shader.NORMAL_INDEX);
-        GLES30.glEnableVertexAttribArray(3);
-        GLES30.glEnableVertexAttribArray(4);
+        GLES30.glEnableVertexAttribArray(Shader.JOINT_INDEX);
+        GLES30.glEnableVertexAttribArray(Shader.WEIGHT_INDEX);
         mVAO.unbind();
 
         mVAO.enableElements(mEBOIndices);
@@ -98,8 +98,8 @@ public class Animator implements Entity {
         GLES30.glEnableVertexAttribArray(Shader.VERTEX_INDEX);
         GLES30.glEnableVertexAttribArray(Shader.TEXTURE_COORD_INDEX);
         GLES30.glEnableVertexAttribArray(Shader.NORMAL_INDEX);
-        GLES30.glEnableVertexAttribArray(3);
-        GLES30.glEnableVertexAttribArray(4);
+        GLES30.glEnableVertexAttribArray(Shader.JOINT_INDEX);
+        GLES30.glEnableVertexAttribArray(Shader.WEIGHT_INDEX);
 
         if(mAnimatedModel.mMesh.mTexture != null){
             GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
@@ -114,8 +114,8 @@ public class Animator implements Entity {
         GLES30.glDisableVertexAttribArray(Shader.VERTEX_INDEX);
         GLES30.glDisableVertexAttribArray(Shader.TEXTURE_COORD_INDEX);
         GLES30.glDisableVertexAttribArray(Shader.NORMAL_INDEX);
-        GLES30.glDisableVertexAttribArray(3);
-        GLES30.glDisableVertexAttribArray(4);
+        GLES30.glDisableVertexAttribArray(Shader.JOINT_INDEX);
+        GLES30.glDisableVertexAttribArray(Shader.WEIGHT_INDEX);
 
         mShader.stop();
         mVAO.unbind();

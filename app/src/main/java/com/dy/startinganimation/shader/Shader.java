@@ -117,4 +117,6 @@ public class Shader {
     public static final int VERTEX_INDEX = 0;
     public static final int TEXTURE_COORD_INDEX = 1;
     public static final int NORMAL_INDEX = 2;
+    public static final int JOINT_INDEX = 3;
+    public static final int WEIGHT_INDEX = 4;
 }
