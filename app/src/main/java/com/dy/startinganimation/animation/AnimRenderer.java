@@ -25,8 +25,7 @@ public class AnimRenderer implements GLSurfaceView.Renderer {
         final String file = "models/model/model.dae";
 
         try {
-            Scene scene = AnimParser.parse(mContext, mContext.getAssets().open(file));
-            animator = scene.createAnimator(mContext);
+            animator = AnimParser.parse(mContext, mContext.getAssets().open(file));
             animator.init();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);

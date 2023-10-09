@@ -1,5 +1,7 @@
 package com.dy.startinganimation.maths;
 
+import java.util.Vector;
+
 public class Vec2 {
     public float x;
     public float y;
@@ -22,6 +24,17 @@ public class Vec2 {
         Vec2 ret = new Vec2(this);
         ret.x *= s;
         ret.y *= s;
+        return ret;
+    }
+
+    static public float[] toFloatArray(Vector<Vec2> data){
+        float[] ret = new float[data.size()*2];
+
+        for(int i = 0; i<data.size(); ++i){
+            ret[i*3] = data.get(i).x;
+            ret[i*3 + 1] = data.get(i).y;
+        }
+
         return ret;
     }
 }

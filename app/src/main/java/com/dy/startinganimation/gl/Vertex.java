@@ -5,21 +5,12 @@ import com.dy.startinganimation.maths.Vec3;
 
 public class Vertex {
     public Vec3 mPos;
-    public Vec2 mTexCoords;
-    public Vec3 mNormal;
     public int mTextureSet;
     public boolean mHasLine = false;
 
     public Vertex(Vec3 pos){
         mPos = pos;
     }
-
-    public Vertex(Vec3 pos, Vec2 texCoords, Vec3 normal){
-        mPos = pos;
-        mTexCoords = texCoords;
-        mNormal = normal;
-    }
-
 
     public void setWeightsNormalized(){
         float sum = 0;

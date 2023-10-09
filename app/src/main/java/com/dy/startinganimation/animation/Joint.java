@@ -15,7 +15,7 @@ public class Joint {
     public String mName;
 
     //index
-    public int mID;
+    public String mID;
 
     //inverse bind shape matrix bind shape matrix
     //see https://www.khronos.org/files/collada_spec_1_4.pdf page 33
@@ -28,10 +28,9 @@ public class Joint {
     public Mat4 mWorldTransform;
     public KeyFrame[] mKeyFrames;
 
-    public Joint(String name, int id, KeyFrame keyFrames[]){
+    public Joint(String ID, String name){
         mName = name;
-        mID = id;
-        mKeyFrames = keyFrames;
+        mID = ID;
         mChildren = new Vector<>();
         mCurrentFrameIndx = 0;
         mNextFrameIndx = 1;
@@ -102,6 +101,7 @@ public class Joint {
                 mKeyFrames[mCurrentFrameIndx].mJointTransforms,
                 mKeyFrames[mNextFrameIndx].mJointTransforms, t
                 );
+        //mBoneInstantAnimatedTransform  = mKeyFrames[0].mJointTransforms.mTransform;
 
 
         if(isRoot()){
@@ -122,7 +122,6 @@ public class Joint {
     private Mat4 interpolateTransformMat(JointTransform jointTransformA, JointTransform jointTransformB, float t){
 
         Mat4 interpolatedTranslateMat = Mat4.interpolateTranslateMat(jointTransformA.mTransform.transpose().getTranslateVec(), jointTransformB.mTransform.transpose().getTranslateVec(), t);
-        Vec3 posA = jointTransformA.mTransform.transpose().getTranslateVec();
         Quat interpolatedRotateQuat = Quat.slerp(jointTransformA.getQuat().normalize(), jointTransformB.getQuat().normalize(), t);
         Mat4 interpolatedRotateMat = interpolatedRotateQuat.toMat();
         Mat4 interpolatedMat = interpolatedTranslateMat.transpose().multiplyMM(interpolatedRotateMat);
@@ -130,11 +129,6 @@ public class Joint {
     }
 
     public Mat4 getAnimationTransform(){
-        //return mIBPM.multiplyMM(mKeyFrames[0].mJointTransforms.mTransform);
-        //return mKeyFrames[0].mJointTransforms.mTransform.multiplyMM(mIBPM);
-        /*Mat4 identity = new Mat4();
-        identity.setIdentityMat();
-        return  identity;*/
         return mFinalAnimatedTransform;
     }
 

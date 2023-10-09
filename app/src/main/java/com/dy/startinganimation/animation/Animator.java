@@ -52,7 +52,6 @@ public class Animator implements Entity {
         mEBOIndices = new EBO(mAnimatedModel.mMesh.mIndices);
         bindAndEnableAttrib();
 
-
         mModelMat = new Mat4();
         mModelMat.setIdentityMat();
         Matrix.rotateM(mModelMat.mData, mModelMat.mOffset, -90, 1, 0, 0);

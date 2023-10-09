@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Vector;
 
 public class GLHelper {
     public static  int genBuffer(){
@@ -98,6 +99,26 @@ public class GLHelper {
         bitmap.recycle();
 
         return texID.get(0);
+    }
+
+    public float[] toFloatArray(Vector<Float> data){
+        float[] res = new float[data.size()];
+
+        for(int i = 0; i < data.size(); ++i){
+            res[i] = data.get(i);
+        }
+
+        return res;
+    }
+
+    public static int[] toIntArray(Vector<Integer> data){
+        int[] res = new int[data.size()];
+
+        for(int i = 0; i < data.size(); ++i){
+            res[i] = data.get(i);
+        }
+
+        return res;
     }
 
     public static void handleException(String tag, Exception e){

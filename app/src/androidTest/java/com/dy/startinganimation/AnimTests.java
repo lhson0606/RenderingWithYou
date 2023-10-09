@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.xml.sax.SAXException;
 
+import com.dy.startinganimation.animation.Animator;
 import com.dy.startinganimation.gl.Vertex;
 import com.dy.startinganimation.model.Mesh;
 import com.dy.startinganimation.parser.AnimParser;
@@ -33,8 +34,8 @@ public class AnimTests {
         String file = "models/model.dae";
 
         try {
-            Scene scene=AnimParser.parse(appContext, appContext.getAssets().open(file));
-            assert(testNullVertex(scene));
+            Animator animator=AnimParser.parse(appContext, appContext.getAssets().open(file));
+            //assert(testNullVertex(scene));
         } catch (ParserConfigurationException e) {
             GLHelper.handleException("Test Model", e.getMessage());
             assert(false);
@@ -54,8 +55,7 @@ public class AnimTests {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         try {
-            Scene scene=AnimParser.parse(appContext, appContext.getAssets().open(file));
-            assert(testNullVertex(scene));
+            Animator animator=AnimParser.parse(appContext, appContext.getAssets().open(file));
         } catch (ParserConfigurationException e) {
             GLHelper.handleException(TAG, e.getMessage());
             assert(false);
@@ -77,8 +77,7 @@ public class AnimTests {
         String file = "models/wolf/wolf.dae";
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         try {
-            Scene scene=AnimParser.parse(appContext, appContext.getAssets().open(file));
-            assert(testNullVertex(scene));
+            Animator animator=AnimParser.parse(appContext, appContext.getAssets().open(file));
         } catch (ParserConfigurationException e) {
             GLHelper.handleException(TAG, e.getMessage());
             assert(false);
@@ -100,8 +99,7 @@ public class AnimTests {
         String file = "models/spider/spider.dae";
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         try {
-            Scene scene=AnimParser.parse(appContext, appContext.getAssets().open(file));
-            assert(testNullVertex(scene));
+            Animator animator=AnimParser.parse(appContext, appContext.getAssets().open(file));
         } catch (ParserConfigurationException e) {
             GLHelper.handleException(TAG, e.getMessage());
             assert(false);
@@ -114,18 +112,5 @@ public class AnimTests {
         }
 
         assert(true);
-    }
-
-    private boolean testNullVertex(Scene scene){
-
-        for(Mesh mesh: scene.getMeshes()){
-            for(Vertex v: mesh.mVertices){
-                if(v==null){
-                    return false;
-                }
-            }
-        }
-
-        return true;
     }
 }

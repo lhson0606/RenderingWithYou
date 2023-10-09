@@ -1,5 +1,7 @@
 package com.dy.startinganimation.maths;
 
+import java.util.Vector;
+
 public class Vec3 {
     public float x;
     public float y;
@@ -97,5 +99,17 @@ public class Vec3 {
         ret.y -= mPos.y;
         ret.z -= mPos.z;
         return ret;
+    }
+
+    static public float[] toFloatArray(Vector<Vec3> data){
+        float[] res = new float[data.size()*3];
+
+        for(int i = 0; i < data.size(); ++i){
+            res[i*3] = data.get(i).x;
+            res[i*3 + 1] = data.get(i).y;
+            res[i*3 + 2] = data.get(i).z;
+        }
+
+        return res;
     }
 }
