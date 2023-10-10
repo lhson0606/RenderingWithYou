@@ -14,11 +14,11 @@ public class AnimatedModel {
     private Mat4 mBindShapeMatrix;
     public Joint[] mJoints;
     private Joint mRootJoint;
-    public AnimatedModel(Mesh mesh, Mat4 BPM, Joint[] joints){
+    public AnimatedModel(Mesh mesh, Mat4 BPM, Joint[] joints, Joint root){
         mMesh = mesh;
         mBindShapeMatrix = BPM;
         mJoints = joints;
-        mRootJoint = joints[0];
+        mRootJoint = root;
         mRootJoint.calculateInverseBindPoseMatrices(Mat4.createIdentityMatrix());
     }
 

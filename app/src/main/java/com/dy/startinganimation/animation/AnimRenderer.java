@@ -6,8 +6,6 @@ import android.opengl.GLSurfaceView;
 
 import com.dy.startinganimation.camera.Camera;
 import com.dy.startinganimation.parser.AnimParser;
-import com.dy.startinganimation.parser.Scene;
-import com.example.startinganimation.R;
 
 import org.xml.sax.SAXException;
 

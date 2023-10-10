@@ -30,6 +30,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -51,10 +52,12 @@ public class AnimParser {
         AnimationParser animationParser = new AnimationParser(dyRoot.getFirstChildHasType("library_animations"));
         VisualScenesParser visualSceneParser = new VisualScenesParser(dyRoot.getFirstChildHasType("library_visual_scenes"));
 
+        assembleKeyframes(visualSceneParser.root, animationParser.jointKeyFrames);
+
         Joint[] joints = new Joint[controllerParser.jointNames.length];
         for(int i = 0; i<joints.length; ++i){
             joints[i] = visualSceneParser.joints.get(controllerParser.jointNames[i]);
-            joints[i].mKeyFrames = animationParser.jointKeyFrames.get(controllerParser.jointNames[i]);
+            //joints[i].mKeyFrames = animationParser.jointKeyFrames.get(controllerParser.jointNames[i]);
         }
 
         Mesh mesh = geometryParser.getGeometries().firstElement().mesh;
@@ -88,7 +91,8 @@ public class AnimParser {
         AnimatedModel animatedModel = new AnimatedModel(
                 mesh,
                 controllerParser.skins.get(mesh.mID).BSM,
-                joints
+                joints,
+                visualSceneParser.root
         );
 
         Shader shader = ShaderHelper.getInstance().createShader(
@@ -104,5 +108,12 @@ public class AnimParser {
         );
 
         return animator;
+    }
+
+    private static void assembleKeyframes(Joint joint, HashMap<String, KeyFrame[]> frames){
+        joint.mKeyFrames = frames.get(joint.mID);
+        for(Joint child : joint.mChildren){
+            assembleKeyframes(child, frames);
+        }
     }
 }

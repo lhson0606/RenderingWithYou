@@ -18,9 +18,15 @@ public class AnimationParser {
     private void parseAnimation(DyNode animationNode){
         String animationID = animationNode.getAttribute("id");
 
-        DyNode source_input_node = null;
-        DyNode source_output_node = null;
+        DyNode source_input_node = animationNode.findContainedNodeByID(animationID + "-input");
+        DyNode source_output_node = animationNode.findContainedNodeByID(animationID + "-output");
 
+        /*if(source_input_node == null || source_output_node == null){
+            animationNode = animationNode.getFirstChildHasType("animation");
+            animationID = animationNode.getAttribute("id");
+            source_input_node = animationNode.findContainedNodeByID(animationID + "-input");
+            source_output_node = animationNode.findContainedNodeByID(animationID + "-output");
+        }*/
         for(DyNode source : animationNode.getChildren("source")){
             String sourceID = source.getAttribute("id");
             if(sourceID.equals(animationID + "-input")){

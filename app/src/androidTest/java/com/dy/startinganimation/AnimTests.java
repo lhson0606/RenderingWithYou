@@ -10,10 +10,7 @@ import org.junit.runner.RunWith;
 import org.xml.sax.SAXException;
 
 import com.dy.startinganimation.animation.Animator;
-import com.dy.startinganimation.gl.Vertex;
-import com.dy.startinganimation.model.Mesh;
 import com.dy.startinganimation.parser.AnimParser;
-import com.dy.startinganimation.parser.Scene;
 import com.dy.startinganimation.utils.GLHelper;
 
 import java.io.IOException;
@@ -46,6 +43,7 @@ public class AnimTests {
             GLHelper.handleException("Test Model", e.getMessage());
             assert(false);
         }
+        assert (true);
     }
 
     @Test
