@@ -12,7 +12,7 @@ uniform vec3 lightDirection;
 
 const vec4 LIGHT_COLOR = vec4(1,1,1,1);
 
-void main(){
+void main(void){
 
     vec4 diffuseColor = texture(diffuseMap, bTexCoord);
     vec3 unitNormal = normalize(bNormal);

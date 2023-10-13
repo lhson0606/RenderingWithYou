@@ -28,6 +28,7 @@ public class Animator implements Entity {
     Mat4 mModelMat;
     Mat4 mViewMat;
     Mat4 mProjMat;
+    private boolean mIsInitialized = false;
     public static String VERTEX_SHADER_PATH = "anim/ver.glsl";
     public static String FRAGMENT_SHADER_PATH = "anim/frag.glsl";
 
@@ -38,9 +39,11 @@ public class Animator implements Entity {
         mShader = shader;
     }
 
+    //has to be called after GL is initialized
     @Override
     public void init() {
-        //mShader = new Shader("","");
+        mShader.init();
+        mAnimatedModel.init();
         mVAO = new VAO();
 
         mVBOVertices = new VBO(mAnimatedModel.mMesh.getVertexPosData(), 3, 3*Float.BYTES, false);
@@ -55,6 +58,8 @@ public class Animator implements Entity {
         mModelMat = new Mat4();
         mModelMat.setIdentityMat();
         Matrix.rotateM(mModelMat.mData, mModelMat.mOffset, -90, 1, 0, 0);
+
+        mIsInitialized = true;
     }
 
     private void bindAndEnableAttrib(){
@@ -105,7 +110,7 @@ public class Animator implements Entity {
             GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  mAnimatedModel.mMesh.mTexture.getID());
         }
 
-        GLES30.glDrawElements(GLES30.GL_TRIANGLES, mEBOIndices.length(), mEBOIndices.getType(), 0);
+        GLES30.glDrawElements(GLES30.GL_LINE_STRIP, mEBOIndices.length(), mEBOIndices.getType(), 0);
 
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
         GLES30.glDisable(GLES30.GL_TEXTURE_2D);
@@ -131,5 +136,9 @@ public class Animator implements Entity {
         mVBOTexCoords.destroy();
         mShader.destroy();
         mAnimatedModel.destroy();
+    }
+
+    public boolean isIsInitialized() {
+        return mIsInitialized;
     }
 }

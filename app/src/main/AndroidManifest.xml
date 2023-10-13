@@ -21,6 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.dy.startinganimation.activities.DemoActivity"/>\
+        <activity android:name="com.dy.startinganimation.activities.DemoGLActivity"/>
     </application>
 
 </manifest>

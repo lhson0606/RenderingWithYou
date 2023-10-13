@@ -63,4 +63,7 @@ public class Mesh {
         return mWeights;
     }
     //#TODO destroy method
+    public void init(){
+        mTexture.init();
+    }
 }

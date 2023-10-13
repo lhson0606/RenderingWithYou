@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
 import com.dy.startinganimation.animation.AnimRenderer;
+import com.dy.startinganimation.camera.Camera;
 import com.dy.startinganimation.utils.ScaleListener;
 
 public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
@@ -16,7 +17,7 @@ public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
         setEGLContextClientVersion(3);
         mRenderer = new AnimRenderer(context);
         setRenderer(mRenderer);
-        mScaleListener = new ScaleListener(mRenderer.camera);
+        mScaleListener = new ScaleListener(Camera.getInstance().getInstance());
         mScaleDetector = new ScaleGestureDetector(context, mScaleListener);
     }
 
@@ -46,12 +47,16 @@ public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
 
         switch(e.getAction()){
             case MotionEvent.ACTION_MOVE:
-                AnimRenderer.camera.move(x-preX, y-preY);
+                Camera.getInstance().getInstance().move(x-preX, y-preY);
                 break;
         }
 
         preX = x;
         preY = y;
         return true;
+    }
+
+    public AnimRenderer getRenderer() {
+        return mRenderer;
     }
 }

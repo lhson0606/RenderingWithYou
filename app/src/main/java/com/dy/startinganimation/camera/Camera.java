@@ -6,7 +6,7 @@ import com.dy.startinganimation.maths.Mat4;
 import com.dy.startinganimation.maths.Vec3;
 
 public class Camera {
-    public Camera(){
+    private Camera(){
         //Set up View matrix
         Matrix.setLookAtM(mViewMat.mData, mViewMat.mOffset,
                 mPos.x, mPos.y, mPos.z,
@@ -18,7 +18,7 @@ public class Camera {
         Matrix.frustumM(mProjMat.mData, mProjMat.mOffset,-aspectRatio, aspectRatio, mBottom, mTop, mNear, mFar);
     }
 
-    public Camera(int width, int height){
+    private Camera(int width, int height){
         mWidth = width; mHeight = height;
 
         //Set up View matrix
@@ -108,4 +108,10 @@ public class Camera {
     public void setHeight(int mHeight) {
         this.mHeight = mHeight;
     }
+
+    public static Camera getInstance(){
+        return instance = (instance == null) ? new Camera() : instance;
+    }
+
+    private static Camera instance = null;
 }

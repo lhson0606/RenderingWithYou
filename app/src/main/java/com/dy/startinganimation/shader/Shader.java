@@ -11,9 +11,17 @@ import com.dy.startinganimation.utils.GLHelper;
 
 public class Shader {
     private int mProgram;
+    String mVerCode;
+    String mFragCode;
     public Shader(String verCode, String fragCode){
-        int verID = ShaderHelper.getInstance().compileShader(verCode, GLES20.GL_VERTEX_SHADER);
-        int fragID = ShaderHelper.getInstance().compileShader(fragCode, GLES20.GL_FRAGMENT_SHADER);
+        mVerCode = verCode;
+        mFragCode = fragCode;
+    }
+
+    //need to be called after GL is initialized
+    public void init(){
+        int verID = ShaderHelper.getInstance().compileShader(mVerCode, GLES20.GL_VERTEX_SHADER);
+        int fragID = ShaderHelper.getInstance().compileShader(mFragCode, GLES20.GL_FRAGMENT_SHADER);
         int programID = GLES30.glCreateProgram();
         GLES20.glAttachShader(programID, verID);
         GLES20.glAttachShader(programID, fragID);
@@ -36,6 +44,7 @@ public class Shader {
 
         getAllUniLocations();
     }
+
     public void loadJointsTransform(Mat4[] mats) {
         int location;
 

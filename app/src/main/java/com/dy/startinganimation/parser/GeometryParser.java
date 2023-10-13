@@ -38,8 +38,8 @@ public class GeometryParser {
         Vector<Vec3> normals = new Vector<>();
         Vector<Vec2> texCoords = new Vector<>();
 
-        float posData[] = DyXml.parseFloats(meshNode.findContainedNodeByID(ret.name + "-mesh-positions-array").getContent(), " ");
-        float normalData[] = DyXml.parseFloats(meshNode.findContainedNodeByID(ret.name + "-mesh-normals-array").getContent(), " ");
+        float posData[] = DyXml.parseFloats(meshNode.findContainedNodeByID(ret.ID + "-positions-array").getContent(), " ");
+        float normalData[] = DyXml.parseFloats(meshNode.findContainedNodeByID(ret.ID + "-normals-array").getContent(), " ");
 
         for(int i = 0; i<posData.length/3; ++i){
             Vertex vertex = new Vertex();
@@ -54,12 +54,12 @@ public class GeometryParser {
         }
 
         for(int i = 0;; ++i){
-            DyNode source = meshNode.findContainedNodeByID(ret.name + "-mesh-map-" + i);
+            DyNode source = meshNode.findContainedNodeByID(ret.ID + "-map-" + i);
             if(source == null){
                 break;
             }
 
-            float[] texCoordsData = DyXml.parseFloats(source.findContainedNodeByID(ret.name + "-mesh-map-" + i + "-array").getContent(), " ");
+            float[] texCoordsData = DyXml.parseFloats(source.findContainedNodeByID(ret.ID + "-map-" + i + "-array").getContent(), " ");
 
             for(int j = 0 ;j<texCoordsData.length/2; ++j){
                 texCoords.add(new Vec2(texCoordsData[j*2], texCoordsData[j*2 + 1]));

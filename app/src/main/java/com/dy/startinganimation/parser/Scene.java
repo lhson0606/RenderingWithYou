@@ -1,12 +1,15 @@
+/*
 package com.dy.startinganimation.parser;
 
 import android.content.Context;
 
+import com.dy.startinganimation.activities.DyGLSurfaceView;
 import com.dy.startinganimation.animation.AnimRenderer;
 import com.dy.startinganimation.animation.AnimatedModel;
 import com.dy.startinganimation.animation.Animator;
 import com.dy.startinganimation.animation.Joint;
 import com.dy.startinganimation.animation.KeyFrame;
+import com.dy.startinganimation.camera.Camera;
 import com.dy.startinganimation.maths.Mat4;
 import com.dy.startinganimation.model.Mesh;
 import com.dy.startinganimation.model.Texture;
@@ -30,9 +33,6 @@ public class Scene {
         mMeshes = new Vector<>();
         mJointKeyFrames = new TreeMap<>();
         mBindPoseMatrices = new Vector<>();
-    }
-    public void addTextures(String id, String path, int texID){
-        mTextures.add(new Texture(texID, path));
     }
 
     public void addMeshes(Mesh mesh){
@@ -116,11 +116,12 @@ public class Scene {
 
         Animator animator = new Animator(
                 animatedModel,
-                AnimRenderer.camera.mViewMat,
-                AnimRenderer.camera.mProjMat,
+                Camera.getInstance().getInstance().mViewMat,
+                Camera.getInstance().getInstance().mProjMat,
                 shader
         );
 
         return animator;
     }
 }
+*/

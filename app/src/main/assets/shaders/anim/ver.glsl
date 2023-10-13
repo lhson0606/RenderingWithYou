@@ -17,7 +17,7 @@ uniform mat4 uModelMat;
 uniform mat4 uViewMat;
 uniform mat4 uProjMat;
 
-void main(){
+void main(void){
 	
 	vec4 finalPos = vec4(0);
 	vec4 finalNorm = vec4(0);

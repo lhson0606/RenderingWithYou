@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#faf6a2">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="#ff0000"
+        android:text="X"
+        android:textColor="#000000"
+        android:minHeight="37sp"
+        android:minWidth="37dp"/>
+
+        <TextView
+            android:layout_below="@+id/btnClose"
+            android:id="@+id/tvObj"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Obj"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:typeface="monospace"
+            android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:id="@+id/tvLine1"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_below="@+id/tvObj"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="#308fe3" />
+
+        <GridView
+            android:layout_below="@+id/tvLine1"
+            android:id="@+id/gvObj"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="auto_fit"
+            android:gravity="center"
+            android:verticalSpacing="@dimen/gridview_vertical_spacing"
+            android:horizontalSpacing="@dimen/gridview_horizontal_spacing"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"/>
+
+        <TextView
+            android:layout_below="@+id/gvObj"
+            android:id="@+id/tvDAE"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DAE"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:typeface="monospace"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:id="@+id/tvLine2"
+            android:layout_below="@id/tvDAE"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="#308fe3"
+            android:layout_margin="10dp"/>
+
+        <GridView
+            android:layout_below="@+id/tvLine2"
+            android:id="@+id/gvDAE"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="4"
+            android:gravity="center"
+            android:verticalSpacing="@dimen/gridview_vertical_spacing"
+            android:horizontalSpacing="@dimen/gridview_horizontal_spacing"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp" />
+
+</RelativeLayout>
