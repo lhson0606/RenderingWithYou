@@ -25,6 +25,7 @@ public class AnimRenderer implements GLSurfaceView.Renderer {
 
     Vector<Animator> animators;
     Vector<Animator> unInitAnimators;
+    private float mPlaySpeed = 0.015f;
     void init(){
 
         for(Animator animator : animators){
@@ -70,7 +71,7 @@ public class AnimRenderer implements GLSurfaceView.Renderer {
         unInitAnimators.clear();
 
         for(Animator animator : animators){
-            animator.update(0.015f);
+            animator.update(mPlaySpeed);
             animator.draw();
         }
 
@@ -83,5 +84,21 @@ public class AnimRenderer implements GLSurfaceView.Renderer {
             animator.init();
         }*/
         unInitAnimators.add(animator);
+    }
+
+    public void destroy(){
+        for(Animator animator : animators){
+            animator.destroy();
+        }
+    }
+
+    public void setDrawMode(int drawMode) {
+        for(Animator animator : animators){
+            animator.setDrawMode(drawMode);
+        }
+    }
+
+    public void setPlaySpeed(float playSpeed) {
+        mPlaySpeed = playSpeed;
     }
 }

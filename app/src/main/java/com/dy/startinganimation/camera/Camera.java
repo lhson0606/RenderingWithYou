@@ -56,8 +56,8 @@ public class Camera {
 
     //Constants
     public static final Vec3 Y_AXIS = new Vec3(0,1,0);
-    final float sensitivity = 0.1f;
-    final float MAX_MOVE_LENGTH = 20;
+    float sensitivity = 0.1f;
+    final float MAX_MOVE_LENGTH = 50;
     final float MAX_DX = MAX_MOVE_LENGTH;
     final float MAX_DY = MAX_MOVE_LENGTH;
     final float MIN_DX = -MAX_MOVE_LENGTH;
@@ -114,4 +114,8 @@ public class Camera {
     }
 
     private static Camera instance = null;
+
+    public void setSensitivity(float value) {
+        this.sensitivity = 0.1f*((value + 50f)/100f);
+    }
 }

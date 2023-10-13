@@ -28,6 +28,7 @@ public class Animator implements Entity {
     Mat4 mModelMat;
     Mat4 mViewMat;
     Mat4 mProjMat;
+    int mDrawMode = GLES30.GL_TRIANGLES;
     private boolean mIsInitialized = false;
     public static String VERTEX_SHADER_PATH = "anim/ver.glsl";
     public static String FRAGMENT_SHADER_PATH = "anim/frag.glsl";
@@ -110,7 +111,7 @@ public class Animator implements Entity {
             GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  mAnimatedModel.mMesh.mTexture.getID());
         }
 
-        GLES30.glDrawElements(GLES30.GL_LINE_STRIP, mEBOIndices.length(), mEBOIndices.getType(), 0);
+        GLES30.glDrawElements(mDrawMode, mEBOIndices.length(), mEBOIndices.getType(), 0);
 
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
         GLES30.glDisable(GLES30.GL_TEXTURE_2D);
@@ -140,5 +141,9 @@ public class Animator implements Entity {
 
     public boolean isIsInitialized() {
         return mIsInitialized;
+    }
+
+    public void setDrawMode(int drawMode) {
+        mDrawMode = drawMode;
     }
 }

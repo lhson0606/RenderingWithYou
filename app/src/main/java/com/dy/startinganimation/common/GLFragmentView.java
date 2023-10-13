@@ -8,21 +8,27 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
+import com.dy.startinganimation.activities.DemoGLActivity;
 import com.dy.startinganimation.activities.DyGLSurfaceView;
 
 public class GLFragmentView extends Fragment {
-    private DyGLSurfaceView glSurfaceView;
-    public GLFragmentView(Activity activity){
-        super();
-        glSurfaceView = new DyGLSurfaceView(activity);
+
+    public static GLFragmentView newInstance(){
+        GLFragmentView fragment = new GLFragmentView();
+        return fragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+        DyGLSurfaceView glSurfaceView = new DyGLSurfaceView(getActivity());
+        Bundle b = new Bundle();
+        b.putSerializable("glSurfaceView", glSurfaceView);
+        setArguments(b);
         return glSurfaceView;
     }
 
     public DyGLSurfaceView getGlSurfaceView() {
+        DyGLSurfaceView glSurfaceView = (DyGLSurfaceView) getArguments().getSerializable("glSurfaceView");
         return glSurfaceView;
     }
 }

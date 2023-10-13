@@ -9,7 +9,10 @@ import com.dy.startinganimation.animation.AnimRenderer;
 import com.dy.startinganimation.camera.Camera;
 import com.dy.startinganimation.utils.ScaleListener;
 
-public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
+import java.io.Serializable;
+
+public class DyGLSurfaceView extends android.opengl.GLSurfaceView
+implements Serializable {
 
     public DyGLSurfaceView(Context context) {
         super(context);
@@ -19,10 +22,7 @@ public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
         setRenderer(mRenderer);
         mScaleListener = new ScaleListener(Camera.getInstance().getInstance());
         mScaleDetector = new ScaleGestureDetector(context, mScaleListener);
-    }
-
-    public DyGLSurfaceView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        setPreserveEGLContextOnPause(true);
     }
 
     protected Context mContext;
@@ -58,5 +58,11 @@ public class DyGLSurfaceView extends android.opengl.GLSurfaceView {
 
     public AnimRenderer getRenderer() {
         return mRenderer;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        mRenderer.destroy();
     }
 }
