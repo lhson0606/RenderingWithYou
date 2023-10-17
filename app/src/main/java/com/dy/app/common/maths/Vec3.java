@@ -112,4 +112,21 @@ public class Vec3 {
 
         return res;
     }
+
+    public Vec3 multiply(float t) {
+        Vec3 ret = new Vec3(x, y, z);
+        ret.x *= t;
+        ret.y *= t;
+        ret.z *= t;
+        return ret;
+    }
+
+    @Override
+    public String toString() {
+        return "Vec3{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                '}';
+    }
 }

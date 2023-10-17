@@ -48,10 +48,11 @@ public class Board implements GameEntity {
 
     }
 
-    public Tile getTile(float x, float y){
-        Vec2i pos = new Vec2i((int)(x / DyConst.tile_size), (int)(y / DyConst.tile_size));
-        return tiles[pos.x][pos.y];
+    public Tile getTile(Vec3 worldPos){
+        Vec2i tilePos = Tile.getTilePos(worldPos);
+        return tiles[tilePos.x][tilePos.y];
     }
+
 
     public Tile getTile(Vec2i pos){
         return tiles[pos.x][pos.y];

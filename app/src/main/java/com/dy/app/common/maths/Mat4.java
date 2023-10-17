@@ -94,4 +94,10 @@ public class Mat4 implements Cloneable{
     public Mat4 clone(){
         return new Mat4(this);
     }
+
+    public Vec4 multiply(Vec4 v4) {
+        float[] resData = new float[4];
+        Matrix.multiplyMV(resData, 0, mData, mOffset, v4.getData(), 0);
+        return new Vec4(resData);
+    }
 }

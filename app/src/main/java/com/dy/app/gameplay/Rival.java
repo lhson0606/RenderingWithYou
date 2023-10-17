@@ -5,7 +5,7 @@ import com.dy.app.utils.DyConst;
 public class Rival {
     private boolean inTurn = true;
     private boolean whitePiece = false;
-    private int pieceSkinIndex = 2;
+    private int pieceSkinIndex = 0;
     private int backgroundSkinIndex = 0;
     private int tileSkinIndex = 0;
     private int boardSkinIndex = 0;

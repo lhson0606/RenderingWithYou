@@ -86,4 +86,8 @@ public class Tile {
     public static Vec3 getOffSet(int x, int y){
         return new Vec3(DyConst.tile_size*(x -4+ 0.5f) , 0, DyConst.tile_size*(y -4+ 0.5f));
     }
+
+    public static Vec2i getTilePos(Vec3 pos){
+        return new Vec2i((int)(pos.x/DyConst.tile_size + 4), (int)(pos.z/DyConst.tile_size + 4));
+    }
 }

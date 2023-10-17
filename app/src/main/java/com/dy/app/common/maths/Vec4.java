@@ -28,4 +28,28 @@ public class Vec4 {
         this.w = w;
     }
 
+    public Vec4(float[] data) {
+        this.x = data[0];
+        this.y = data[1];
+        this.z = data[2];
+        this.w = data[3];
+    }
+
+    public float[] getData(){
+        return new float[]{x, y, z, w};
+    }
+
+    @Override
+    public String toString() {
+        return "Vec4{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                ", w=" + w +
+                '}';
+    }
+
+    public Vec3 xyz() {
+        return new Vec3(x, y, z);
+    }
 }

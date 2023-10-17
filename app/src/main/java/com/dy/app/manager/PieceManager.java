@@ -6,8 +6,13 @@ import com.dy.app.gameplay.Player;
 import com.dy.app.gameplay.Rival;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.piece.Bishop;
+import com.dy.app.gameplay.piece.King;
+import com.dy.app.gameplay.piece.Knight;
 import com.dy.app.gameplay.piece.Pawn;
 import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.gameplay.piece.Queen;
+import com.dy.app.gameplay.piece.Rook;
 import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.shader.PieceShader;
@@ -52,32 +57,97 @@ public class PieceManager {
         }
     }
 
+    private Piece loadSinglePiece(Board board, boolean onPlayerSide, Skin skin, String pieceName, Vec2i pos) throws IOException {
+        Tile tile = board.getTile(pos);
+        Obj3D obj = ObjManager.getInstance().getObj(pieceName);
+        obj.setModelMat(tile.getObj().getModelMat().clone());
+        obj.setTex(skin.getTexture());
+        obj.setMaterial(skin.getMaterial());
+
+        Piece piece = null;
+
+        switch (pieceName){
+            case DyConst.pawn:
+                piece = new Pawn(
+                        tile,
+                        obj,
+                        onPlayerSide
+                );
+                break;
+            case DyConst.rook:
+                piece = new Rook(
+                        tile,
+                        obj,
+                        onPlayerSide
+                );
+                break;
+            case DyConst.knight:
+                piece = new Knight(
+                        tile,
+                        obj,
+                        onPlayerSide
+                );
+                break;
+            case DyConst.bishop:
+                piece = new Bishop(
+                        tile,
+                        obj,
+                        onPlayerSide
+                );
+                break;
+            case DyConst.queen:
+                piece = new Queen(
+                        tile,
+                        obj,
+                        onPlayerSide
+                );
+                break;
+            case DyConst.king:
+                piece = new King(
+                        tile,
+                        obj,
+                        onPlayerSide
+                );
+                break;
+        }
+
+
+        tile.setPiece(piece);
+        PieceShader shader = new PieceShader(
+                ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_ver_glsl_path)),
+                ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_frag_glsl_path))
+        );
+        shader.setPiece(piece);
+        piece.getObj().setShader(shader);
+        return piece;
+    }
+
     private Vector<Piece> loadBlackPieces(boolean onPlayerSide, Skin skin) throws IOException {
         Vector<Piece> pieces = new Vector<>();
         Board board = Board.getInstance();
-        String verCode  = ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_ver_glsl_path));
-        String fragCode = ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_frag_glsl_path));
+
         //8 pawns
         for(int i = 0; i<8; i++){
-            Tile tile = board.getTile(new Vec2i(i, 6));
-            Obj3D obj = ObjManager.getInstance().getObj(DyConst.pawn);
-            obj.setModelMat(tile.getObj().getModelMat().clone());
-            obj.setTex(skin.getTexture());
-            obj.setMaterial(skin.getMaterial());
-
-            Pawn pawn = new Pawn(
-                    tile,
-                    obj,
-                    onPlayerSide
-            );
-
-            tile.setPiece(pawn);
-            PieceShader shader = new PieceShader(verCode, fragCode);
-            shader.setPiece(pawn);
-            pawn.getObj().setShader(shader);
-            pieces.add(pawn);
-
+            pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.pawn, new Vec2i(i, 6)));
         }
+
+        //2 rooks
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(0, 7)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(7, 7)));
+
+        //2 knights
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(1, 7)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(6, 7)));
+
+        //2 bishops
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(2, 7)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(5, 7)));
+
+        //1 queen
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.queen, new Vec2i(3, 7)));
+
+        //1 king
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(4, 7)));
 
         return pieces;
     }
@@ -89,25 +159,26 @@ public class PieceManager {
         String fragCode = ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_frag_glsl_path));
         //8 pawns
         for(int i = 0; i<8; i++){
-            Tile tile = board.getTile(new Vec2i(i, 1));
-            Obj3D obj = ObjManager.getInstance().getObj(DyConst.pawn);
-            obj.setModelMat(tile.getObj().getModelMat().clone());
-            obj.setTex(skin.getTexture());
-            obj.setMaterial(skin.getMaterial());
-
-            Pawn pawn = new Pawn(
-                    tile,
-                    obj,
-                    onPlayerSide
-            );
-
-            tile.setPiece(pawn);
-            PieceShader shader = new PieceShader(verCode, fragCode);
-            shader.setPiece(pawn);
-            pawn.getObj().setShader(shader);
-            pieces.add(pawn);
-
+            pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.pawn, new Vec2i(i, 1)));
         }
+
+        //2 rooks
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(0, 0)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(7, 0)));
+
+        //2 knights
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(1, 0)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(6, 0)));
+
+        //2 bishops
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(2, 0)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(5, 0)));
+
+        //1 queen
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.queen, new Vec2i(3, 0)));
+
+        //1 king
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(4, 0)));
 
         return pieces;
     }
