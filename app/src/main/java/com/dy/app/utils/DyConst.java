@@ -19,8 +19,8 @@ public class DyConst {
     public static final String board_skins[] ={"basic.jpg"};
     public static final String tile_skins[] = {"basic.png"};
     public static final String back_ground_skins[] = {"basic.jpg"};
-    public static final String terrain_tex[] = {"galaxy.jpg"};
-    public static final String terrain_models[] = {"galaxy.obj"};
+    public static final String terrain_tex[] = {"cozy_room.jpg", "galaxy.jpg"};
+    public static final String terrain_models[] = {"cozy_room.obj", "galaxy.obj"};
     public static final String king = "king";
     public static final String queen = "queen";
     public static final String bishop = "bishop";
@@ -42,13 +42,17 @@ public class DyConst {
     public static final Vec3 light_color = new Vec3(1.0f, 1.0f, 1.0f);
     public static final Vec3 light_pos = new Vec3(0.0f, 20.0f, 0.0f);
     public static final float light_intensity = 1.0f;
-    public static final float tile_size = 0.639908f;
+    public static final float tile_size = 0.649908f;
     public static final float board_height = 0.117954f;
     public static float default_attenuation_constant = 0.0f;
     public static float default_attenuation_linear = 0f;
     public static float default_attenuation_quadratic = 0f;
-    public static final String ver_glsl_path = "glsl/basic_obj/ver.glsl";
-    public static final String frag_glsl_path = "glsl/basic_obj/frag.glsl";
+    public static final String piece_ver_glsl_path = "glsl/piece/ver.glsl";
+    public static final String piece_frag_glsl_path = "glsl/piece/frag.glsl";
+    public static final String terrain_ver_glsl_path = "glsl/terrain/ver.glsl";
+    public static final String terrain_frag_glsl_path = "glsl/terrain/frag.glsl";
+    public static final String tile_ver_glsl_path = "glsl/tile/ver.glsl";
+    public static final String tile_frag_glsl_path = "glsl/tile/frag.glsl";
     public static final String piece_model[] = {"king.obj", "queen.obj", "bishop.obj", "rook.obj", "knight.obj", "pawn.obj"};
     public static final String tile_model_path ="model/board/tile.obj";
 }

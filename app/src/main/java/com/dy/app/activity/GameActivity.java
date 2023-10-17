@@ -99,7 +99,8 @@ implements MainCallback {
             case END:
                 break;
             case SHOW_DIALOG:
-                progressDialog.show();
+                if(!progressDialog.isShowing())
+                    progressDialog.show();
                 break;
             case DISMISS_DIALOG:
                 progressDialog.dismiss();

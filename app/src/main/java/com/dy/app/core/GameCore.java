@@ -77,6 +77,22 @@ public class GameCore {
                 "initializing game board"
         );
 
+        //terrain
+        TaskManager.getInstance().addTask(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            EntityManger.getInstance().newEntity(Terrain.newInstance());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                },
+                "loading terrain"
+        );
+
+
         TaskManager.getInstance().addTask(
                 new Runnable() {
                     @Override
@@ -113,7 +129,6 @@ public class GameCore {
 
     public void startGame(){
         //set game background
-        EntityManger.getInstance().newEntity(Terrain.newInstance());
         gameActivity.onMsgToMain(TAG, -1, TaskType.SET_GAME_SURFACE, null);
     }
 }

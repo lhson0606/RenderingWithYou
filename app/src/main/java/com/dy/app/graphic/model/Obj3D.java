@@ -1,29 +1,28 @@
 package com.dy.app.graphic.model;
 
-import android.graphics.Color;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
 
 import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.common.maths.Vec4;
-import com.dy.app.core.GameCore;
 import com.dy.app.graphic.Material;
 import com.dy.app.graphic.gl.EBO;
 import com.dy.app.graphic.gl.VAO;
 import com.dy.app.graphic.gl.VBO;
-import com.dy.app.graphic.shader.Shader;
+import com.dy.app.graphic.shader.Obj3DShader;
+import com.dy.app.graphic.shader.TileShader;
 
 import java.util.Map;
 
-public class Obj3D{
+public class Obj3D implements Cloneable{
 
     private VAO VAO;
     private VBO VBOpos;
     private VBO VBOTexCoords;
     private VBO VBONormals;
     private EBO EBOIndices;
-    private Shader shader;
+    private Obj3DShader shader;
     private Mesh mesh;
     private Mat4 modelMat;
     private Vec3 target;//looking at
@@ -31,15 +30,11 @@ public class Obj3D{
     private Material material;
     private Vec4 highlightColor;
 
-    private Map<State, Vec4> highlightColors;
+    private final Map<State, Vec4> highlightColors;
 
-    public Obj3D(Obj3D o) {
-        this.mesh = new Mesh(o.mesh);
-        this.modelMat = new Mat4(o.modelMat);
-        this.shader = new Shader(o.shader.getVerCode(), o.shader.getFragCode());
-        this.highlightColors = new java.util.HashMap<>(o.highlightColors);
-        this.highlightColor = new Vec4(o.highlightColor);
-    }
+/*    public Obj3D(Obj3D o) {
+        this = (Obj)
+    }*/
 
     public enum State{
         NORMAL,
@@ -49,10 +44,9 @@ public class Obj3D{
         ENDANGERED
     }
 
-    public Obj3D(Mesh mesh, Shader shader){
+    public Obj3D(Mesh mesh){
         this.mesh = mesh;
         this.modelMat = Mat4.createIdentityMatrix();
-        this.shader = shader;
         highlightColors = new java.util.HashMap<>();
         highlightColors.put(State.NORMAL, new Vec4(0, 0, 0, 0));
         highlightColors.put(State.HIGHLIGHTED, new Vec4(1, 1, 0, 0.3f));
@@ -60,6 +54,10 @@ public class Obj3D{
         highlightColors.put(State.SOURCE, new Vec4(0, 0, 1, 0.3f));
         highlightColors.put(State.ENDANGERED, new Vec4(1, 0, 0, 0.3f));
         highlightColor = highlightColors.get(State.NORMAL);
+    }
+
+    public void setShader(Obj3DShader shader) {
+        this.shader = shader;
     }
 
     //has to be called after GL is initialized
@@ -76,12 +74,12 @@ public class Obj3D{
 
     private void bindAndEnableAttrib(){
         VAO.bind();
-        VAO.linkBufferAttribute(Shader.VERTEX_INDEX, VBOpos, 0);
-        VAO.linkBufferAttribute(Shader.TEXTURE_COORD_INDEX, VBOTexCoords, 0);
-        VAO.linkBufferAttribute(Shader.NORMAL_INDEX, VBONormals, 0);
-        GLES30.glEnableVertexAttribArray(Shader.VERTEX_INDEX);
-        GLES30.glEnableVertexAttribArray(Shader.TEXTURE_COORD_INDEX);
-        GLES30.glEnableVertexAttribArray(Shader.NORMAL_INDEX);
+        VAO.linkBufferAttribute(Obj3DShader.VERTEX_INDEX, VBOpos, 0);
+        VAO.linkBufferAttribute(Obj3DShader.TEXTURE_COORD_INDEX, VBOTexCoords, 0);
+        VAO.linkBufferAttribute(Obj3DShader.NORMAL_INDEX, VBONormals, 0);
+        GLES30.glEnableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
+        GLES30.glEnableVertexAttribArray(Obj3DShader.TEXTURE_COORD_INDEX);
+        GLES30.glEnableVertexAttribArray(Obj3DShader.NORMAL_INDEX);
         VAO.unbind();
 
         VAO.enableElements(EBOIndices);
@@ -94,19 +92,12 @@ public class Obj3D{
     public void draw(Mat4 viewMat, Mat4 projMat) {
         shader.start();
         //load uniforms
-        shader.loadLight(GameCore.getInstance().getGameSetting().getLight());
-        shader.loadModelMat(modelMat.mData);
-        shader.loadViewMat(viewMat.mData);
-        shader.loadProjectionMat(projMat.mData);
-        shader.loadShineDampener(material.getLightDampener());
-        shader.loadReflectivity(material.getReflectivity());
-        shader.loadAmbient(GameCore.getInstance().getGameSetting().getAmbientFactor());
-        shader.loadHighlightColor(highlightColor);
+        shader.loadUniforms();
 
         VAO.bind();
-        GLES30.glEnableVertexAttribArray(Shader.VERTEX_INDEX);
-        GLES30.glEnableVertexAttribArray(Shader.TEXTURE_COORD_INDEX);
-        GLES30.glEnableVertexAttribArray(Shader.NORMAL_INDEX);
+        GLES30.glEnableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
+        GLES30.glEnableVertexAttribArray(Obj3DShader.TEXTURE_COORD_INDEX);
+        GLES30.glEnableVertexAttribArray(Obj3DShader.NORMAL_INDEX);
 
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  tex.getID());
@@ -126,6 +117,20 @@ public class Obj3D{
         EBOIndices.destroy();
         shader.destroy();
         tex.destroy();
+    }
+
+    @Override
+    public Obj3D clone(){
+        Obj3D res = new Obj3D(new Mesh(mesh));
+        if(shader!=null){
+            res.setShader(shader.clone());
+            res.shader.setObj3D(res);
+        }
+        res.setTex(tex);
+        res.setMaterial(material);
+        res.setModelMat(new Mat4(modelMat));
+        res.setTarget(target);
+        return res;
     }
 
     public void setModelMat(Mat4 modelMat){
@@ -150,5 +155,33 @@ public class Obj3D{
 
     public void setMaterial(Material material) {
         this.material = material;
+    }
+
+    public Mat4 getModelMat() {
+        return modelMat;
+    }
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public Mesh getMesh() {
+        return mesh;
+    }
+
+    public Vec3 getTarget() {
+        return target;
+    }
+
+    public Texture getTex() {
+        return tex;
+    }
+
+    public Vec4 getHighlightColor() {
+        return highlightColor;
+    }
+
+    public Map<State, Vec4> getHighlightColors() {
+        return highlightColors;
     }
 }

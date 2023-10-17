@@ -5,7 +5,6 @@ import android.content.Context;
 import com.dy.app.common.maths.Vec2;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.graphic.model.Mesh;
-import com.dy.app.graphic.shader.Shader;
 import com.dy.app.graphic.shader.ShaderHelper;
 
 import java.io.BufferedReader;
@@ -128,20 +127,6 @@ public class MeshLoader {
         }
 
         reader.close();
-
-        int shaderProgram = -1;
-        String vertSource = new String();
-        String fragSource = new String();
-        try {
-            InputStream vertexShaderStream = context.getAssets().open(DyConst.ver_glsl_path);
-            InputStream fragmentShaderStream = context.getAssets().open(DyConst.frag_glsl_path);
-            vertSource = ShaderHelper.getInstance().readShader(vertexShaderStream);
-            fragSource = ShaderHelper.getInstance().readShader(fragmentShaderStream);
-        } catch (IOException e) {
-            GLHelper.handleException(TAG, e);
-        }
-
-        Shader shader = new Shader(vertSource, fragSource);
 
         float texCoords[] = new float[texCoordsDst.length*2];
         for(int i = 0;i<texCoordsDst.length; ++i){

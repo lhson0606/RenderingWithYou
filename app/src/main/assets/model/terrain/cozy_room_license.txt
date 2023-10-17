@@ -1,0 +1,11 @@
+Model Information:
+* title:	Cozy room
+* source:	https://sketchfab.com/3d-models/cozy-room-5f63d254de7b481b8ae0a8cd60a47dbf
+* author:	Irina Kostina (https://sketchfab.com/irinaa1810k)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Cozy room" (https://sketchfab.com/3d-models/cozy-room-5f63d254de7b481b8ae0a8cd60a47dbf) by Irina Kostina (https://sketchfab.com/irinaa1810k) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

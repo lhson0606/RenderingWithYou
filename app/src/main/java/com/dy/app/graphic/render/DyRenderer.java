@@ -1,25 +1,10 @@
 package com.dy.app.graphic.render;
 
-import android.content.Context;
 import android.opengl.GLES30;
 
-import com.dy.app.core.GameCore;
 import com.dy.app.core.GameEntity;
-import com.dy.app.gameplay.board.Tile;
-import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.camera.Camera;
-import com.dy.app.graphic.model.Mesh;
-import com.dy.app.graphic.model.Obj3D;
-import com.dy.app.graphic.model.Texture;
-import com.dy.app.graphic.shader.ShaderHelper;
-import com.dy.app.manager.AssetManger;
 import com.dy.app.manager.EntityManger;
-import com.dy.app.manager.ObjManager;
-import com.dy.app.utils.DyConst;
-import com.dy.app.utils.MeshLoader;
-import com.dy.app.utils.ObjLoader;
-
-import java.io.IOException;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -28,8 +13,8 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     public DyRenderer() {
     }
 
-    private Obj3D test1 = null;
-    private Obj3D test2 = null;
+    //private Obj3D test1 = null;
+    //private Obj3D test2 = null;
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         init();
@@ -37,7 +22,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         GLES30.glEnable(GLES30.GL_DEPTH_TEST);
 
 
-        try {
+       /* try {
             test1 = ObjLoader.load("model/piece/knight.obj");
             Skin skin1 = AssetManger.getInstance().getSkin(AssetManger.SkinType.BLACK_TILE);
             Texture texture1 = new Texture(skin1.getBitmap());
@@ -56,7 +41,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
             test2.changeState(Obj3D.State.SOURCE);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
 
     }
 
@@ -78,7 +63,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         for(GameEntity e: EntityManger.getInstance().getEntities()){
             e.draw();
         }
-        test1.draw(Camera.getInstance().mViewMat, Camera.getInstance().mProjMat);
-        test2.draw(Camera.getInstance().mViewMat, Camera.getInstance().mProjMat);
+        //test1.draw(Camera.getInstance().mViewMat, Camera.getInstance().mProjMat);
+        //test2.draw(Camera.getInstance().mViewMat, Camera.getInstance().mProjMat);
     }
 }

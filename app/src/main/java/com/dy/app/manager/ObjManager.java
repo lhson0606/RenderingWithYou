@@ -1,14 +1,13 @@
 package com.dy.app.manager;
 
+import android.graphics.Shader;
+
 import com.dy.app.core.GameCore;
 import com.dy.app.gameplay.Player;
-import com.dy.app.graphic.Skin;
-import com.dy.app.graphic.model.Mesh;
 import com.dy.app.graphic.model.Obj3D;
-import com.dy.app.graphic.shader.Shader;
+import com.dy.app.graphic.shader.PieceShader;
 import com.dy.app.graphic.shader.ShaderHelper;
 import com.dy.app.utils.DyConst;
-import com.dy.app.utils.MeshLoader;
 import com.dy.app.utils.ObjLoader;
 
 import java.io.IOException;
@@ -25,7 +24,7 @@ public class ObjManager {
     private static ObjManager instance = null;
 
     public void init(){
-        loadPieceModel();
+        //loadPieceModel();
         loadTile();
         loadTerrain();
     }
@@ -57,7 +56,6 @@ public class ObjManager {
             try {
                 Obj3D obj3D =  ObjLoader.load(path);
                 obj3D.setMaterial(DyConst.default_material);
-
                 if(pieceName.startsWith(DyConst.king)){
                     obj3Ds.put(DyConst.king, obj3D);
                 }else if(pieceName.startsWith(DyConst.queen)) {
@@ -83,6 +81,7 @@ public class ObjManager {
     }
 
     public Obj3D getObj(String name){
-        return new Obj3D(obj3Ds.get(name));
+        Obj3D o = obj3Ds.get(name);
+        return o.clone();
     }
 }
