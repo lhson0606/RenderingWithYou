@@ -38,7 +38,7 @@ public class PieceShader extends Obj3DShader{
         //load uniforms
         super.loadUniforms();
         loadLight(GameCore.getInstance().getGameSetting().getLight());
-        loadShineDampener(mPiece.getObj().getMaterial().getLightDampener());
+        loadShineDamper(mPiece.getObj().getMaterial().getLightDamper());
         loadReflectivity(mPiece.getObj().getMaterial().getReflectivity());
         loadAmbient(GameCore.getInstance().getGameSetting().getAmbientFactor());
         loadHighlightColor(mPiece.getObj().getHighlightColor());
@@ -47,38 +47,40 @@ public class PieceShader extends Obj3DShader{
     @Override
     public void getAllUniLocations(){
         super.getAllUniLocations();
-        mLightPosLoc = GLHelper.getUniLocation(mProgram, LIGHT_POS_NAME);
         mLightModelMatLoc = GLHelper.getUniLocation(mProgram, LIGHT_MODEL_MAT_NAME);
+        mLightPosLoc = GLHelper.getUniLocation(mProgram, LIGHT_POS_NAME);
         mLightColorLoc = GLHelper.getUniLocation(mProgram, LIGHT_COLOR_NAME);
-        mShineDampenerLoc = GLHelper.getUniLocation(mProgram, SHINE_DAMPENER_NAME);
+
+        mShineDamperLoc = GLHelper.getUniLocation(mProgram, SHINE_Damper_NAME);
         mReflectivityLoc = GLHelper.getUniLocation(mProgram, REFLECTIVITY_NAME);
+
         mAmbientFactorLoc = GLHelper.getUniLocation(mProgram, AMBIENT_FACTOR_NAME);
-        mAttenConstLoc = GLHelper.getUniLocation(mProgram, ATTEN_CONSTANT_NAME);
-        mAttenLinearLoc = GLHelper.getUniLocation(mProgram, ATTEN_LINEAR_NAME);
-        mAttenQuadraticLoc = GLHelper.getUniLocation(mProgram, ATTEN_QUADRATIC_NAME);
+        //mAttenConstLoc = GLHelper.getUniLocation(mProgram, ATTEN_CONSTANT_NAME);
+        //mAttenLinearLoc = GLHelper.getUniLocation(mProgram, ATTEN_LINEAR_NAME);
+        //mAttenQuadraticLoc = GLHelper.getUniLocation(mProgram, ATTEN_QUADRATIC_NAME);
         mHighlightColorLoc = GLHelper.getUniLocation(mProgram, HIGHLIGHT_COLOR_NAME);
     }
 
     public void loadLight(Light light){
-        loadVec3(mLightColorLoc, light.getColor());
-        loadVec3(mLightPosLoc, light.getPos());
         loadMat4(mLightModelMatLoc, light.getModelMat());
+        loadVec3(mLightPosLoc, light.getPos());
+        loadVec3(mLightColorLoc, light.getColor());
         //load light attenuation (aka natural light) factors
-        GLES30.glUniform1f(mAttenConstLoc, light.getAttenuationConstant());
-        GLES30.glUniform1f(mAttenLinearLoc, light.getAttenuationLinear());
-        GLES30.glUniform1f(mAttenQuadraticLoc, light.getAttenuationQuadratic());
+        //GLES30.glUniform1f(mAttenConstLoc, light.getAttenuationConstant());
+        //GLES30.glUniform1f(mAttenLinearLoc, light.getAttenuationLinear());
+        //GLES30.glUniform1f(mAttenQuadraticLoc, light.getAttenuationQuadratic());
     }
 
-    public void loadShineDampener(float dampener){
-        GLES30.glUniform1f(mShineDampenerLoc, dampener);
+    public void loadShineDamper(float Damper){
+        GLES30.glUniform1f(mShineDamperLoc, Damper);
     }
 
     public void loadReflectivity(float reflectivity){
         GLES30.glUniform1f(mReflectivityLoc, reflectivity);
     }
 
-    public void loadAmbient(float ambient){
-        GLES30.glUniform1f(mAmbientFactorLoc, ambient);
+    public void loadAmbient(float ambientFactor){
+        GLES30.glUniform1f(mAmbientFactorLoc, ambientFactor);
     }
 
     public void loadHighlightColor(Vec4 color){
@@ -91,8 +93,8 @@ public class PieceShader extends Obj3DShader{
     private int mLightModelMatLoc;
     private final String LIGHT_COLOR_NAME = "uLightColor";
     private int mLightColorLoc;
-    private final String SHINE_DAMPENER_NAME = "uShineDampener";
-    private int mShineDampenerLoc;
+    private final String SHINE_Damper_NAME = "uShineDamper";
+    private int mShineDamperLoc;
     private final String REFLECTIVITY_NAME = "uReflectivity";
     private int mReflectivityLoc;
     private  final String AMBIENT_FACTOR_NAME = "uAmbientFactor";

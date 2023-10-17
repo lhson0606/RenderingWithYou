@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 import com.dy.app.graphic.model.Texture;
 
-public class Skin {
+public class Skin implements Cloneable{
     private Material material;
     private Bitmap bitmap;
 
@@ -24,5 +24,11 @@ public class Skin {
     public Texture getTexture() {
         Texture res = new Texture(bitmap);
         return res;
+    }
+
+    @Override
+    public Skin clone(){
+        Skin skin = new Skin(material, bitmap);
+        return skin;
     }
 }

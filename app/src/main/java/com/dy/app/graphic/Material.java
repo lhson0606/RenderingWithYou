@@ -1,21 +1,21 @@
 package com.dy.app.graphic;
 
 public class Material {
-    float lightDampener;
-    float reflectivity;
+    float lightDamper = 1f;
+    float reflectivity = 0f;
 
     public Material(float lightDampener, float reflectivity) {
-        this.lightDampener = lightDampener;
+        this.lightDamper = lightDampener;
         this.reflectivity = reflectivity;
     }
 
     public Material(Material material) {
-        this.lightDampener = material.lightDampener;
+        this.lightDamper = material.lightDamper;
         this.reflectivity = material.reflectivity;
     }
 
-    public float getLightDampener() {
-        return lightDampener;
+    public float getLightDamper() {
+        return lightDamper;
     }
 
     public float getReflectivity() {

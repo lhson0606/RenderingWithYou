@@ -24,7 +24,7 @@ public class ObjManager {
     private static ObjManager instance = null;
 
     public void init(){
-        //loadPieceModel();
+        loadPieceModel();
         loadTile();
         loadTerrain();
     }
@@ -55,7 +55,6 @@ public class ObjManager {
             String path = DyConst.piece_model_path + pieceName;
             try {
                 Obj3D obj3D =  ObjLoader.load(path);
-                obj3D.setMaterial(DyConst.default_material);
                 if(pieceName.startsWith(DyConst.king)){
                     obj3Ds.put(DyConst.king, obj3D);
                 }else if(pieceName.startsWith(DyConst.queen)) {

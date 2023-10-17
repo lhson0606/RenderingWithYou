@@ -4,7 +4,9 @@ import com.dy.app.gameplay.board.Tile;
 import com.dy.app.graphic.model.Obj3D;
 
 public class Pawn extends Piece{
-    public Pawn(Tile tile, boolean onPlayerSide, Obj3D obj) {
-        super(tile, onPlayerSide, obj);
+
+    public Pawn(Tile tile, Obj3D obj, boolean onPlayerSide) {
+        super(tile, obj, onPlayerSide);
     }
+
 }

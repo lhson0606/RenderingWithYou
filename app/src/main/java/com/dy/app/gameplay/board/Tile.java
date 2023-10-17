@@ -50,8 +50,9 @@ public class Tile {
         return piece;
     }
 
-    public void setPiece(Piece piece){
+    public Tile setPiece(Piece piece){
         this.piece = piece;
+        return this;
     }
 
     public Vec3 getWorldPos(){

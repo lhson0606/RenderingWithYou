@@ -101,6 +101,7 @@ public class Obj3D implements Cloneable{
 
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  tex.getID());
+
         GLES30.glDrawElements(GLES30.GL_TRIANGLES, EBOIndices.length(), EBOIndices.getType(), 0);
 
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);

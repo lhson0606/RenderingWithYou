@@ -3,7 +3,7 @@ package com.dy.app.common.maths;
 import android.opengl.Matrix;
 import android.renderscript.Matrix4f;
 
-public class Mat4 {
+public class Mat4 implements Cloneable{
 
     public Mat4(float[] data){
         mData = data;
@@ -90,4 +90,8 @@ public class Mat4 {
         return ret;
     }
 
+    @Override
+    public Mat4 clone(){
+        return new Mat4(this);
+    }
 }

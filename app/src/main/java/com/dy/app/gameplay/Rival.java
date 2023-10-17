@@ -4,8 +4,8 @@ import com.dy.app.utils.DyConst;
 
 public class Rival {
     private boolean inTurn = true;
-    private boolean whitePiece = true;
-    private int pieceSkinIndex = 0;
+    private boolean whitePiece = false;
+    private int pieceSkinIndex = 2;
     private int backgroundSkinIndex = 0;
     private int tileSkinIndex = 0;
     private int boardSkinIndex = 0;
@@ -51,11 +51,11 @@ public class Rival {
         return DyConst.background_tex_path + DyConst.back_ground_skins[backgroundSkinIndex];
     }
 
-    private static Player instance = null;
+    private static Rival instance = null;
 
-    public static Player getInstance() {
+    public static Rival getInstance() {
         if(instance != null) return instance;
-        instance = new Player();
+        instance = new Rival();
         return instance;
     }
 }

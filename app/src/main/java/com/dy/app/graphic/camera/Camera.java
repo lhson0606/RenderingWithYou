@@ -69,8 +69,8 @@ public class Camera {
             dy = MIN_DY;
         }
 
-        if(abs(dx) < 0.3f) dx = 0;
-        if(abs(dy) < 0.3f) dy = 0;
+        if(abs(dx) < 0.8f) dx = 0;
+        if(abs(dy) < 0.8f) dy = 0;
 
         //Rotate around Y axis
         Vec3 vecFor = (mCenter.sub(mPos)).normalize();

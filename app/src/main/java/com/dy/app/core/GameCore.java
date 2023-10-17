@@ -15,6 +15,7 @@ import com.dy.app.manager.AssetManger;
 import com.dy.app.manager.BackgroundManger;
 import com.dy.app.manager.EntityManger;
 import com.dy.app.manager.ObjManager;
+import com.dy.app.manager.PieceManager;
 import com.dy.app.setting.GameSetting;
 import com.dy.app.utils.DyConst;
 
@@ -90,6 +91,19 @@ public class GameCore {
                     }
                 },
                 "loading terrain"
+        );
+
+        //load board boundary
+
+        //load chess pieces
+        TaskManager.getInstance().addTask(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        PieceManager.getInstance();
+                    }
+                },
+                "loading chess pieces"
         );
 
 

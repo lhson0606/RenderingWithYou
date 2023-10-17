@@ -52,10 +52,10 @@ public class Piece implements GameEntity {
         return obj;
     }
 
-    public Piece(Tile tile, boolean onPlayerSide, Obj3D obj){
+    public Piece(Tile tile, Obj3D obj, boolean onPlayerSide){
         this.tile = tile;
-        this.onPlayerSide = onPlayerSide;
         this.obj = obj;
+        this.onPlayerSide = onPlayerSide;
         EntityManger.getInstance().newEntity(this);
     }
 
