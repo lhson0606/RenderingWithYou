@@ -3,6 +3,7 @@ package com.dy.app.graphic.camera;
 import static java.lang.Math.abs;
 
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec3;
@@ -94,6 +95,7 @@ public class Camera {
         mPos = newPos;
         //update vector up
         mUp = vecFor.cross(Y_AXIS).cross(vecFor).normalize();
+        Log.d("Camera", "mPos: " + mPos.toString());
         update();
     }
 

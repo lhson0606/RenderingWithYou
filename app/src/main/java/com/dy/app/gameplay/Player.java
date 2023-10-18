@@ -4,12 +4,12 @@ import com.dy.app.utils.DyConst;
 
 public class Player {
     private boolean inTurn = true;
-    private boolean whitePiece = true;
+    private boolean whitePiece = false;
     private int pieceSkinIndex = 0;
     private int backgroundSkinIndex = 0;
     private int tileSkinIndex = 0;
     private int boardSkinIndex = 0;
-    private int terrainSkinIndex = 1;
+    private int terrainSkinIndex = DyConst.terrain_models.length-1;
 
     public boolean isInTurn() {
         return inTurn;

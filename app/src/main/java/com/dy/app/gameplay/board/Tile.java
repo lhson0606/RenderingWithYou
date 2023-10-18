@@ -45,7 +45,7 @@ public class Tile {
 
     public Piece getPiece(){
         if(!hasPiece())
-            throw new RuntimeException("Tile has no piece");
+            return null;
 
         return piece;
     }

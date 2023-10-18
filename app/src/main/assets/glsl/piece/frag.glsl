@@ -41,7 +41,7 @@ void main()
     float dampedFactor = pow(specularFactor, uShineDamper);
     vec3 finalSpecular = dampedFactor * uReflectivity * uLightColor;
 
-    finalColor = vec4(diffuse, 1.0) *texture(uTex2D0, bTexCoords) + vec4(finalSpecular, 1.0) + uHighlightColor;
+    finalColor = vec4(diffuse, 1.0) *texture(uTex2D0, bTexCoords) + vec4(finalSpecular, 1.0) + vec4(uHighlightColor.xyz, 0)*uHighlightColor.w;
 
 
 

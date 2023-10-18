@@ -19,8 +19,8 @@ public class DyConst {
     public static final String board_skins[] ={"basic.jpg"};
     public static final String tile_skins[] = {"wooden.jpg", "basic.png"};
     public static final String back_ground_skins[] = {"basic.jpg"};
-    public static final String terrain_tex[] = {"cozy_room.jpg", "galaxy.jpg"};
-    public static final String terrain_models[] = {"cozy_room.obj", "galaxy.obj"};
+    public static final String terrain_tex[] = {"cozy_room.jpg", "galaxy.jpg", "Booth2_lambert1_BaseColor.png", "PicnicTable_albedoM.tga.png"};
+    public static final String terrain_models[] = {"cozy_room.obj", "galaxy.obj", "dinner_booth.obj", "picnic_table.obj"};
     public static final String king = "king";
     public static final String queen = "queen";
     public static final String bishop = "bishop";
@@ -31,8 +31,8 @@ public class DyConst {
     public static final String terrain = "terrain";
     public static final Material default_material = new Material(2f, 0.5f);
     public static final Light defulat_light = new Light(new Vec3(1.0f, 1.0f, 1.0f), new Vec3(0.0f, 25.0f, 0.0f), 100.0f);
-    public static final Vec3 default_black_cam_pos = new Vec3(0.0f, 20.0f, 20.0f);
-    public static final Vec3 default_white_cam_pos = new Vec3(0.0f, 20.0f, -20.0f);
+    public static final Vec3 default_black_cam_pos = new Vec3(-0.007419136f, 3.611991f, 0.6967087f);
+    public static final Vec3 default_white_cam_pos = new Vec3(-1.2612155E-4f, 3.611991f, -0.6967087f);
     public static final String board = "board";
     public static final Vec3 black_target = new Vec3(0.0f, 0.0f, 1.0f);
     public static final Vec3 white_target = new Vec3(0.0f, 0.0f, -1.0f);
@@ -55,4 +55,5 @@ public class DyConst {
     public static final String tile_frag_glsl_path = "glsl/tile/frag.glsl";
     public static final String piece_model[] = {"king.obj", "queen.obj", "bishop.obj", "rook.obj", "knight.obj", "pawn.obj"};
     public static final String tile_model_path ="model/board/tile.obj";
+
 }

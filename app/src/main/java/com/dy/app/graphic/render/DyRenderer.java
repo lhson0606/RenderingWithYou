@@ -1,16 +1,26 @@
 package com.dy.app.graphic.render;
 
 import android.opengl.GLES30;
+import android.view.GestureDetector;
 
 import com.dy.app.core.GameEntity;
 import com.dy.app.graphic.camera.Camera;
+import com.dy.app.graphic.display.GameSurface;
+import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.EntityManger;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
-    public DyRenderer() {
+    private GameSurface gameSurface;
+    private TilePicker tilePicker;
+    private boolean pickerIsSet = false;
+
+    public DyRenderer(GameSurface gameSurface) {
+        this.gameSurface = gameSurface;
+        tilePicker = new TilePicker(0,0);
+        gameSurface.setGestureDetector(new GestureDetector(gameSurface.getContext(), tilePicker));
     }
 
     //private Obj3D test1 = null;
@@ -53,8 +63,12 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
 
     @Override
     public void onSurfaceChanged(GL10 gl, int w, int h) {
+        GLES30.glViewport ( 0, 0, w, h );
         Camera.getInstance().getInstance().setWidth(w);
         Camera.getInstance().getInstance().setHeight(h);
+        tilePicker.setScreenSize(w, h);
+        if(!pickerIsSet) gameSurface.setOnTouchListener(tilePicker);
+
     }
 
     @Override

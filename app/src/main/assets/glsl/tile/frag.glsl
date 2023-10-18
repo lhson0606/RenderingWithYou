@@ -11,6 +11,6 @@ uniform vec4 uHighlightColor;
 void main()
 {
 
-	finalColor = texture(uTex2D0, bTexCoords) + uHighlightColor;
+	finalColor = texture(uTex2D0, bTexCoords) + vec4(uHighlightColor.xyz, 0)*uHighlightColor.w;
 
 }

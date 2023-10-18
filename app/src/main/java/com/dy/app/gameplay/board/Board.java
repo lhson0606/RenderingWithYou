@@ -50,6 +50,8 @@ public class Board implements GameEntity {
 
     public Tile getTile(Vec3 worldPos){
         Vec2i tilePos = Tile.getTilePos(worldPos);
+        if(tilePos.x < 0 || tilePos.x >= DyConst.row_count || tilePos.y < 0 || tilePos.y >= DyConst.col_count)
+            return null;
         return tiles[tilePos.x][tilePos.y];
     }
 

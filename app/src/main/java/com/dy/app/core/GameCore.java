@@ -144,5 +144,11 @@ public class GameCore {
     public void startGame(){
         //set game background
         gameActivity.onMsgToMain(TAG, -1, TaskType.SET_GAME_SURFACE, null);
+        //setting game camera
+        if(Player.getInstance().isWhitePiece()){
+            Camera.getInstance().setPos(DyConst.default_white_cam_pos);
+        }else{
+            Camera.getInstance().setPos(DyConst.default_black_cam_pos);
+        }
     }
 }
