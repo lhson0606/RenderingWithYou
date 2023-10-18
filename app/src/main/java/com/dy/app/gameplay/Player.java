@@ -9,7 +9,7 @@ public class Player {
     private int backgroundSkinIndex = 0;
     private int tileSkinIndex = 0;
     private int boardSkinIndex = 0;
-    private int terrainSkinIndex = DyConst.terrain_models.length-1;
+    private int terrainSkinIndex = 0;
 
     public boolean isInTurn() {
         return inTurn;

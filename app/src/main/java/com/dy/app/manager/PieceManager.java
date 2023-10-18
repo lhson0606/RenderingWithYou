@@ -57,7 +57,7 @@ public class PieceManager {
         }
     }
 
-    private Piece loadSinglePiece(Board board, boolean onPlayerSide, Skin skin, String pieceName, Vec2i pos) throws IOException {
+    private Piece loadSinglePiece(Board board, boolean onPlayerSide, Skin skin, String pieceName, Vec2i pos, Piece.PieceColor pieceColor) throws IOException {
         Tile tile = board.getTile(pos);
         Obj3D obj = ObjManager.getInstance().getObj(pieceName);
         obj.setModelMat(tile.getObj().getModelMat().clone());
@@ -71,42 +71,48 @@ public class PieceManager {
                 piece = new Pawn(
                         tile,
                         obj,
-                        onPlayerSide
+                        onPlayerSide,
+                        pieceColor
                 );
                 break;
             case DyConst.rook:
                 piece = new Rook(
                         tile,
                         obj,
-                        onPlayerSide
+                        onPlayerSide,
+                        pieceColor
                 );
                 break;
             case DyConst.knight:
                 piece = new Knight(
                         tile,
                         obj,
-                        onPlayerSide
+                        onPlayerSide,
+                        pieceColor
                 );
                 break;
             case DyConst.bishop:
                 piece = new Bishop(
                         tile,
                         obj,
-                        onPlayerSide
+                        onPlayerSide,
+                        pieceColor
                 );
                 break;
             case DyConst.queen:
                 piece = new Queen(
                         tile,
                         obj,
-                        onPlayerSide
+                        onPlayerSide,
+                        pieceColor
                 );
                 break;
             case DyConst.king:
                 piece = new King(
                         tile,
                         obj,
-                        onPlayerSide
+                        onPlayerSide,
+                        pieceColor
                 );
                 break;
         }
@@ -128,26 +134,26 @@ public class PieceManager {
 
         //8 pawns
         for(int i = 0; i<8; i++){
-            pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.pawn, new Vec2i(i, 6)));
+            pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.pawn, new Vec2i(i, 6), Piece.PieceColor.BLACK));
         }
 
         //2 rooks
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(0, 7)));
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(7, 7)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(0, 7), Piece.PieceColor.BLACK));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(7, 7), Piece.PieceColor.BLACK));
 
         //2 knights
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(1, 7)));
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(6, 7)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(1, 7), Piece.PieceColor.BLACK));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(6, 7), Piece.PieceColor.BLACK));
 
         //2 bishops
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(2, 7)));
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(5, 7)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(2, 7), Piece.PieceColor.BLACK));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(5, 7), Piece.PieceColor.BLACK));
 
         //1 queen
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.queen, new Vec2i(3, 7)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.queen, new Vec2i(3, 7), Piece.PieceColor.BLACK));
 
         //1 king
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(4, 7)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(4, 7), Piece.PieceColor.BLACK));
 
         return pieces;
     }
@@ -159,26 +165,26 @@ public class PieceManager {
         String fragCode = ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_frag_glsl_path));
         //8 pawns
         for(int i = 0; i<8; i++){
-            pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.pawn, new Vec2i(i, 1)));
+            pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.pawn, new Vec2i(i, 1), Piece.PieceColor.WHITE));
         }
 
         //2 rooks
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(0, 0)));
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(7, 0)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(0, 0), Piece.PieceColor.WHITE));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.rook, new Vec2i(7, 0), Piece.PieceColor.WHITE));
 
         //2 knights
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(1, 0)));
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(6, 0)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(1, 0), Piece.PieceColor.WHITE));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.knight, new Vec2i(6, 0), Piece.PieceColor.WHITE));
 
         //2 bishops
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(2, 0)));
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(5, 0)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(2, 0), Piece.PieceColor.WHITE));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.bishop, new Vec2i(5, 0), Piece.PieceColor.WHITE));
 
         //1 queen
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.queen, new Vec2i(3, 0)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.queen, new Vec2i(3, 0), Piece.PieceColor.WHITE));
 
         //1 king
-        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(4, 0)));
+        pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(4, 0), Piece.PieceColor.WHITE));
 
         return pieces;
     }
@@ -189,5 +195,15 @@ public class PieceManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void removePiece(Piece piece) {
+        if(piece.isOnPlayerSide()){
+            player_pieces.remove(piece);
+        }else{
+            enemy_pieces.remove(piece);
+        }
+
+        EntityManger.getInstance().removeEntity(piece);
     }
 }

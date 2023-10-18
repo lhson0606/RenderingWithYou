@@ -39,7 +39,7 @@ public class Tile {
         obj.translate(getOffSet(pos.x, pos.y));
     }
 
-    boolean hasPiece(){
+    public boolean hasPiece(){
         return piece != null;
     }
 

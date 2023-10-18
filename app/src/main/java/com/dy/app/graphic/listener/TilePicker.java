@@ -24,24 +24,64 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
         height = h;
     }
 
-    private Tile lastTile = null;
-    private Piece lastPiece = null;
+    public static Tile lastTile = null;
+    private static Piece lastPiece = null;
     private boolean firstTouch = true;
+
+    private void cancelPicking(){
+        lastPiece.isPicking(false);
+        lastPiece = null;
+    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+        //ugly diagram by me
+        //https://app.diagrams.net/#G1kvrd5YVAJhFpZ6-JCbSDUIHSVGOq_gVz
         Log.d("TilePicker", "onTouch");
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
-                if(firstTouch){
-                    Piece piece = getPiece(event.getX(), event.getY());
-                    if(piece == null) return false;
+                if(firstTouch) {
+                    firstTouch = false;
+                    Tile tile = getTile(event.getX(), event.getY());
+                    Piece piece = null;
+                    if(lastPiece == null){
+                        if(tile == null){
+                            //do nothing :)
+                            return false;
+                        }else{
+                            piece = tile.getPiece();
+                            if(piece == null){
+                                //do nothing :)
+                                return false;
+                            }else if(!piece.isOnPlayerSide()){
+                                return false;
 
-                    if(piece != lastPiece && lastPiece != null)
-                        lastPiece.getObj().changeState(Obj3D.State.NORMAL);
+                            }else{/*is player piece*/
+                                piece.isPicking(true);
+                                lastPiece = piece;
+                                return false;
+                            }
+                        }
+                    } else if(tile == null) {
+                        cancelPicking();
+                        return false;
+                    } else if(!lastPiece.getPossibleMoves().contains(tile)){
+                        cancelPicking();
+                        return false;
+                    }else if(!tile.hasPiece()){
+                        //perform move
+                        lastPiece.move(tile.pos);
+                        cancelPicking();
+                        return false;
+                    }else{
+                        //perform attack
+                        lastPiece.move(tile.pos);
+                        cancelPicking();
+                        return false;
+                    }
 
-                    piece.getObj().changeState(Obj3D.State.SELECTED);
-                    lastPiece = piece;
+                }else{
+                    return false;
                 }
             case MotionEvent.ACTION_UP:
                 firstTouch = true;
@@ -88,15 +128,26 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        Piece piece = getPiece(e.getX(), e.getY());
-        if(piece == null) return false;
-
-        if(piece == lastPiece)
-            piece.getObj().changeState(Obj3D.State.NORMAL);
-        else if(lastPiece != null)
-            lastPiece.getObj().changeState(Obj3D.State.NORMAL);
-
-        lastPiece = null;
+        //ugly diagram by me
+        //https://app.diagrams.net/#G1kvrd5YVAJhFpZ6-JCbSDUIHSVGOq_gVz
+        Tile tile = getTile(e.getX(), e.getY());
+        if (tile == null) {
+            //do nothing :)
+        } else {
+            Piece piece = tile.getPiece();
+            if (piece == null) {
+                //do nothing :))
+            } else {
+                if (lastPiece == null) {
+                    //do nothing also :)))
+                } else if (lastPiece == piece) {
+                    lastPiece.isPicking(false);
+                    lastPiece = null;
+                } else {
+                    //do nothing also :))))
+                }
+            }
+        }
         return true;
     }
 
