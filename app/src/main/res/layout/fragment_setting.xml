@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#330077ff"
+    android:alpha="0.69">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnClose"
+        android:layout_width="@dimen/default_size"
+        android:layout_height="@dimen/default_size"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/ic_exit"
+        android:foreground="?attr/selectableItemBackground"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Configuration"
+        style="@style/tile_1"
+        android:background="@color/light_blue_2"/>
+
+    <ScrollView
+        android:layout_below="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GL draw mode"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+
+            <Spinner
+                android:id="@+id/spnGLDrawMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:dropDownWidth="match_parent"
+                android:dropDownVerticalOffset="37dp"
+                android:dropDownHorizontalOffset="20dp"
+                android:dropDownHeight="wrap_content"
+                android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+                android:spinnerMode="dropdown" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sensitivity"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sldSensorSensitivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="50"
+                android:valueFrom="0"
+                android:valueTo="100"
+                android:stepSize="1"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Directional light color"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Red"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="12sp"
+                android:textColor="#000000"/>
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="255"
+                android:valueFrom="0"
+                android:valueTo="255"
+                android:stepSize="1"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Green"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="12sp"
+                android:textColor="#000000"/>
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="255"
+                android:valueFrom="0"
+                android:valueTo="255"
+                android:stepSize="1"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Blue"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="12sp"
+                android:textColor="#000000"/>
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="255"
+                android:valueFrom="0"
+                android:valueTo="255"
+                android:stepSize="1"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ambient light"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="0.3"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:stepSize="0.05"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Play speed (milliseconds)"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+
+            <EditText
+                android:id="@+id/etPlaySpeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal|numberSigned"
+                android:textColor="#000000"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Spectacular light intensity"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="50"
+                android:valueFrom="0"
+                android:valueTo="1000"
+                android:stepSize="1"/>
+
+            <!--Material-->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Material"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Shine dampener"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="12sp"
+                android:textColor="#000000"/>
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="1"
+                android:valueFrom="0.1"
+                android:valueTo="10"
+                android:stepSize="0.1"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reflectivity"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="12sp"
+                android:textColor="#000000"/>
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="0.1"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:stepSize="0.05"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ambient factor"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="12sp"
+                android:textColor="#000000"/>
+
+            <com.google.android.material.slider.Slider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:value="0.3"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:stepSize="0.01"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

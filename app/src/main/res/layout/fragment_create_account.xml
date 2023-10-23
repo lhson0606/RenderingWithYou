@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#330077ff"
+        android:alpha="0.69">
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="@dimen/default_size"
+            android:layout_height="@dimen/default_size"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/ic_exit"
+            android:foreground="?attr/selectableItemBackground"
+            android:foregroundTintMode="add"/>
+
+        <TextView
+            android:id="@+id/tvTile"
+            style="@style/tile_1"
+            android:layout_width="match_parent"
+            android:layout_height="37dp"
+            android:background="@color/light_blue_2"
+            android:text="New account" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/tvTile"
+            android:layout_centerVertical="true">
+            <ScrollView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                >
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_centerInParent="true">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0sp"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="0sp"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="@dimen/medium_text_size"
+                                    android:layout_weight="3"
+                                    android:text="Email"
+                                    android:typeface="monospace"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/white"/>
+
+                                <EditText
+                                    android:id="@+id/etMail"
+                                    android:layout_width="0sp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="7"
+                                    android:textSize="@dimen/medium_text_size"
+                                    android:background="@drawable/light_blue_round_background"
+                                    android:textAlignment="center"
+                                    android:typeface="monospace"
+                                    android:foreground="?attr/selectableItemBackground"/>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0sp"
+                            android:layout_weight="1"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="0sp"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="@dimen/medium_text_size"
+                                    android:layout_weight="3"
+                                    android:text="Username"
+                                    android:typeface="monospace"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/white"/>
+
+                                <EditText
+                                    android:id="@+id/etUsername"
+                                    android:layout_width="0sp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="7"
+                                    android:textSize="@dimen/medium_text_size"
+                                    android:background="@drawable/light_blue_round_background"
+                                    android:textAlignment="center"
+                                    android:typeface="monospace"
+                                    android:foreground="?attr/selectableItemBackground"/>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0sp"
+                            android:layout_weight="1">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="0sp"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="@dimen/medium_text_size"
+                                    android:layout_weight="3"
+                                    android:text="Password"
+                                    android:typeface="monospace"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/white"/>
+
+                                <EditText
+                                    android:id="@+id/etPassword"
+                                    android:layout_width="0sp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="7"
+                                    android:textSize="@dimen/medium_text_size"
+                                    android:background="@drawable/light_blue_round_background"
+                                    android:textAlignment="center"
+                                    android:typeface="monospace"
+                                    android:inputType="textPassword"
+                                    android:foreground="?attr/selectableItemBackground"/>
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0sp"
+                            android:layout_weight="1">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                android:gravity="center">
+
+                                <TextView
+                                    android:layout_width="0sp"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="@dimen/medium_text_size"
+                                    android:layout_weight="3"
+                                    android:text="Retype"
+                                    android:typeface="monospace"
+                                    android:textAlignment="center"
+                                    android:textColor="@color/white"/>
+
+                                <EditText
+                                    android:id="@+id/etRetype"
+                                    android:layout_width="0sp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="7"
+                                    android:textSize="@dimen/medium_text_size"
+                                    android:background="@drawable/light_blue_round_background"
+                                    android:textAlignment="center"
+                                    android:typeface="monospace"
+                                    android:inputType="textPassword"
+                                    android:foreground="?attr/selectableItemBackground"/>
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0sp"
+                            android:layout_weight="1"
+                            android:gravity="right"
+                            android:orientation="horizontal"
+                            android:weightSum="12">
+
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:id="@+id/btnCancel"
+                                android:layout_width="0sp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:background="@drawable/light_red_round_background"
+                                android:text="Cancel"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/small_text_size"
+                                android:foreground="?attr/selectableItemBackground"
+                                android:layout_margin="@dimen/default_margin"/>
+
+                            <androidx.appcompat.widget.AppCompatButton
+                                android:id="@+id/btnCreate"
+                                android:layout_width="0sp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:background="@drawable/dark_blue_round_background"
+                                android:text="CREATE"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/small_text_size"
+                                android:foreground="?attr/selectableItemBackground"
+                                android:layout_margin="@dimen/default_margin"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </RelativeLayout>
+            </ScrollView>
+        </RelativeLayout>
+
+
+
+
+
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

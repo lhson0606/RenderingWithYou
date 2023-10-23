@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#330077ff"
+    android:alpha="0.69">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnClose"
+        android:layout_width="@dimen/default_size"
+        android:layout_height="@dimen/default_size"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/ic_exit"
+        android:foreground="?attr/selectableItemBackground" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="37dp"
+        android:text="Credits"
+        style="@style/tile_1"
+        android:background="@color/light_blue_2"/>
+
+    <ScrollView
+        android:layout_below="@+id/btnClose"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/credits"
+                android:textColor="#ff0000"
+                android:textStyle="bold|italic"
+                android:typeface="monospace"
+                android:foreground="?attr/selectableItemBackground"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

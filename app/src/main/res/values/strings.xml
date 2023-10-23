@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">renderingWithYou</string>
+    <string name="credits">
+    \t\n3D model
+        \t\t\nhttps://www.turbosquid.com/3d-models/3d-chess-2086885
+    \n
+    \t\nmain menu background
+        \t\t\nhttps://www.wallpaperflare.com/clear-and-blue-chess-game-set-board-party-glass-chess-board-wallpaper-xma
+    \n
+    \t\nloading_bg
+         \t\t\nhttps://pixabay.com/photos/chess-board-game-board-game-2730034/
+         \t\t\nhttps://pixabay.com/photos/chess-board-game-chess-board-316658/
+         \t\t\nhttps://pixabay.com/photos/tabby-cat-chess-game-strategy-pet-5946499/
+         \t\t\nhttps://pixabay.com/photos/chess-checkmate-chess-board-5516446/
+         \t\t\nhttps://pixabay.com/photos/chess-chess-board-black-game-white-140340/
+         \t\t\nhttps://pixabay.com/photos/chess-pawn-king-game-queen-1483735/
+         \t\t\nhttps://www.vecteezy.com/photo/25446001-ice-cubes-background-ice-cube-texture-ice-wallpaper-it-makes-me-feel-fresh-and-feel-good-in-the-summer-ice-and-cold-drinks-will-make-us-feel-relaxed-made-for-beverage-or-refreshment-business
+         \t\t\nhttps://www.freepik.com/free-photos-vectors/light-wood-texture
+         \t\t\nhttps://unsplash.com/photos/6vvIBTvL90A
+    \n
+    \t\nicon
+        \t\t\nhttps://i.pinimg.com/originals/44/aa/5a/44aa5a87d61cc08571aabfc61c7ae887.jpg
+    \n
+    \t\ndeveloped by
+        \t\t\ndy
+    \n
+    </string>
 </resources>

@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.dy.app.R;
@@ -16,6 +17,7 @@ import com.dy.app.core.GameCore;
 import com.dy.app.core.MainCallback;
 import com.dy.app.core.TaskManager;
 import com.dy.app.graphic.display.GameFragment;
+import com.dy.app.utils.ImageLoader;
 
 public class GameActivity extends FragmentActivity
 implements MainCallback {
@@ -32,7 +34,6 @@ implements MainCallback {
         TaskManager.getInstance().setActivity(this);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         mainHandler = new Handler(getMainLooper());
-
         initCore();
     }
 

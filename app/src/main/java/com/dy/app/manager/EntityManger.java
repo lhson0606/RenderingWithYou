@@ -32,7 +32,9 @@ public class EntityManger {
     private static EntityManger instance = null;
 
     public synchronized Vector<GameEntity> getEntities() {
-
+        for(GameEntity e: removeList){
+            e.destroy();
+        }
         entities.removeAll(removeList);
         removeList.clear();
         return entities;

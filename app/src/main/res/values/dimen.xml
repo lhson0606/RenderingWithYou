@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="default_margin">3sp</dimen>
+    <dimen name="default_size">30sp</dimen>
+    <dimen name="tiny_size">12sp</dimen>
+    <dimen name="small_text_size" >16sp</dimen>
+    <dimen name="medium_text_size" >20sp</dimen>
+    <dimen name="large_text_size" >24sp</dimen>
+    <dimen name="huge_text_size" >30sp</dimen>
+    <dimen name="medium_margin">10sp</dimen>
+</resources>

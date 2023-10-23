@@ -10,6 +10,10 @@ public class Player {
     private int tileSkinIndex = 0;
     private int boardSkinIndex = 0;
     private int terrainSkinIndex = 0;
+    private boolean hasLogin = false;
+    private String name = "Player";
+
+    private float xp = 0;
 
     public boolean isInTurn() {
         return inTurn;
@@ -68,4 +72,27 @@ public class Player {
         return instance;
     }
 
+    public boolean hasLogin() {
+        return hasLogin;
+    }
+
+    public void setLoginStatus(boolean hasLogin) {
+        this.hasLogin = hasLogin;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public float getXp() {
+        return xp;
+    }
+
+    public void setXp(float xp) {
+        this.xp = xp;
+    }
 }

@@ -1,0 +1,290 @@
+package com.dy.app.activity;
+
+import android.os.Bundle;
+import android.os.Handler;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.dy.app.R;
+import com.dy.app.core.MainCallback;
+import com.dy.app.gameplay.Player;
+import com.dy.app.manager.UIManager;
+import com.dy.app.ui.view.FragmentCreateAccount;
+import com.dy.app.ui.view.FragmentCredits;
+import com.dy.app.ui.view.FragmentLoginForm;
+import com.dy.app.ui.view.FragmentLogoutForm;
+import com.dy.app.ui.view.FragmentMainMenu;
+import com.dy.app.ui.view.FragmentSetting;
+import com.dy.app.utils.ImageLoader;
+
+public class MainActivity extends FragmentActivity
+        implements MainCallback, View.OnClickListener {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main_activity);
+        fm = getSupportFragmentManager();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        menuScreen = findViewById(R.id.mainScreen);
+        btnConfig = findViewById(R.id.btnConfig);
+        btnAccount = findViewById(R.id.btnAccount);
+        tvUsername = findViewById(R.id.tvUsername);
+
+        menuScreen.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
+        handler = new Handler(getMainLooper());
+        attachFragment();
+        attachListener();
+    }
+
+    private void attachListener() {
+        btnConfig.setOnClickListener(this);
+        btnAccount.setOnClickListener(this);
+    }
+
+    private void attachFragment() {
+        FragmentTransaction ft = fm.beginTransaction();
+
+        mainMenuFragment = (FragmentMainMenu) UIManager.getInstance().getUI(UIManager.UIType.MENU);
+        ft.add(R.id.flStage, mainMenuFragment, FragmentMainMenu.TAG);
+        ft.addToBackStack(FragmentMainMenu.TAG);
+        ft.show(mainMenuFragment);
+
+        settingFragment = (FragmentSetting) UIManager.getInstance().getUI(UIManager.UIType.CONFIG);
+        ft.add(R.id.flStage, settingFragment, FragmentSetting.TAG);
+        ft.addToBackStack(FragmentMainMenu.TAG);
+        ft.hide(settingFragment);
+
+        creditsFragment = (FragmentCredits) UIManager.getInstance().getUI(UIManager.UIType.CREDITS);
+        ft.add(R.id.flStage, creditsFragment, FragmentCredits.TAG);
+        ft.addToBackStack(FragmentMainMenu.TAG);
+        ft.hide(creditsFragment);
+
+        loginFormFragment = (FragmentLoginForm) UIManager.getInstance().getUI(UIManager.UIType.LOGIN);
+        ft.add(R.id.flStage, loginFormFragment, FragmentLoginForm.TAG);
+        ft.addToBackStack(FragmentMainMenu.TAG);
+        ft.hide(loginFormFragment);
+
+        logoutFormFragment = (FragmentLogoutForm) UIManager.getInstance().getUI(UIManager.UIType.LOGOUT);
+        ft.add(R.id.flStage, logoutFormFragment, FragmentLogoutForm.TAG);
+        ft.addToBackStack(FragmentMainMenu.TAG);
+        ft.hide(logoutFormFragment);
+
+        createAccountFragment = (FragmentCreateAccount) UIManager.getInstance().getUI(UIManager.UIType.CREATE_ACCOUNT);
+        ft.add(R.id.flStage, createAccountFragment, FragmentCreateAccount.TAG);
+        ft.addToBackStack(FragmentMainMenu.TAG);
+        ft.hide(createAccountFragment);
+
+        currentFragment = mainMenuFragment;
+        ft.commit();
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+    }
+
+    @Override
+    public void onMsgToMain(String TAG, int type, Object o1, Object o2) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                handle(TAG, type, o1, o2);
+            }
+        });
+    }
+
+    private void handle(String tag, int type, Object o1, Object o2) {
+        switch (tag){
+            case FragmentMainMenu.TAG:
+            {
+                handleMsgFromMainMenu(type, o1, o2);
+                break;
+            }
+
+            case FragmentSetting.TAG:
+            {
+                handleMsgFromSetting(type, o1, o2);
+            }
+
+            case FragmentCredits.TAG:
+            {
+                handleMsgFromCredits(type, o1, o2);
+                break;
+            }
+
+            case FragmentLoginForm.TAG:
+            {
+                handleMsgFromLoginForm(type, o1, o2);
+                break;
+            }
+
+            case FragmentLogoutForm.TAG:
+            {
+                handleMsgFromLogoutForm(type, o1, o2);
+                break;
+            }
+
+            case FragmentCreateAccount.TAG:
+            {
+                handleMsgFromCreateAccount(type, o1, o2);
+                break;
+            }
+        }
+    }
+
+    private void handleMsgFromCreateAccount(int type, Object o1, Object o2) {
+        switch (type){
+            case 0:
+            {
+                showFragment(mainMenuFragment);
+                break;
+            }
+
+            case 1:
+            {
+                showFragment(loginFormFragment);
+                break;
+            }
+
+            case 2:
+            {
+                Player.getInstance().setLoginStatus(true);
+                logoutFormFragment.onMsgFromMain(FragmentLogoutForm.TAG, 0, Player.getInstance().getName(), null);
+                tvUsername.setText(Player.getInstance().getName());
+                showFragment(logoutFormFragment);
+                break;
+            }
+        }
+    }
+
+    private void handleMsgFromLogoutForm(int type, Object o1, Object o2) {
+        switch (type){
+            case 0:
+            {
+                showFragment(mainMenuFragment);
+                break;
+            }
+
+            case 1:
+            {
+                Player.getInstance().setLoginStatus(false);
+                loginFormFragment.onMsgFromMain(FragmentLoginForm.TAG, 0, null, null);
+                tvUsername.setText("Login");
+                showFragment(loginFormFragment);
+                break;
+            }
+        }
+    }
+
+    private void handleMsgFromLoginForm(int type, Object o1, Object o2) {
+        switch (type){
+            case 0:
+            {
+                showFragment(mainMenuFragment);
+                break;
+            }
+
+            case 1:
+            {
+                Player.getInstance().setLoginStatus(true);
+                logoutFormFragment.onMsgFromMain(FragmentLogoutForm.TAG, 0, Player.getInstance().getName(), null);
+                tvUsername.setText(Player.getInstance().getName());
+                showFragment(logoutFormFragment);
+                break;
+            }
+
+            case 2:
+            {
+                showFragment(createAccountFragment);
+                break;
+            }
+        }
+    }
+
+    private void handleMsgFromCredits(int type, Object o1, Object o2) {
+        switch (type){
+            case 0:
+            {
+                showFragment(mainMenuFragment);
+                break;
+            }
+        }
+    }
+
+    private void handleMsgFromSetting(int type, Object o1, Object o2) {
+        switch (type){
+            case 0:
+            {
+                showFragment(mainMenuFragment);
+                break;
+            }
+        }
+    }
+
+    private void handleMsgFromMainMenu(int type, Object o1, Object o2) {
+        switch (type) {
+            case 0: {
+//                FragmentTransaction ft = fm.beginTransaction();
+//                ft.hide(settingFragment);
+//                ft.show(mainMenuFragment);
+//                ft.commit();
+                break;
+            }
+            case 1: {
+                showFragment(creditsFragment);
+                break;
+            }
+            case 2: {
+                finish();
+                break;
+            }
+        }
+    }
+
+    private void showFragment(Fragment fragment){
+        if(currentFragment == fragment){
+            return;
+        }
+
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.hide(currentFragment);
+        ft.show(fragment);
+        ft.commit();
+        currentFragment = fragment;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.btnConfig) {
+            showFragment(settingFragment);
+        }else if(v.getId() == R.id.btnAccount){
+
+            if(Player.getInstance().hasLogin())
+                showFragment(logoutFormFragment);
+            else
+                showFragment(loginFormFragment);
+
+        }
+    }
+
+    public final String TAG = getClass().getSimpleName();
+    private FragmentMainMenu mainMenuFragment;
+    private FragmentSetting settingFragment;
+    private FragmentCredits creditsFragment;
+    private FragmentLoginForm loginFormFragment;
+    private FragmentLogoutForm logoutFormFragment;
+    private FragmentCreateAccount createAccountFragment;
+    TextView tvUsername;
+    private View menuScreen;
+    private FragmentManager fm;
+    private Handler handler;
+    private Button btnConfig, btnAccount;
+    private Fragment currentFragment;
+}
