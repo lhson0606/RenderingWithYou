@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="0sp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnPrev"
+            android:layout_width="@dimen/default_size"
+            android:layout_height="@dimen/default_size"
+            android:layout_centerInParent="true"
+            android:background="@drawable/ic_prev" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0sp"
+        android:layout_height="match_parent"
+        android:layout_weight="10">
+
+        <com.daimajia.slider.library.SliderLayout
+            android:id="@+id/slider"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="0sp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnNext"
+            android:layout_width="@dimen/default_size"
+            android:layout_height="@dimen/default_size"
+            android:layout_centerInParent="true"
+            android:background="@drawable/ic_next" />
+
+    </RelativeLayout>
+
+</LinearLayout>

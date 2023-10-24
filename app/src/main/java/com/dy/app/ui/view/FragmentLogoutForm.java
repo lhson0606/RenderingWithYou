@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dy.app.R;
+import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
 import com.dy.app.core.FragmentCallback;
 
@@ -20,7 +21,7 @@ public class FragmentLogoutForm extends Fragment
     private TextView tvUsername;
 
     public final static String TAG = "FragmentLogoutForm";
-    private MainActivity main;
+    private FragmentHubActivity main;
 
     public static FragmentLogoutForm newInstance(){
         FragmentLogoutForm fragment = new FragmentLogoutForm();
@@ -30,7 +31,7 @@ public class FragmentLogoutForm extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        main = (MainActivity)getActivity();
+        main = (FragmentHubActivity)getActivity();
     }
 
     @Override

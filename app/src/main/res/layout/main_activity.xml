@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainScreen"
     android:orientation="horizontal"
     android:layout_width="match_parent"
@@ -136,7 +137,7 @@
                 android:text="Login"/>
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnSkin"
+                android:id="@+id/btnChooseSkin"
                 android:layout_width="@dimen/default_size"
                 android:layout_height="@dimen/default_size"
                 android:layout_below="@+id/tvUsername"
@@ -152,7 +153,7 @@
                 android:id="@+id/tvLevel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/btnSkin"
+                android:layout_below="@+id/btnChooseSkin"
                 android:layout_alignParentEnd="true"
                 style="@style/style_1"
                 android:text="lv. 0"/>

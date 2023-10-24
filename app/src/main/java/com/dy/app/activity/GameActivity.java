@@ -19,7 +19,7 @@ import com.dy.app.core.TaskManager;
 import com.dy.app.graphic.display.GameFragment;
 import com.dy.app.utils.ImageLoader;
 
-public class GameActivity extends FragmentActivity
+public class GameActivity extends FragmentHubActivity
 implements MainCallback {
     private ProgressDialog progressDialog;
     private Handler mainHandler;

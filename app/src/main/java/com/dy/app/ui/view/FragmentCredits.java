@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dy.app.R;
+import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
 
 public class FragmentCredits extends Fragment
@@ -17,7 +18,7 @@ public class FragmentCredits extends Fragment
     Button btnClose;
 
     public final static String TAG = "FragmentCredits";
-    private MainActivity main;
+    private FragmentHubActivity main;
 
     public static FragmentCredits newInstance(){
         FragmentCredits fragment = new FragmentCredits();
@@ -27,7 +28,7 @@ public class FragmentCredits extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        main = (MainActivity)getActivity();
+        main = (FragmentHubActivity)getActivity();
     }
 
     @Override

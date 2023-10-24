@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_transparency">0.5</string>
+    <string name="perfect_transparency">0.69</string>
+    <string name="no_transparency">0.0</string>
+    <string name="full_transparency">1.0</string>
+    <string name="half_transparency">0.5</string>
+    <string name="quarter_transparency">0.25</string>
+    <string name="three_quarters_transparency">0.75</string>
+    <string name="high_transparency">0.9</string>
+</resources>

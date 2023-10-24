@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dy.app.R;
+import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
 import com.dy.app.core.FragmentCallback;
 
@@ -21,7 +22,7 @@ public class FragmentLoginForm extends Fragment
     private EditText etUsername, etPassword;
 
     public final static String TAG = "FragmentLoginForm";
-    private MainActivity main;
+    private FragmentHubActivity main;
 
     public static FragmentLoginForm newInstance(){
         FragmentLoginForm fragment = new FragmentLoginForm();
@@ -31,7 +32,7 @@ public class FragmentLoginForm extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        main = (MainActivity)getActivity();
+        main = (FragmentHubActivity)getActivity();
     }
 
     @Override

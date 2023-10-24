@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dy.app.R;
+import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
 import com.dy.app.core.FragmentCallback;
 import com.dy.app.ui.adapter.AdapterMenuItems;
@@ -23,7 +24,7 @@ import com.dy.app.utils.ImageLoader;
 public class FragmentMainMenu extends Fragment
         implements FragmentCallback, AdapterView.OnItemClickListener {
     public final static String TAG = "FragmentMainMenu";
-    private MainActivity main;
+    private FragmentHubActivity main;
     private ListView lvMenuItems;
     private AdapterMenuItems adapterMenuItems;
 
@@ -35,7 +36,7 @@ public class FragmentMainMenu extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        main = (MainActivity)getActivity();
+        main = (FragmentHubActivity)getActivity();
     }
 
     @Override

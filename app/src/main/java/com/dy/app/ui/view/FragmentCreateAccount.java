@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.dy.app.R;
+import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
 import com.dy.app.core.FragmentCallback;
 
@@ -21,7 +22,7 @@ public class FragmentCreateAccount extends Fragment
 
 
     public final static String TAG = "FragmentCreateCountForm";
-    private MainActivity main;
+    private FragmentHubActivity main;
 
     public static FragmentCreateAccount newInstance(){
         FragmentCreateAccount fragment = new FragmentCreateAccount();
@@ -31,24 +32,28 @@ public class FragmentCreateAccount extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        main = (MainActivity)getActivity();
+        main = (FragmentHubActivity)getActivity();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_create_account, container, false);
         btnClose = view.findViewById(R.id.btnClose);
-        btnClose.setOnClickListener(this);
         btnCancel = view.findViewById(R.id.btnCancel);
-        btnCancel.setOnClickListener(this);
         btnCreate = view.findViewById(R.id.btnCreate);
-        btnCreate.setOnClickListener(this);
         etMail = view.findViewById(R.id.etMail);
         etUsername = view.findViewById(R.id.etUsername);
         etPassword = view.findViewById(R.id.etPassword);
         etConfirmPassword = view.findViewById(R.id.etRetype);
 
+        exqListener();
         return view;
+    }
+
+    private void exqListener() {
+        btnClose.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
+        btnCreate.setOnClickListener(this);
     }
 
     @Override

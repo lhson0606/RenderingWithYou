@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:motion="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#330077ff"
     android:alpha="0.69">
 
@@ -32,71 +32,93 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0sp"
-            android:layout_weight="1">
-
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            </TableLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0sp"
             android:layout_weight="10"
             android:orientation="horizontal">
 
-            <LinearLayout
-                android:layout_width="0sp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight="10"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tlStage"
+                    android:layout_width="match_parent"
+                    android:layout_height="50sp"
+                    app:tabMode="fixed"
+                    app:tabGravity="fill"
+                    android:background="@color/light_blue"
+                    app:tabTextColor="@color/white"
+                    app:tabIndicatorColor="@color/light_blue_2"
+                    app:tabSelectedTextColor="@color/dark_blue">
+
+                    <com.google.android.material.tabs.TabItem
+                        android:text="Piece"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:icon="@drawable/ic_pawn"/>
+
+                    <com.google.android.material.tabs.TabItem
+                        android:text="Terrain"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:icon="@drawable/ic_peaks"/>
+
+                    <com.google.android.material.tabs.TabItem
+                        android:text="Tile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:icon="@drawable/ic_tile"/>
+
+                </com.google.android.material.tabs.TabLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
-                    android:layout_weight="20">
+                    android:layout_weight="20"
+                    android:orientation="vertical">
 
-                    <androidx.constraintlayout.motion.widget.MotionLayout
-                        android:layout_height="match_parent"
+                    <FrameLayout
+                        android:id="@+id/flStage"
                         android:layout_width="match_parent"
-                        motion:layoutDescription="@xml/fragment_skin_selection_scene">
-
-
-                    <androidx.constraintlayout.helper.widget.Carousel
-                        android:id="@+id/carousel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                </androidx.constraintlayout.motion.widget.MotionLayout>
+                        android:layout_height="match_parent"/>
 
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
-                    android:layout_weight="1"></LinearLayout>
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <com.daimajia.slider.library.Indicators.PagerIndicator
+                        android:id="@+id/carousel_indicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"/>
+
+                    <com.daimajia.slider.library.Tricks.InfiniteViewPager
+                        android:id="@+id/infiniteViewPager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+
+                </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="250sp"
                     android:layout_height="0sp"
-                    android:layout_weight="5"></LinearLayout>
+                    android:layout_weight="2"
+                    android:background="@drawable/oval"
+                    android:alpha="0.5">
+
+                </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0sp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"></LinearLayout>
+
         </LinearLayout>
 
 
