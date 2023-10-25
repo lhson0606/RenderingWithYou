@@ -14,6 +14,7 @@ import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
 import com.dy.app.core.FragmentCallback;
+import com.dy.app.gameplay.Player;
 
 public class FragmentLogoutForm extends Fragment
         implements View.OnClickListener, FragmentCallback {
@@ -44,7 +45,13 @@ public class FragmentLogoutForm extends Fragment
 
         btnClose.setOnClickListener(this);
         btnLogout.setOnClickListener(this);
+
+        updateContent();
         return view;
+    }
+
+    private void updateContent() {
+        tvUsername.setText(Player.getInstance().getName());
     }
 
     @Override
@@ -60,7 +67,7 @@ public class FragmentLogoutForm extends Fragment
     public void onMsgFromMain(String TAG, int type, Object o1, Object o2) {
         switch (type){
             case 0:
-                tvUsername.setText((String)o1);
+                //tvUsername.setText((String)o1);
                 break;
             case 1:
                 break;

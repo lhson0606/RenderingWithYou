@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fullScreen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="@dimen/huge_padding">
+
+        <LinearLayout
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:orientation="vertical"
+            android:background="@drawable/outline_white_background">
+
+            <FrameLayout
+                android:id="@+id/flChatWindow"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="3"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Time"
+                        android:textSize="@dimen/small_text_size"
+                        android:layout_above="@+id/time"
+                        android:textAlignment="center"
+                        android:background="@drawable/outline_gradient_gray_background"/>
+
+                    <Spinner
+                        android:id="@+id/time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:foreground="?attr/selectableItemBackground"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5">
+
+                    <androidx.emoji2.emojipicker.EmojiPickerView
+                        android:id="@+id/emoji_picker"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        app:emojiGridColumns="4" />
+
+                </RelativeLayout>
+
+
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <RelativeLayout
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnQuit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:textSize="@dimen/small_text_size"
+                        android:text="Quit"
+                        android:layout_marginRight="@dimen/default_margin"
+                        android:background="@drawable/outline_gradient_red_background"
+                        android:typeface="monospace"
+                        android:foreground="?attr/selectableItemBackground"/>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3">
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/btnReady"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentStart="true"
+                        android:padding="@dimen/large_padding"
+                        android:text="Ready!"
+                        android:textSize="@dimen/huge_text_size"
+                        android:typeface="monospace"
+                        android:background="@drawable/outline_gradient_green_background"
+                        android:foreground="?attr/selectableItemBackground"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

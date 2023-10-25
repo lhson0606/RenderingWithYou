@@ -1,0 +1,19 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Shape layer with a gradient background -->
+    <item>
+
+        <shape>
+            <corners android:radius="7dp" />
+            <stroke
+                android:width="2dp"
+                android:color="#9c2121" />
+            <gradient
+                android:startColor="#eb8934"
+                android:centerColor="#eb4634"
+                android:endColor="#eb3434"
+                android:angle="-90"/>
+            />
+        </shape>
+    </item>
+</layer-list>

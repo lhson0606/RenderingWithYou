@@ -35,6 +35,18 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.compose.animation:animation-core-android:1.5.4")
     testImplementation("junit:junit:4.13.2")
+
+    //JSON
+    implementation("com.google.code.gson:gson:2.8.9")
+
+    //emoji2 lib
+    implementation("androidx.emoji2:emoji2:1.4.0")
+    implementation("androidx.emoji2:emoji2-views:1.4.0")
+    implementation("androidx.emoji2:emoji2-views-helper:1.4.0")
+    implementation("androidx.emoji2:emoji2-emojipicker:1.4.0")
+    implementation("com.android.support:support-emoji:28.0.0")
+    implementation("com.vanniktech:emoji-google:0.15.0")
+
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 

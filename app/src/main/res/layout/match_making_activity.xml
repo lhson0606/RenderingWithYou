@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/screenView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.69"
+        android:background="@color/light_blue"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:weightSum="12"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/default_margin"
+                    android:layout_weight="6"
+                    android:background="@drawable/outline_light_blue_background">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:typeface="monospace"
+                        android:textSize="@dimen/default_size"
+                        android:text="Available"
+                        android:textAlignment="center">
+
+                    </TextView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="6">
+
+                <ListView
+                    android:id="@+id/lvPeers"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="@dimen/default_padding"
+                    android:background="@drawable/outline_white_background"
+                    android:layout_margin="@dimen/medium_margin"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="2"
+                android:orientation="horizontal"
+                android:weightSum="12"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="@dimen/default_size"
+                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_weight="3"
+                    android:background="@drawable/outline_red_background"
+                    android:gravity="center"
+                    android:paddingStart="20sp"
+                    android:paddingEnd="20sp">
+
+                    <Button
+                        android:id="@+id/btnExit"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ic_cross"
+                        android:foreground="?attr/selectableItemBackground" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="@dimen/default_size"
+                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_weight="3"
+                    android:paddingStart="20sp"
+                    android:paddingEnd="20sp"
+                    android:background="@drawable/outline_green_background">
+
+                    <Button
+                        android:id="@+id/btnReload"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ic_sync"
+                        android:foreground="?attr/selectableItemBackground"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="@dimen/default_size"
+
+                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_weight="3"
+                    android:paddingStart="20sp"
+                    android:paddingEnd="20sp"
+                    android:background="@drawable/outline_light_blue_background">
+
+                    <Button
+                        android:id="@+id/btnJoin"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ic_join"
+                        android:foreground="?attr/selectableItemBackground"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0sp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:weightSum="12"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/default_margin"
+                    android:layout_weight="6"
+                    android:background="@drawable/outline_light_blue_background">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:typeface="monospace"
+                        android:textSize="@dimen/default_size"
+                        android:text="Log"
+                        android:textAlignment="center">
+
+                    </TextView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="6">
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/outline_white_background"
+                    android:padding="@dimen/default_padding"
+                    android:layout_margin="@dimen/medium_margin">
+                    <TextView
+                        android:id="@+id/tvLog"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:typeface="monospace"
+                        android:textSize="@dimen/tiny_size"
+                        android:text="Logging begins ...\n"/>
+                </ScrollView>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="2"
+                android:orientation="horizontal"
+                android:weightSum="12"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="@dimen/default_size"
+                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_weight="5"
+                    android:background="@drawable/outline_white_background"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingStart="25sp"
+                    android:paddingEnd="25sp">
+
+                    <Button
+                        android:id="@+id/btnWifi"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ic_wifi"
+                        android:foreground="?attr/selectableItemBackground"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="@dimen/default_size"
+                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_weight="3"
+                    android:background="@drawable/outline_yellow_background"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnClear"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ic_delete"
+                        android:foreground="?attr/selectableItemBackground"/>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

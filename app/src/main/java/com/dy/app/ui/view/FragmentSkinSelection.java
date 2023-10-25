@@ -60,13 +60,18 @@ public class FragmentSkinSelection extends Fragment
         fragmentManager = getChildFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        transaction.add(R.id.flStage, fragmentPieceSelection);
+        transaction.add(R.id.flStage, fragmentPieceSelection, FragmentPieceSelection.TAG);
         transaction.add(R.id.flStage, fragmentTerrainSelection);
         transaction.add(R.id.flStage, fragmentTileSelection);
 
-        transaction.show(fragmentPieceSelection); currentFragment = fragmentPieceSelection;
+        transaction.addToBackStack(FragmentPieceSelection.TAG);
+        transaction.addToBackStack(FragmentTerrainSelection.TAG);
+        transaction.addToBackStack(FragmentTileSelection.TAG);
+
         transaction.hide(fragmentTerrainSelection);
         transaction.hide(fragmentTileSelection);
+
+        transaction.show(fragmentPieceSelection); currentFragment = fragmentPieceSelection;
 
         transaction.commit();
 
@@ -74,6 +79,7 @@ public class FragmentSkinSelection extends Fragment
     }
 
     private void showFragment(Fragment fragment){
+        if(fragment == currentFragment) return;
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.hide(currentFragment);
         transaction.show(fragment);
@@ -128,5 +134,8 @@ public class FragmentSkinSelection extends Fragment
     @Override
     public void onMsgFromMain(String TAG, int type, Object o1, Object o2) {
 
+    }
+
+    public void setFragmentManager(FragmentManager supportFragmentManager) {
     }
 }

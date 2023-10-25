@@ -1,5 +1,6 @@
 package com.dy.app.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -44,8 +46,36 @@ public class MainActivity extends FragmentHubActivity
         menuScreen.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
         handler = new Handler(getMainLooper());
         attachFragment();
+
         attachListener();
         initManager();
+    }
+
+    @Override
+    protected void onPause() {
+//        FragmentTransaction ft = fm.beginTransaction();
+//        //ft.remove(mainMenuFragment);
+//        ft.remove(settingFragment);
+//        ft.remove(creditsFragment);
+//        ft.remove(loginFormFragment);
+//        ft.remove(logoutFormFragment);
+//        ft.remove(createAccountFragment);
+//        ft.remove(skinSelectionFragment);
+//        ft.commit();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        //attachFragment();
+        super.onResume();
+    }
+
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
     }
 
     private void initManager() {
@@ -63,41 +93,35 @@ public class MainActivity extends FragmentHubActivity
 
         mainMenuFragment = (FragmentMainMenu) UIManager.getInstance().getUI(UIManager.UIType.MENU);
         ft.add(R.id.flStage, mainMenuFragment, FragmentMainMenu.TAG);
-        ft.addToBackStack(FragmentMainMenu.TAG);
         ft.show(mainMenuFragment);
 
         settingFragment = (FragmentSetting) UIManager.getInstance().getUI(UIManager.UIType.CONFIG);
-        ft.add(R.id.flStage, settingFragment, FragmentSetting.TAG);
-        ft.addToBackStack(FragmentSetting.TAG);
-        ft.hide(settingFragment);
+        //ft.add(R.id.flStage, settingFragment, FragmentSetting.TAG);
+        //ft.hide(settingFragment);
 
         creditsFragment = (FragmentCredits) UIManager.getInstance().getUI(UIManager.UIType.CREDITS);
-        ft.add(R.id.flStage, creditsFragment, FragmentCredits.TAG);
-        ft.addToBackStack(FragmentCredits.TAG);
-        ft.hide(creditsFragment);
+        //ft.add(R.id.flStage, creditsFragment, FragmentCredits.TAG);
+        //ft.hide(creditsFragment);
 
         loginFormFragment = (FragmentLoginForm) UIManager.getInstance().getUI(UIManager.UIType.LOGIN);
-        ft.add(R.id.flStage, loginFormFragment, FragmentLoginForm.TAG);
-        ft.addToBackStack(FragmentLoginForm.TAG);
-        ft.hide(loginFormFragment);
+        //ft.add(R.id.flStage, loginFormFragment, FragmentLoginForm.TAG);
+        //ft.hide(loginFormFragment);
 
         logoutFormFragment = (FragmentLogoutForm) UIManager.getInstance().getUI(UIManager.UIType.LOGOUT);
-        ft.add(R.id.flStage, logoutFormFragment, FragmentLogoutForm.TAG);
-        ft.addToBackStack(FragmentLogoutForm.TAG);
-        ft.hide(logoutFormFragment);
+        //ft.add(R.id.flStage, logoutFormFragment, FragmentLogoutForm.TAG);
+        //ft.hide(logoutFormFragment);
 
         createAccountFragment = (FragmentCreateAccount) UIManager.getInstance().getUI(UIManager.UIType.CREATE_ACCOUNT);
-        ft.add(R.id.flStage, createAccountFragment, FragmentCreateAccount.TAG);
-        ft.addToBackStack(FragmentCreateAccount.TAG);
-        ft.hide(createAccountFragment);
+        //ft.add(R.id.flStage, createAccountFragment, FragmentCreateAccount.TAG);
+        //ft.hide(createAccountFragment);
 
         skinSelectionFragment = (FragmentSkinSelection) UIManager.getInstance().getUI(UIManager.UIType.SKIN_SELECTION);
-        ft.add(R.id.flStage, skinSelectionFragment, FragmentSkinSelection.TAG);
-        ft.addToBackStack(FragmentSkinSelection.TAG);
-        ft.hide(skinSelectionFragment);
+        //ft.add(R.id.flStage, skinSelectionFragment, FragmentSkinSelection.TAG);
+        //ft.hide(skinSelectionFragment);
+
+        ft.commit();
 
         currentFragment = mainMenuFragment;
-        ft.commit();
     }
 
     @Override
@@ -186,7 +210,6 @@ public class MainActivity extends FragmentHubActivity
             case 2:
             {
                 Player.getInstance().setLoginStatus(true);
-                logoutFormFragment.onMsgFromMain(FragmentLogoutForm.TAG, 0, Player.getInstance().getName(), null);
                 tvUsername.setText(Player.getInstance().getName());
                 showFragment(logoutFormFragment);
                 break;
@@ -204,10 +227,10 @@ public class MainActivity extends FragmentHubActivity
 
             case 1:
             {
+                showFragment(loginFormFragment);
                 Player.getInstance().setLoginStatus(false);
                 loginFormFragment.onMsgFromMain(FragmentLoginForm.TAG, 0, null, null);
                 tvUsername.setText("Login");
-                showFragment(loginFormFragment);
                 break;
             }
         }
@@ -224,9 +247,8 @@ public class MainActivity extends FragmentHubActivity
             case 1:
             {
                 Player.getInstance().setLoginStatus(true);
-                logoutFormFragment.onMsgFromMain(FragmentLogoutForm.TAG, 0, Player.getInstance().getName(), null);
-                tvUsername.setText(Player.getInstance().getName());
                 showFragment(logoutFormFragment);
+                tvUsername.setText(Player.getInstance().getName());
                 break;
             }
 
@@ -261,10 +283,7 @@ public class MainActivity extends FragmentHubActivity
     private void handleMsgFromMainMenu(int type, Object o1, Object o2) {
         switch (type) {
             case 0: {
-//                FragmentTransaction ft = fm.beginTransaction();
-//                ft.hide(settingFragment);
-//                ft.show(mainMenuFragment);
-//                ft.commit();
+                startFindingLobby();
                 break;
             }
             case 1: {
@@ -278,13 +297,23 @@ public class MainActivity extends FragmentHubActivity
         }
     }
 
+    private void startFindingLobby(){
+        Intent intent = new Intent(this, MatchMakingActivity.class);
+        startActivity(intent);
+    }
+
     private void showFragment(Fragment fragment){
         if(currentFragment == fragment){
             return;
         }
 
+        if(fragment == null) return;
+
         FragmentTransaction ft = fm.beginTransaction();
-        ft.hide(currentFragment);
+        //ft.remove(currentFragment);
+        ft.replace(R.id.flStage, fragment);
+//        ft.hide(currentFragment);
+
         ft.show(fragment);
         ft.commit();
         currentFragment = fragment;

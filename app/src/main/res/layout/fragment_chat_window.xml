@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="7"
+        android:gravity="bottom">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="3"
+            >
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="1"
+            android:background="@drawable/outline_gradient_blue_background"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/default_size"
+                android:text="Lobby"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:typeface="monospace"
+                />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvChat"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:padding="@dimen/huge_padding"
+            android:textSize="@dimen/small_text_size"
+            android:layout_weight="5"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:background="@drawable/outline_white_background">
+
+            <LinearLayout
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/outline_gradient_blue_background">
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnEmoji"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/ic_smiley"
+                    android:foreground="?attr/selectableItemBackground"/>
+            </LinearLayout>
+
+
+            <EditText
+                android:id="@+id/etMsg"
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:padding="@dimen/huge_padding"/>
+
+            <LinearLayout
+                android:layout_width="0sp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/outline_gradient_blue_background"
+                android:padding="@dimen/default_padding">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnSend"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/ic_forward"
+                    android:foreground="?attr/selectableItemBackground"/>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
