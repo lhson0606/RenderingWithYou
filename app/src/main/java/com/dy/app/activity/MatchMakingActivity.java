@@ -222,7 +222,12 @@ public class MatchMakingActivity extends AppCompatActivity
                 }
 
                 if (grantResults[i] == PackageManager.PERMISSION_DENIED && permissions[i].equals(android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    finish();
+                    new android.app.AlertDialog.Builder(this)
+                            .setTitle("Permission denied")
+                            .setMessage("Without this permission the app is unable to discover peers")
+                            .setPositiveButton("OK", null)
+                            .show();
+                    //finish();
                 }
             }
         }
@@ -241,54 +246,34 @@ public class MatchMakingActivity extends AppCompatActivity
     }
 
     private void connectToGroupOwner(String hostAddress) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Socket socket = new Socket();
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressDialog.setMessage("Connecting to " + hostAddress);
-                            logSystem("Connecting to " + hostAddress);
-                            progressDialog.show();
-                        }
-                    });
 
-                    try{
-                        socket.connect(new InetSocketAddress(hostAddress, 8888), 5000);
-                    }catch (SocketTimeoutException e){
-                        finish();
-                    }
+                    socket.connect(new InetSocketAddress(hostAddress, 8888), 10000);
 
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressDialog.dismiss();
-                            logSystem("Client - connected");
-                            try {
-                                ConnectionManager.startNewInstance(socket.getInputStream(), socket.getOutputStream());
-                                //start game lobby activity
+                    try {
+                        ConnectionManager.startNewInstance(socket.getInputStream(), socket.getOutputStream(), new ConnectionManager.ConnectionManagerCallback() {
+                            @Override
+                            public void onConnectionManagerReady() {
+                                //start game lobby activity after connection manager is ready
                                 Intent intent = new Intent(MatchMakingActivity.this, GameLobbyActivity.class);
                                 startActivity(intent);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
                             }
+                        });
+                    } catch (IOException e) {
+                        throw new RuntimeException("Connection timeout");
+//                        Log.e("MainActivity", e.getMessage());
+//                        finish();
+                    }
 
-                        }
-                    });
 
-
-                } catch (SocketTimeoutException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalBlockingModeException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalArgumentException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (IllegalBlockingModeException | IllegalArgumentException | IOException e) {
+                    throw new RuntimeException("Connection timeout");
+                    //Log.e("MainActivity", e.getMessage());
+                    //finish();
                 }
             }
         });
@@ -297,51 +282,35 @@ public class MatchMakingActivity extends AppCompatActivity
     }
 
     private void waitForClientConnection() {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(false);
 
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     ServerSocket ss = new ServerSocket(8888);
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressDialog.setMessage("Waiting for client connection");
-                            logSystem("Waiting for client connection");
-                            progressDialog.show();
-                        }
-                    });
 
-                    ss.setSoTimeout(5000);
+                    ss.setSoTimeout(10000);
                     try{
                         Socket socket = ss.accept();
-
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        socket.setSoTimeout(10000);
+                        ss.close();
+                        ConnectionManager.startNewInstance(socket.getInputStream(), socket.getOutputStream(), new ConnectionManager.ConnectionManagerCallback() {
                             @Override
-                            public void run() {
-                                progressDialog.dismiss();
-                                logSystem("Host - connected");
-                                try {
-                                    ss.close();
-                                    ConnectionManager.startNewInstance(socket.getInputStream(), socket.getOutputStream());
-                                    //start game lobby activity
-                                    Intent intent = new Intent(MatchMakingActivity.this, GameLobbyActivity.class);
-                                    startActivity(intent);
-                                } catch (IOException e) {
-                                    throw new RuntimeException(e);
-                                }
-
+                            public void onConnectionManagerReady() {
+                                //start game lobby activity after connection manager is ready
+                                Intent intent = new Intent(MatchMakingActivity.this, GameLobbyActivity.class);
+                                startActivity(intent);
                             }
                         });
                     }catch (SocketTimeoutException e){
-                        finish();
+                        throw new RuntimeException("Connection timeout");
+                        //finish();
                     }
 
                 } catch (IOException e) {
-                    Log.d("MainActivity", e.getMessage());
-                    finish();
+                    throw new RuntimeException("Connection timeout");
+                    //Log.d("MainActivity", e.getMessage());
+                    //finish();
                 }
             }
         });
@@ -375,23 +344,6 @@ public class MatchMakingActivity extends AppCompatActivity
             logSystem("No device found");
         }
     }
-
-    private TextView tvLog;
-    private Button btnExit, btnReload, btnJoin, btnWifi, btnClear;
-    private SoundManager soundManager;
-    private View screenView;
-
-    private IntentFilter intentFilter;
-    private WifiManager wifiManager;
-    private WifiP2pManager wifiP2pManager;
-    private WifiP2pManager.Channel channel;
-    private WiFiDirectBroadcastReceiver broadcastReceiver;
-    private List<WifiP2pDevice> peers;
-    private String[] deviceNames;
-    private WifiP2pDevice[] devices;
-    private ListView lvPeers;
-    private WifiP2pDevice currentDevice;
-    private View currentSelectedItem;
 
     @Override
     public void onSuccess() {
@@ -428,7 +380,7 @@ public class MatchMakingActivity extends AppCompatActivity
         if(currentSelectedItem != null){
             currentSelectedItem.setBackgroundColor(Color.parseColor("#00000000"));
         }
-
+        //set new color
         currentSelectedItem = view;
         currentSelectedItem.setBackgroundColor(Color.parseColor("#FF4081"));
     }
@@ -459,8 +411,24 @@ public class MatchMakingActivity extends AppCompatActivity
             });
         }
         catch (Exception e){
-            logSystem("Not connected to " + currentDevice.deviceName);
+            throw new RuntimeException(e.getMessage());
         }
 
     }
+
+    private TextView tvLog;
+    private Button btnExit, btnReload, btnJoin, btnWifi, btnClear;
+    private SoundManager soundManager;
+    private View screenView;
+    private IntentFilter intentFilter;
+    private WifiManager wifiManager;
+    private WifiP2pManager wifiP2pManager;
+    private WifiP2pManager.Channel channel;
+    private WiFiDirectBroadcastReceiver broadcastReceiver;
+    private List<WifiP2pDevice> peers;
+    private String[] deviceNames;
+    private WifiP2pDevice[] devices;
+    private ListView lvPeers;
+    private WifiP2pDevice currentDevice;
+    private View currentSelectedItem;
 }

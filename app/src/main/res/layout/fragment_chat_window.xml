@@ -2,29 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:weightSum="7"
-        android:gravity="bottom">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0sp"
-            android:layout_weight="3"
-            >
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0sp"
-            android:layout_weight="1"/>
-
-    </LinearLayout>
-
+    android:id="@+id/root_view">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,7 +12,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0sp"
-            android:layout_weight="1"
+            android:layout_weight="0.5"
             android:background="@drawable/outline_gradient_blue_background"
             android:gravity="center">
 
@@ -50,18 +28,27 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvChat"
+        <ScrollView
+            android:id="@+id/svChat"
             android:layout_width="match_parent"
             android:layout_height="0sp"
             android:padding="@dimen/huge_padding"
             android:textSize="@dimen/small_text_size"
-            android:layout_weight="5"/>
+            android:layout_weight="3">
+
+            <LinearLayout
+                android:id="@+id/llChatContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:orientation="vertical">
+            </LinearLayout>
+
+        </ScrollView>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0sp"
-            android:layout_weight="1"
+            android:layout_height="@dimen/huge_2_padding"
             android:orientation="horizontal"
             android:background="@drawable/outline_white_background">
 
@@ -84,7 +71,8 @@
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight="3"
-                android:padding="@dimen/huge_padding"/>
+                android:padding="@dimen/default_padding"
+                android:textAlignment="textStart"/>
 
             <LinearLayout
                 android:layout_width="0sp"

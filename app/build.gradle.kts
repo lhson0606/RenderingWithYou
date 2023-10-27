@@ -39,20 +39,17 @@ dependencies {
     //JSON
     implementation("com.google.code.gson:gson:2.8.9")
 
-    //emoji2 lib
-    implementation("androidx.emoji2:emoji2:1.4.0")
-    implementation("androidx.emoji2:emoji2-views:1.4.0")
-    implementation("androidx.emoji2:emoji2-views-helper:1.4.0")
-    implementation("androidx.emoji2:emoji2-emojipicker:1.4.0")
+    //emoji lib
+    //noinspection GradleCompatible
     implementation("com.android.support:support-emoji:28.0.0")
-    implementation("com.vanniktech:emoji-google:0.15.0")
+    implementation("com.vanniktech:emoji-google:0.6.0")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
     //daimajia carousel
     //https://github.com/daimajia/AndroidImageSlider
-    implementation("com.android.support:support-v4:28.0.0"){
+    implementation("androidx.legacy:legacy-support-v4:1.0.0"){
         exclude(group = "com.android.support")
     }
     implementation("com.squareup.picasso:picasso:2.3.2")

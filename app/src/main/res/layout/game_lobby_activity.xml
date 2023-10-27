@@ -5,6 +5,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/huge_padding">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnQuit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/btnReady"
+            android:layout_alignParentBottom="true"
+            android:textSize="@dimen/small_text_size"
+            android:text="Quit"
+            android:layout_marginRight="@dimen/default_margin"
+            android:background="@drawable/outline_gradient_red_background"
+            android:typeface="monospace"
+            android:foreground="?attr/selectableItemBackground"
+            android:layout_margin="@dimen/default_margin"
+            android:textColor="@color/white"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnReady"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:padding="@dimen/large_padding"
+            android:text="Ready!"
+            android:textSize="@dimen/huge_text_size"
+            android:typeface="monospace"
+            android:background="@drawable/outline_gradient_green_background"
+            android:foreground="?attr/selectableItemBackground"
+            android:layout_margin="@dimen/default_margin"
+            android:textColor="@color/white"/>
+
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -67,12 +103,10 @@
                     android:layout_height="match_parent"
                     android:layout_weight="5">
 
-                    <androidx.emoji2.emojipicker.EmojiPickerView
-                        android:id="@+id/emoji_picker"
+                    <FrameLayout
+                        android:id="@+id/flSkinSelection"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_centerInParent="true"
-                        app:emojiGridColumns="4" />
+                        android:layout_height="match_parent"/>
 
                 </RelativeLayout>
 
@@ -85,45 +119,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <RelativeLayout
-                    android:layout_width="0sp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="4">
 
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/btnQuit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentEnd="true"
-                        android:textSize="@dimen/small_text_size"
-                        android:text="Quit"
-                        android:layout_marginRight="@dimen/default_margin"
-                        android:background="@drawable/outline_gradient_red_background"
-                        android:typeface="monospace"
-                        android:foreground="?attr/selectableItemBackground"/>
-
-                </RelativeLayout>
-
-                <RelativeLayout
-                    android:layout_width="0sp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3">
-
-                    <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/btnReady"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_alignParentStart="true"
-                        android:padding="@dimen/large_padding"
-                        android:text="Ready!"
-                        android:textSize="@dimen/huge_text_size"
-                        android:typeface="monospace"
-                        android:background="@drawable/outline_gradient_green_background"
-                        android:foreground="?attr/selectableItemBackground"/>
-
-                </RelativeLayout>
 
             </LinearLayout>
         </LinearLayout>

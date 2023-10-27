@@ -58,4 +58,8 @@ public class Rival {
         instance = new Rival();
         return instance;
     }
+
+    public String getName() {
+        return "Rival";
+    }
 }

@@ -1,14 +1,23 @@
 package com.dy.app.activity;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.provider.FontRequest;
+import androidx.emoji.text.EmojiCompat;
+import androidx.emoji.text.FontRequestEmojiCompatConfig;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -18,6 +27,8 @@ import com.dy.app.manager.UIManager;
 import com.dy.app.ui.view.FragmentChatLobby;
 import com.dy.app.ui.view.FragmentSkinSelection;
 import com.dy.app.utils.ImageLoader;
+import com.dy.app.network.MessageType;
+import com.dy.app.utils.MessageFactory;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,12 +50,12 @@ implements View.OnClickListener {
     private void attachFragment() {
         FragmentTransaction ft = fm.beginTransaction();
 
-//        fragmentSkinSelection = (FragmentSkinSelection) uiManager.getUI(UIManager.UIType.SKIN_SELECTION);
-//        ft.replace(R.id.flSkinSelection, fragmentSkinSelection, FragmentSkinSelection.TAG);
-//        ft.show(fragmentSkinSelection);
+        fragmentSkinSelection = (Fragment) uiManager.getUI(UIManager.UIType.CREDITS);
+        ft.add(R.id.flSkinSelection, fragmentSkinSelection, null);
+        ft.show(fragmentSkinSelection);
 
 
-        ft.replace(R.id.flChatWindow,fragmentChatLobby, FragmentChatLobby.TAG);
+        ft.add(R.id.flChatWindow,fragmentChatLobby, FragmentChatLobby.TAG);
         ft.show(fragmentChatLobby);
 
 
@@ -54,6 +65,71 @@ implements View.OnClickListener {
     }
 
     private void exqListener() {
+        // start listening to incoming messages
+        Handler handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what){
+                    case 0:
+                        fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, 0, msg.obj, null);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        ConnectionManager.getInstance().startReceiving(handler);
+        ConnectionManager.getInstance().setConnectionLostCallback(new ConnectionManager.ConnectionStatusCallback() {
+            @Override
+            public void onConnectionLost() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!isFinishing()) {  // Check if the activity is finishing
+                            AlertDialog.Builder builder = new AlertDialog.Builder(GameLobbyActivity.this);
+                            builder.setTitle("Connection lost");
+                            builder.setCancelable(false);  // Prevent the dialog from being canceled by clicking outside
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Handle the OK button click
+                                    dialog.dismiss();
+                                    // You can finish the activity or take other actions here
+                                    finish();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onWeakConnection() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!isFinishing()) {  // Check if the activity is finishing
+                            AlertDialog.Builder builder = new AlertDialog.Builder(GameLobbyActivity.this);
+                            builder.setTitle("Weak connection");
+                            builder.setCancelable(false);  // Prevent the dialog from being canceled by clicking outside
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Handle the OK button click
+                                    dialog.dismiss();
+                                    // You can finish the activity or take other actions here
+                                    //finish();
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                        }
+                    }
+                });
+            }
+        });
     }
 
 
@@ -71,6 +147,15 @@ implements View.OnClickListener {
         btnReady.setPadding(30, 30, 30, 30);
         btnReady.setTextSize(30);
         isReady = false;
+        // Initialize EmojiCompat
+        FontRequest fontRequest = new FontRequest(
+                "com.google.android.gms.fonts",
+                "com.google.android.gms",
+                "Noto Color Emoji Compat",
+                R.array.com_google_android_gms_fonts_certs);
+        EmojiCompat.Config config = new FontRequestEmojiCompatConfig(this, fontRequest);
+        EmojiCompat.init(config);
+
 
     }
 
@@ -94,6 +179,7 @@ implements View.OnClickListener {
                 btnReady.setPadding(0, 0, 0, 0);
                 btnReady.setText("We are ready!");
                 btnReady.setTextSize(16);
+                informPeerReady(true);
                 isReady = true;
             }else{
                 btnReady.setText("Ready!!!");
@@ -104,11 +190,37 @@ implements View.OnClickListener {
 
         }
     }
+    @Override
+    public void onBackPressed() {
 
-    private InputStream is;
-    private OutputStream os;
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmation")
+                .setMessage("Do you want to exit this lobby?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Perform any necessary actions here before exiting
+                        // For example, you can call super.onBackPressed() to navigate back
+                        GameLobbyActivity.super.onBackPressed();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User chose not to exit, so do nothing
+                    }
+                })
+                .show();
+
+        //to prevent compiler from complaining
+        if(false)
+            super.onBackPressed();
+    }
+
+    private void informPeerReady(boolean isReady){
+        ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("I am ready", 0));
+    }
+
     private View screenView;
-    private FragmentSkinSelection fragmentSkinSelection;
+    private Fragment fragmentSkinSelection;
     private UIManager uiManager;
     private FragmentManager fm;
     private Button btnQuit, btnReady;
