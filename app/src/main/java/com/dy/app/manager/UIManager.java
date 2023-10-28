@@ -4,6 +4,7 @@ import android.provider.Contacts;
 
 import androidx.fragment.app.Fragment;
 
+import com.dy.app.ui.view.FragmentChatLobby;
 import com.dy.app.ui.view.FragmentCreateAccount;
 import com.dy.app.ui.view.FragmentCredits;
 import com.dy.app.ui.view.FragmentLoginForm;
@@ -51,6 +52,7 @@ public class UIManager {
         uiMap.put(UIType.SKIN_PIECE_SELECTION, FragmentPieceSelection.newInstance());
         uiMap.put(UIType.SKIN_TERRAIN_SELECTION, FragmentTerrainSelection.newInstance());
         uiMap.put(UIType.SKIN_TILE_SELECTION, FragmentTileSelection.newInstance());
+        uiMap.put(UIType.CHAT, FragmentChatLobby.newInstance());
     }
 
     private static UIManager instance = null;

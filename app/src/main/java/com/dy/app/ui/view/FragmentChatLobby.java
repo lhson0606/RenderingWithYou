@@ -88,8 +88,8 @@ public class FragmentChatLobby extends Fragment
 
         switch (type){
             case 0:
-                final Message netWorkMsg = (Message) o1;
-                String chatText = new String(netWorkMsg.getData(), 0, netWorkMsg.getLength());
+                final Message msg = (Message)o1;
+                String chatText = new String(msg.getData(), 0, msg.getLength());
                 addMessageFromPeer(chatText);
                 break;
         }

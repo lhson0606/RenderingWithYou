@@ -1,5 +1,7 @@
 package com.dy.app.network;
 
+import androidx.annotation.NonNull;
+
 public class Message {
     private byte[] data;
     private int length;
@@ -91,5 +93,21 @@ public class Message {
 
     public void setCode(int code) {
         this.code = code;
+    }
+
+    @NonNull
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        Message msg = new Message();
+        msg.setAck(this.ack);
+        msg.setCode(this.code);
+        msg.setData(this.data);
+        msg.setLength(this.length);
+        msg.setRecipient(new String(this.recipient));
+        msg.setSender(new String(this.sender));
+        msg.setSeq(this.seq);
+        msg.setTimestamp(this.timestamp);
+        msg.setType(this.type);
+        return msg;
     }
 }

@@ -1,9 +1,8 @@
 package com.dy.app.manager;
 
-import android.app.Dialog;
-import android.os.Bundle;
 import android.os.Handler;
 
+import com.dy.app.core.dythread.MessageDispatcher;
 import com.dy.app.network.Message;
 import com.google.gson.Gson;
 
@@ -20,6 +19,10 @@ public class ConnectionManager {
     private int ack = 0;
     private int seq = 0;
     public final static String TAG = "ConnectionManager";
+
+    public boolean isListening() {
+        return isRunning;
+    }
 
     public interface ConnectionManagerCallback {
         void onConnectionManagerReady();
@@ -46,7 +49,7 @@ public class ConnectionManager {
         ConnectionManager.instance = new ConnectionManager(callback);
         ConnectionManager.instance.is = inputStream;
         ConnectionManager.instance.os = outputStream;
-        ConnectionManager.instance.isRunning = true;
+        ConnectionManager.instance.isRunning = false;
         callback.onConnectionManagerReady();
         return ConnectionManager.instance;
     }
@@ -66,18 +69,18 @@ public class ConnectionManager {
     private Thread sendingThread;
     private Thread receivingThread;
     private Handler handler;
-    public void startReceiving(Handler handler){
+    public void startReceiving(){
         if(receivingThread != null){
             isRunning = false;
             receivingThread.interrupt();
         }
-        this.handler = handler;
+        this.handler = MessageDispatcher.getInstance().getHandler();
         receivingThread = new Thread(new ReceivingThread());
         receivingThread.start();
     }
 
     private boolean isSending = false;
-    private boolean isRunning = true;
+    private boolean isRunning = false;
 
     private void startSending() {
         sendingThread = new Thread(new Runnable() {
@@ -124,6 +127,7 @@ public class ConnectionManager {
         private final int BUFFER_SIZE = 1024;
         @Override
         public void run() {
+            isRunning = true;
             while(isRunning){
                 try{
                     byte[] buffer = new byte[BUFFER_SIZE];
@@ -137,7 +141,7 @@ public class ConnectionManager {
 
                     if(o != null){
                         // Process the received message on the main (UI) thread
-                        handler.obtainMessage(0, length, -1, o).sendToTarget();
+                        handler.obtainMessage(o.getType(), o.getCode(), -1, o).sendToTarget();
                     }
                 }catch (Exception e){
                     handlePeerWeakConnection();

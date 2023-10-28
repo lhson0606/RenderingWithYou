@@ -1,6 +1,7 @@
 package com.dy.app.activity;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -26,10 +27,12 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.dy.app.R;
+import com.dy.app.gameplay.Player;
 import com.dy.app.manager.ConnectionManager;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.network.WiFiDirectBroadcastReceiver;
@@ -237,10 +240,12 @@ public class MatchMakingActivity extends AppCompatActivity
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo wifiP2pInfo) {
         if (wifiP2pInfo.groupFormed && wifiP2pInfo.isGroupOwner) {
-            logSystem("I am the group owner");
+            //logSystem("I am the group owner");
+            Player.getInstance().setHost(true);
             waitForClientConnection();
         } else if (wifiP2pInfo.groupFormed) {
-            logSystem("I am not the group owner");
+            //logSystem("I am not the group owner");
+            Player.getInstance().setHost(false);
             connectToGroupOwner(wifiP2pInfo.groupOwnerAddress.getHostAddress());
         }
     }
@@ -252,28 +257,43 @@ public class MatchMakingActivity extends AppCompatActivity
                 try {
                     Socket socket = new Socket();
 
-                    socket.connect(new InetSocketAddress(hostAddress, 8888), 10000);
+                    socket.connect(new InetSocketAddress(hostAddress, 8888), 1000);
 
-                    try {
-                        ConnectionManager.startNewInstance(socket.getInputStream(), socket.getOutputStream(), new ConnectionManager.ConnectionManagerCallback() {
-                            @Override
-                            public void onConnectionManagerReady() {
-                                //start game lobby activity after connection manager is ready
-                                Intent intent = new Intent(MatchMakingActivity.this, GameLobbyActivity.class);
-                                startActivity(intent);
-                            }
-                        });
-                    } catch (IOException e) {
-                        throw new RuntimeException("Connection timeout");
-//                        Log.e("MainActivity", e.getMessage());
-//                        finish();
-                    }
+                    ConnectionManager.startNewInstance(socket.getInputStream(), socket.getOutputStream(), new ConnectionManager.ConnectionManagerCallback() {
+                        @Override
+                        public void onConnectionManagerReady() {
+                            //start game lobby activity after connection manager is ready
+                            Intent intent = new Intent(MatchMakingActivity.this, GameLobbyActivity.class);
+                            startActivity(intent);
+                        }
+                    });
 
 
                 } catch (IllegalBlockingModeException | IllegalArgumentException | IOException e) {
-                    throw new RuntimeException("Connection timeout");
+                    //throw new RuntimeException("Connection timeout");
                     //Log.e("MainActivity", e.getMessage());
-                    //finish();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MatchMakingActivity.this);
+                    builder.setTitle("Cannot connect to host, click OK to try again.");
+                    builder.setCancelable(false);  // Prevent the dialog from being canceled by clicking outside
+                    builder.setPositiveButton("OK", (dialog, which) -> {
+                        // Handle the OK button click
+                        dialog.dismiss();
+                        connectToGroupOwner(hostAddress);
+                        // You can finish the activity or take other actions here
+                        //finish();
+                    });
+                    builder.setNegativeButton("Cancel", (dialog, which) -> {
+                        // Handle the OK button click
+                        dialog.dismiss();
+                        // You can finish the activity or take other actions here
+                        //finish();
+                    });
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            builder.show();
+                        }
+                    });
                 }
             }
         });
@@ -284,33 +304,59 @@ public class MatchMakingActivity extends AppCompatActivity
     private void waitForClientConnection() {
 
         Thread t = new Thread(new Runnable() {
+            ServerSocket ss = null;
             @Override
             public void run() {
                 try {
-                    ServerSocket ss = new ServerSocket(8888);
+                    ss = new ServerSocket(8888);
 
                     ss.setSoTimeout(10000);
-                    try{
-                        Socket socket = ss.accept();
-                        socket.setSoTimeout(10000);
-                        ss.close();
-                        ConnectionManager.startNewInstance(socket.getInputStream(), socket.getOutputStream(), new ConnectionManager.ConnectionManagerCallback() {
-                            @Override
-                            public void onConnectionManagerReady() {
-                                //start game lobby activity after connection manager is ready
-                                Intent intent = new Intent(MatchMakingActivity.this, GameLobbyActivity.class);
-                                startActivity(intent);
-                            }
-                        });
-                    }catch (SocketTimeoutException e){
-                        throw new RuntimeException("Connection timeout");
-                        //finish();
-                    }
+                    Socket socket = ss.accept();
+                    socket.setSoTimeout(1000);
+                    ss.close();
+                    ConnectionManager.startNewInstance(socket.getInputStream(), socket.getOutputStream(), new ConnectionManager.ConnectionManagerCallback() {
+                        @Override
+                        public void onConnectionManagerReady() {
+                            //start game lobby activity after connection manager is ready
+                            Intent intent = new Intent(MatchMakingActivity.this, GameLobbyActivity.class);
+                            startActivity(intent);
+                        }
+                    });
 
                 } catch (IOException e) {
-                    throw new RuntimeException("Connection timeout");
+                    //throw new RuntimeException("Connection timeout");
                     //Log.d("MainActivity", e.getMessage());
                     //finish();
+                    if(ss!=null) {
+                        try {
+                            ss.close();
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
+                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MatchMakingActivity.this);
+                    builder.setTitle("Cannot connect to host, click OK to try again.");
+                    builder.setCancelable(false);  // Prevent the dialog from being canceled by clicking outside
+                    builder.setPositiveButton("OK", (dialog, which) -> {
+                        // Handle the OK button click
+                        dialog.dismiss();
+                        waitForClientConnection();
+                        // You can finish the activity or take other actions here
+                        //finish();
+                    });
+                    builder.setNegativeButton("Cancel", (dialog, which) -> {
+                        // Handle the OK button click
+                        dialog.dismiss();
+                        // You can finish the activity or take other actions here
+                        //finish();
+                    });
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            builder.show();
+                        }
+                    });
                 }
             }
         });

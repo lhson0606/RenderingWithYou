@@ -12,7 +12,7 @@ public class Player {
     private int terrainSkinIndex = 0;private int[] terrain_skins = {0,1,2,3};
     private boolean hasLogin = false;
     private String name = "Player";
-
+    private boolean isHost;
     private float xp = 0;
 
     public boolean isInTurn() {
@@ -166,5 +166,13 @@ public class Player {
 
     public void setTerrain_skins(int[] terrain_skins) {
         this.terrain_skins = terrain_skins;
+    }
+
+    public boolean isHost() {
+        return isHost;
+    }
+
+    public void setHost(boolean host) {
+        isHost = host;
     }
 }

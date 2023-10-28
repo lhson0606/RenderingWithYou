@@ -22,6 +22,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.dy.app.R;
+import com.dy.app.core.dythread.MessageDispatcher;
 import com.dy.app.manager.ConnectionManager;
 import com.dy.app.manager.UIManager;
 import com.dy.app.ui.view.FragmentChatLobby;
@@ -63,22 +64,38 @@ implements View.OnClickListener {
         ft.commit();
         //fragmentSkinSelection.setFragmentManager(getSupportFragmentManager());
     }
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case 0:
+                    fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, 0, msg.obj, null);
+                    break;
+            }
+            return false;
+        }
+    });
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MessageDispatcher.getInstance().unsubscribe(handler, 0);
+    }
 
     private void exqListener() {
         // start listening to incoming messages
-        Handler handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {
-                switch (msg.what){
-                    case 0:
-                        fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, 0, msg.obj, null);
-                        break;
-                }
-                return false;
-            }
-        });
 
-        ConnectionManager.getInstance().startReceiving(handler);
+
+        if (!MessageDispatcher.getInstance().isAlive()) {
+            MessageDispatcher.getInstance().start();
+        }
+
+        if (!ConnectionManager.getInstance().isListening()) {
+            ConnectionManager.getInstance().startReceiving();
+        }
+
+        //bugs
+        MessageDispatcher.getInstance().subscribe(handler, 0);
         ConnectionManager.getInstance().setConnectionLostCallback(new ConnectionManager.ConnectionStatusCallback() {
             @Override
             public void onConnectionLost() {
@@ -107,27 +124,27 @@ implements View.OnClickListener {
 
             @Override
             public void onWeakConnection() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!isFinishing()) {  // Check if the activity is finishing
-                            AlertDialog.Builder builder = new AlertDialog.Builder(GameLobbyActivity.this);
-                            builder.setTitle("Weak connection");
-                            builder.setCancelable(false);  // Prevent the dialog from being canceled by clicking outside
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Handle the OK button click
-                                    dialog.dismiss();
-                                    // You can finish the activity or take other actions here
-                                    //finish();
-                                }
-                            });
-                            AlertDialog dialog = builder.create();
-                            dialog.show();
-                        }
-                    }
-                });
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if (!isFinishing()) {  // Check if the activity is finishing
+//                            AlertDialog.Builder builder = new AlertDialog.Builder(GameLobbyActivity.this);
+//                            builder.setTitle("Weak connection");
+//                            builder.setCancelable(false);  // Prevent the dialog from being canceled by clicking outside
+//                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    // Handle the OK button click
+//                                    dialog.dismiss();
+//                                    // You can finish the activity or take other actions here
+//                                    //finish();
+//                                }
+//                            });
+//                            AlertDialog dialog = builder.create();
+//                            dialog.show();
+//                        }
+//                    }
+//                });
             }
         });
     }
@@ -138,7 +155,7 @@ implements View.OnClickListener {
         uiManager = UIManager.getInstance();
         screenView = (View) findViewById(R.id.fullScreen);
         screenView.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
-        fragmentChatLobby = FragmentChatLobby.newInstance();
+        fragmentChatLobby = (FragmentChatLobby) UIManager.getInstance().getUI(UIManager.UIType.CHAT);
         btnQuit = (Button)findViewById(R.id.btnQuit);
         btnQuit.setOnClickListener(this);
         btnReady = (Button)findViewById(R.id.btnReady);
@@ -162,6 +179,8 @@ implements View.OnClickListener {
     @Override
     protected void onPause() {
         super.onPause();
+        //MessageDispatcher.getInstance().interrupt();
+        //ConnectionManager.getInstance().pauseReceiving();
     }
 
     @Override
@@ -185,6 +204,7 @@ implements View.OnClickListener {
                 btnReady.setText("Ready!!!");
                 btnReady.setPadding(30, 30, 30, 30);
                 btnReady.setTextSize(30);
+                informPeerReady(false);
                 isReady = false;
             }
 
@@ -216,7 +236,10 @@ implements View.OnClickListener {
     }
 
     private void informPeerReady(boolean isReady){
-        ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("I am ready", 0));
+        if(isReady)
+            ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("I am ready", 0));
+        else
+            ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("I am not ready", 0));
     }
 
     private View screenView;
