@@ -37,6 +37,11 @@ implements MainCallback {
         initCore();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
     private void initCore() {
         TaskManager.getInstance().addTask(new Runnable() {
             @Override
@@ -100,8 +105,9 @@ implements MainCallback {
             case END:
                 break;
             case SHOW_DIALOG:
-                if(!progressDialog.isShowing())
-                    progressDialog.show();
+                if(!progressDialog.isShowing()){
+                    //progressDialog.show();
+                }
                 break;
             case DISMISS_DIALOG:
                 progressDialog.dismiss();

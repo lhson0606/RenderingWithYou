@@ -11,7 +11,7 @@ public class MessageFactory {
     private Player player = null;
     private Rival rival = null;
 
-    public Message createChatMessage(String message) {
+    public Message createChatMessage(String message, int code) {
         Message msg = new Message();
         msg.setType(MessageType.CHAT.ordinal());
         msg.setSender(player.getName());
@@ -21,7 +21,7 @@ public class MessageFactory {
         msg.setLength(message.getBytes().length);
         msg.setAck(ConnectionManager.getInstance().getAck());
         msg.setSeq(ConnectionManager.getInstance().getSeq());
-        msg.setCode(0);
+        msg.setCode(code);
         return msg;
     }
 

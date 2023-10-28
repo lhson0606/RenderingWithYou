@@ -45,6 +45,10 @@ public class ConnectionManager {
         return instance;
     }
 
+    public boolean isSending(){
+        return isSending;
+    }
+
     public static ConnectionManager startNewInstance(InputStream inputStream, OutputStream outputStream, ConnectionManagerCallback callback) {
         ConnectionManager.instance = new ConnectionManager(callback);
         ConnectionManager.instance.is = inputStream;
@@ -58,7 +62,19 @@ public class ConnectionManager {
 
     public void postMessage(Object o) {
         if(isSending){
-            messages.add(o);
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(isSending){
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    messages.add(o);
+                }
+            });
         }
         else{
             messages.clear();
@@ -114,9 +130,28 @@ public class ConnectionManager {
 
     public void closeConnection(){
         try{
-            sendingThread.interrupt();
-            is.close();
-            os.close();
+            isRunning = false;
+            receivingThread.interrupt();
+            //wait for sending to complete
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(isSending){
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    sendingThread.interrupt();
+                    try {
+                        is.close();
+                        os.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
         }catch (Exception e){
 
         }

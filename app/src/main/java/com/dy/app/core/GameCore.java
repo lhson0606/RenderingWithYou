@@ -128,7 +128,7 @@ public class GameCore {
     private static GameCore instance = null;
 
     public void setActivity(GameActivity gameActivity) {
-        if(this.gameActivity != null) return;
+        if(this.gameActivity == gameActivity) return;
         this.gameActivity = gameActivity;
         instance.init();
     }

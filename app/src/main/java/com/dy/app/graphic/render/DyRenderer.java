@@ -75,9 +75,9 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     public void onDrawFrame(GL10 gl) {
         GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
 
-        for(GameEntity e: EntityManger.getInstance().getEntities()){
-            e.update(0f);
-        }
+//        for(GameEntity e: EntityManger.getInstance().getEntities()){
+//            e.update(0f);
+//        }
 
         for(GameEntity e: EntityManger.getInstance().getEntities()){
             e.draw();

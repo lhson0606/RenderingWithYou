@@ -60,7 +60,7 @@ public class Board implements GameEntity {
         return tiles[pos.x][pos.y];
     }
 
-    public static Board getInstance(){
+    public static synchronized Board getInstance(){
         return instance = (instance == null) ? new Board() : instance;
     }
 

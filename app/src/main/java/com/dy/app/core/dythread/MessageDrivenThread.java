@@ -13,11 +13,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MessageDrivenThread extends Thread{
-    private Handler handler;
-    private boolean isRunning = false;
-    private boolean isPaused = false;
-    private Lock lock;
-    private Condition condition;
+    protected Handler handler;
+    protected boolean isRunning = false;
+    protected boolean isPaused = false;
+    protected Lock lock;
+    protected Condition condition;
     protected Vector<com.dy.app.network.Message> msgQueue;
 
     public MessageDrivenThread(){
@@ -34,7 +34,13 @@ public class MessageDrivenThread extends Thread{
     }
 
     private void addMessage(com.dy.app.network.Message obj) {
-        msgQueue.add(obj);
+        lock.lock();
+        try{
+            msgQueue.add(obj);
+            condition.signal();
+        } finally {
+            lock.unlock();
+        }
         if(isPaused){
             resumeThread();
         }
@@ -54,8 +60,16 @@ public class MessageDrivenThread extends Thread{
                     lock.unlock();
                 }
             }else{
-                handleMsgQueue();
-                msgQueue.clear();
+
+                lock.lock();
+                try{
+                    handleMsgQueue();
+                    msgQueue.clear();
+                    condition.signal();
+                } finally {
+                    lock.unlock();
+                }
+
                 pauseThread();
             }
         }

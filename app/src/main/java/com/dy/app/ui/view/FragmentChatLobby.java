@@ -92,6 +92,9 @@ public class FragmentChatLobby extends Fragment
                 String chatText = new String(msg.getData(), 0, msg.getLength());
                 addMessageFromPeer(chatText);
                 break;
+            case 1:
+                //connection lost
+                break;
         }
     }
 
@@ -103,7 +106,7 @@ public class FragmentChatLobby extends Fragment
         //scroll down to the last message
         scrollDown();
         //send message to the other player
-        Message o = MessageFactory.getInstance().createChatMessage(chatText);
+        Message o = MessageFactory.getInstance().createChatMessage(chatText, 0);
         ConnectionManager.getInstance().postMessage(o);
     }
 
@@ -124,5 +127,13 @@ public class FragmentChatLobby extends Fragment
                 svChat.fullScroll(View.FOCUS_DOWN);
             }
         });
+    }
+
+    public void addSystemMessage(String s) {
+        TextView tv = LayoutInflater.from(getContext()).inflate(R.layout.system_text_view, llChat, false).findViewById(R.id.tvMsg);
+        tv.setText(s);
+        llChat.addView(tv);
+        //scroll down to the last message
+        scrollDown();
     }
 }
