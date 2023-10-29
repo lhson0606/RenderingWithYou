@@ -1,6 +1,7 @@
 package com.dy.app.manager;
 
 import android.os.Handler;
+import android.util.Log;
 
 import com.dy.app.core.dythread.MessageDispatcher;
 import com.dy.app.network.Message;
@@ -16,8 +17,9 @@ public class ConnectionManager {
     private static ConnectionManager instance = null;
     private InputStream is;
     private OutputStream os;
-    private int ack = 0;
     private int seq = 0;
+    private int ack = 0;
+    private boolean clientReceived = false;
     public final static String TAG = "ConnectionManager";
 
     public boolean isListening() {
@@ -58,27 +60,13 @@ public class ConnectionManager {
         return ConnectionManager.instance;
     }
 
-    private Vector<Object> messages;
+    private Vector<Message> messages;
+    private int currentMsg = 0;
 
-    public void postMessage(Object o) {
-        if(isSending){
-            Thread t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while(isSending){
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    messages.add(o);
-                }
-            });
-        }
-        else{
-            messages.clear();
-            messages.add(o);
+
+    public synchronized void postMessage(Message o) {
+        messages.add(o);
+        if(!isSending){
             startSending();
         }
     }
@@ -97,27 +85,38 @@ public class ConnectionManager {
 
     private boolean isSending = false;
     private boolean isRunning = false;
+    private Gson gson = new Gson();
 
-    private void startSending() {
+    private synchronized void startSending() {
         sendingThread = new Thread(new Runnable() {
-            private void sendOneMessage(Object o) throws IOException {
-                Gson gson = new Gson();
-                String json = gson.toJson(o);
-                os.write(json.getBytes());
-                os.flush();
+            private void sendOneMessage(Message o) throws IOException, InterruptedException {
+                clientReceived = false;
+                while(!clientReceived){
+                    o.setSeq(seq);
+                    String json = gson.toJson(o);
+                    os.write(json.getBytes());
+                    os.flush();
+                    Thread.sleep(69);
+                    Log.d(TAG, "sendOneMessage: " + seq);
+                }
+                Log.d(TAG, "ack: " + seq);
+                ++seq;
             }
 
             @Override
             public void run() {
                 isSending = true;
 
-                for(Object o : messages) {
+                for(; currentMsg<messages.size(); currentMsg++){
                     try {
-                        sendOneMessage(o);
+                        sendOneMessage(messages.get(currentMsg));
                     } catch (IOException e) {
                         isSending = false;
                         handlePeerConnectionLost();
                         break;
+                    } catch (InterruptedException e) {
+                        //#todo did not handle yet
+                        throw new RuntimeException(e);
                     }
                 }
 
@@ -138,7 +137,7 @@ public class ConnectionManager {
                 public void run() {
                     while(isSending){
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(69);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -152,6 +151,8 @@ public class ConnectionManager {
                     }
                 }
             });
+
+            thread.start();
         }catch (Exception e){
 
         }
@@ -174,10 +175,45 @@ public class ConnectionManager {
 
                     Message o = gson.fromJson(json, Message.class);
 
-                    if(o != null){
-                        // Process the received message on the main (UI) thread
-                        handler.obtainMessage(o.getType(), o.getCode(), -1, o).sendToTarget();
+                    if(o==null) continue;
+
+                    if(o.getType() == -1){
+
+                        if(seq == o.getAck()){
+                            clientReceived = true;
+                            Log.d(TAG, "client echo: " + o.getAck());
+                        }
+                        //ackMsg.setSeq(seq);
+                        continue;
                     }
+
+                    Message ackMsg = new Message();
+                    ackMsg.setType(-1);
+                    ackMsg.setAck(o.getSeq());
+
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String json = gson.toJson(ackMsg);
+                            try {
+                                os.write(json.getBytes());
+                                os.flush();
+                            } catch (IOException e) {
+                                handlePeerConnectionLost();
+                            }
+                        }
+                    });
+
+                    t.start();
+
+                    if(o.getSeq() != ack){
+                        Log.d(TAG, "run: " + o.getSeq() + " " + ack);
+                        continue;
+                    }
+
+                    ++ack;
+
+                    handler.obtainMessage(o.getType(), o.getCode(), -1, o).sendToTarget();
                 }catch (Exception e){
                     handlePeerWeakConnection();
                 }
@@ -208,25 +244,11 @@ public class ConnectionManager {
 
     }
 
-    public int getAck() {
-        return ack;
+
+    public int getNextSeq() {
+        return seq++;
     }
 
-    public void setAck(int ack) {
-        this.ack = ack;
-    }
-
-    public int newAck() {
-        return ack++;
-    }
-
-    public int getSeq() {
-        return seq;
-    }
-
-    public void increaseSeq() {
-        seq++;
-    }
 
     public int newSeq() {
         return seq++;

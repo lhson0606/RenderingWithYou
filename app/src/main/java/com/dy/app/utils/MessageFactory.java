@@ -19,8 +19,6 @@ public class MessageFactory {
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(message.getBytes());
         msg.setLength(message.getBytes().length);
-        msg.setAck(ConnectionManager.getInstance().getAck());
-        msg.setSeq(ConnectionManager.getInstance().getSeq());
         msg.setCode(code);
         return msg;
     }
@@ -33,8 +31,6 @@ public class MessageFactory {
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(message.getBytes());
         msg.setLength(message.getBytes().length);
-        msg.setAck(ConnectionManager.getInstance().getAck());
-        msg.setSeq(ConnectionManager.getInstance().getSeq());
         msg.setCode(code);
         return msg;
     }

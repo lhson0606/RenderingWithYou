@@ -22,7 +22,7 @@ public class DyConst {
     public static final String tile_skins[] = {"basic.png", "wooden.jpg"};
     public static final int tile_skin_thumbnails[] ={R.raw.thumbnail_tile_basic, R.raw.thumbnail_tile_wooden};
     public static final String back_ground_skins[] = {"basic.jpg"};
-    public static final String terrain_tex[] = {"cozy_room.jpg", "galaxy.jpg", "Booth2_lambert1_BaseColor.png", "PicnicTable_albedoM.tga.png"};
+    public static final String terrain_tex[] = {"galaxy.jpg", "cozy_room.jpg", "Booth2_lambert1_BaseColor.png", "PicnicTable_albedoM.tga.png"};
     public static final String terrain_models[] = {"galaxy.obj", "cozy_room.obj", "dinner_booth.obj", "picnic_table.obj"};
     public static final int terrain_skin_thumbnails[] = {R.raw.thumbnail_terrain_galaxy, R.raw.thumbnail_terrain_cozy_room, R.raw.thumbnail_terrain_booth, R.raw.thumbnail_terrain_pinic_table};
     public static final String king = "king";
