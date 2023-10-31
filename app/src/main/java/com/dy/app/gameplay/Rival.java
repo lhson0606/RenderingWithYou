@@ -59,6 +59,15 @@ public class Rival {
         return instance;
     }
 
+
+    public void setWhitePiece(boolean whitePiece) {
+        this.whitePiece = whitePiece;
+    }
+
+    public void setInTurn(boolean inTurn) {
+        this.inTurn = inTurn;
+    }
+
     public String getName() {
         return "Rival";
     }

@@ -28,7 +28,6 @@ public class FragmentTileSelection extends Fragment
     private SliderLayout slider;
     private Button btnNext, btnPrev;
     private final SoundManager soundManager = SoundManager.getInstance();
-    private int selected_index = 0;
     private Player player;
 
     public static FragmentTileSelection newInstance(){

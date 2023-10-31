@@ -23,6 +23,10 @@ public class Player {
         return whitePiece;
     }
 
+    public void setWhitePiece(boolean whitePiece) {
+        this.whitePiece = whitePiece;
+    }
+
     public int getPieceSkinIndex() {
         return pieceSkinIndex;
     }
@@ -62,6 +66,10 @@ public class Player {
 
     public String getTerrainModelPath(){
         return DyConst.terrain_model_path + DyConst.terrain_models[terrainSkinIndex];
+    }
+
+    public void setInTurn(boolean inTurn) {
+        this.inTurn = inTurn;
     }
 
     private static Player instance = null;

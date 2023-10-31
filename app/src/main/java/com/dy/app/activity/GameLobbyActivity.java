@@ -34,6 +34,7 @@ import com.dy.app.ui.view.FragmentSkinSelection;
 import com.dy.app.utils.ImageLoader;
 import com.dy.app.network.MessageType;
 import com.dy.app.utils.MessageFactory;
+import com.dy.app.utils.Utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -112,6 +113,7 @@ implements View.OnClickListener {
             public boolean handleMessage(@NonNull Message msg) {
                 com.dy.app.network.Message message = (com.dy.app.network.Message)msg.obj;
                 final String sysMsg = new String(message.getData(), StandardCharsets.UTF_8);
+                Integer isWhitePiece;
                 switch(message.getCode()) {
                     case 0:
                         if (sysMsg.equals(ready_msg)) {
@@ -144,7 +146,19 @@ implements View.OnClickListener {
                     break;
 
                     case 1://start match
-                        ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("", 4));
+                        isWhitePiece = Utils.randomInt(0,1);
+                        ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage(isWhitePiece.toString(), 4));
+                        if(isWhitePiece == 1) {
+                            Player.getInstance().setWhitePiece(true);
+                            Rival.getInstance().setWhitePiece(false);
+                            Player.getInstance().setInTurn(true);
+                            Rival.getInstance().setInTurn(false);
+                        }else{
+                            Player.getInstance().setWhitePiece(false);
+                            Player.getInstance().setInTurn(false);
+                            Rival.getInstance().setWhitePiece(true);
+                            Rival.getInstance().setInTurn(true);
+                        }
                         startMatch();
                     break;
                     case 2://count down
@@ -164,6 +178,18 @@ implements View.OnClickListener {
                         });
                     break;
                     case 4://echo match started
+                        Integer isWhite = Integer.parseInt(sysMsg);
+                        if(isWhite == 1) {
+                            Player.getInstance().setWhitePiece(false);
+                            Player.getInstance().setInTurn(false);
+                            Rival.getInstance().setWhitePiece(true);
+                            Rival.getInstance().setInTurn(true);
+                        }else{
+                            Player.getInstance().setWhitePiece(true);
+                            Player.getInstance().setInTurn(true);
+                            Rival.getInstance().setWhitePiece(false);
+                            Rival.getInstance().setInTurn(false);
+                        }
                         startMatch();
                     break;
                     case 5://request count down
@@ -191,6 +217,7 @@ implements View.OnClickListener {
     private Thread count_down_thread = null;
 
     private int count_down = 0;
+    private final int count_down_max = 5;
 
     private void countDown() {
         startingMatch = true;
@@ -199,15 +226,15 @@ implements View.OnClickListener {
             @Override
             public void run() {
 
-                while(startingMatch && count_down < 10){
+                while(startingMatch && count_down < count_down_max){
                     try {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 count_down++;
-                                if(count_down != 10) {
-                                    fragmentChatLobby.addSystemMessage("start in " + (10-count_down) + " seconds");
-                                    ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("start in " + (10-count_down) + " seconds", 2));
+                                if(count_down != count_down_max) {
+                                    fragmentChatLobby.addSystemMessage("start in " + (count_down_max-count_down) + " seconds");
+                                    ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("start in " + (count_down_max-count_down) + " seconds", 2));
                                 }else{
 
                                     //signal match starts

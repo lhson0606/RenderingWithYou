@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.common.maths.Vec4;
+import com.dy.app.gameplay.Player;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.piece.Piece;
@@ -37,7 +38,9 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
     public boolean onTouch(View v, MotionEvent event) {
         //ugly diagram by me
         //https://app.diagrams.net/#G1kvrd5YVAJhFpZ6-JCbSDUIHSVGOq_gVz
-        Log.d("TilePicker", "onTouch");
+
+        if(!Player.getInstance().isInTurn()) return false;
+
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 if(firstTouch) {

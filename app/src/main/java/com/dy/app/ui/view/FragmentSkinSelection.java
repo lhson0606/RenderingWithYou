@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
@@ -25,7 +26,7 @@ import com.google.android.material.tabs.TabLayout;
 public class FragmentSkinSelection extends Fragment
         implements FragmentCallback, View.OnClickListener {
 
-    private Button btnClose;
+    private LottieAnimationView btnClose;
 
     public final static String TAG = "FragmentSkinSelection";
     private FragmentHubActivity main;
@@ -127,6 +128,7 @@ public class FragmentSkinSelection extends Fragment
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnClose){
+            btnClose.playAnimation();
             main.onMsgToMain(TAG, 0, null, null);
         }
     }

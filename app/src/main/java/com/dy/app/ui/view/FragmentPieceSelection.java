@@ -31,7 +31,6 @@ implements View.OnClickListener, ViewPagerEx.OnPageChangeListener {
     private SliderLayout slider;
     private Button btnNext, btnPrev;
     private final SoundManager soundManager = SoundManager.getInstance();
-    private int selected_index = 0;
     private Player player;
 
     public static FragmentPieceSelection newInstance(){

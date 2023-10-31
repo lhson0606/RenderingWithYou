@@ -9,13 +9,14 @@ import android.widget.Button;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
 
 public class FragmentCredits extends Fragment
     implements View.OnClickListener {
-    Button btnClose;
+    private LottieAnimationView btnClose;
 
     public final static String TAG = "FragmentCredits";
     private FragmentHubActivity main;
@@ -42,6 +43,7 @@ public class FragmentCredits extends Fragment
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnClose){
+            btnClose.playAnimation();
             main.onMsgToMain(TAG, 0, null, null);
         }
     }

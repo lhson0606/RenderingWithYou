@@ -31,6 +31,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.gameplay.Player;
 import com.dy.app.manager.ConnectionManager;
@@ -101,7 +102,6 @@ public class MatchMakingActivity extends AppCompatActivity
         btnWifi = findViewById(R.id.btnWifi);
         btnClear = findViewById(R.id.btnClear);
         tvLog = findViewById(R.id.tvLog);
-        screenView = findViewById(R.id.screenView);
         soundManager = SoundManager.getInstance().initInContext(this);
 
         peers = new java.util.ArrayList<>();
@@ -115,21 +115,23 @@ public class MatchMakingActivity extends AppCompatActivity
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-
-        screenView.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
     }
 
     @Override
     public void onClick(View v) {
         soundManager.playSound(getBaseContext(), SoundManager.SoundType.BTN_BLOP);
         if (v == btnExit) {
+            btnExit.playAnimation();
             disconnectAllWifiDirect();
             finish();
         } else if (v == btnReload) {
+            btnReload.playAnimation();
             startDiscovery();
         } else if (v == btnJoin) {
+            btnJoin.playAnimation();
             startConnection();
         } else if (v == btnWifi) {
+            btnWifi.playAnimation();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 askForConnection();
             } else if (wifiManager.isWifiEnabled()) {
@@ -141,6 +143,7 @@ public class MatchMakingActivity extends AppCompatActivity
             }
 
         } else if (v == btnClear) {
+            btnClear.playAnimation();
             clearLog();
         }
     }
@@ -428,7 +431,7 @@ public class MatchMakingActivity extends AppCompatActivity
         }
         //set new color
         currentSelectedItem = view;
-        currentSelectedItem.setBackgroundColor(Color.parseColor("#FF4081"));
+        currentSelectedItem.setBackgroundColor(Color.parseColor("#2050CA"));
     }
 
     private void startConnection() {
@@ -463,9 +466,8 @@ public class MatchMakingActivity extends AppCompatActivity
     }
 
     private TextView tvLog;
-    private Button btnExit, btnReload, btnJoin, btnWifi, btnClear;
+    private LottieAnimationView btnExit, btnReload, btnJoin, btnWifi, btnClear;
     private SoundManager soundManager;
-    private View screenView;
     private IntentFilter intentFilter;
     private WifiManager wifiManager;
     private WifiP2pManager wifiP2pManager;

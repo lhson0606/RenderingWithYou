@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
@@ -18,7 +19,8 @@ import com.dy.app.core.FragmentCallback;
 
 public class FragmentLoginForm extends Fragment
         implements View.OnClickListener, FragmentCallback {
-    private Button btnClose, btnLogin, btnCreateAccount;
+    private LottieAnimationView btnClose;
+    private Button btnLogin, btnCreateAccount;
     private EditText etUsername, etPassword;
 
     public final static String TAG = "FragmentLoginForm";
@@ -52,6 +54,7 @@ public class FragmentLoginForm extends Fragment
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnClose){
+            btnClose.playAnimation();
             main.onMsgToMain(TAG, 0, null, null);
         }else if(v.getId() == R.id.btnLogin){
             main.onMsgToMain(TAG, 1, etUsername.getText().toString(), etPassword.getText().toString());

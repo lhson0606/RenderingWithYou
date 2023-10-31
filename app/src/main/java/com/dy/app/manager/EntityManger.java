@@ -13,7 +13,15 @@ public class EntityManger {
     private Vector<GameEntity> entities;
     private Vector<GameEntity> removeList = new Vector<>();
 
-    public static EntityManger getInstance(){
+    public void reset(){
+        for(GameEntity e: entities){
+            e.destroy();
+        }
+        entities.clear();
+        removeList.clear();
+    }
+
+    public static synchronized EntityManger getInstance(){
         return instance = (instance == null) ? new EntityManger() : instance;
     }
 
@@ -31,12 +39,12 @@ public class EntityManger {
 
     private static EntityManger instance = null;
 
-    public synchronized Vector<GameEntity> getEntities() {
-        for(GameEntity e: removeList){
-            e.destroy();
-        }
-        entities.removeAll(removeList);
-        removeList.clear();
+    public Vector<GameEntity> getEntities() {
+//        for(GameEntity e: removeList){
+//            e.destroy();
+//        }
+//        entities.removeAll(removeList);
+//        removeList.clear();
         return entities;
     }
 

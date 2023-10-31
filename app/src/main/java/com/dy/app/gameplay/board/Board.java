@@ -21,6 +21,10 @@ public class Board implements GameEntity {
     private Tile tiles[][];
 
     private Board(){
+
+    }
+
+    public void newBoard(){
         tiles = new Tile[DyConst.row_count][DyConst.col_count];
         for(int i = 0; i < DyConst.row_count; i++){
             for(int j = 0; j < DyConst.col_count; j++)

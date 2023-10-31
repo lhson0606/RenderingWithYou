@@ -14,11 +14,13 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.core.MainCallback;
 import com.dy.app.gameplay.Player;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.manager.UIManager;
+import com.dy.app.setting.GameSetting;
 import com.dy.app.ui.view.FragmentCreateAccount;
 import com.dy.app.ui.view.FragmentCredits;
 import com.dy.app.ui.view.FragmentLoginForm;
@@ -37,15 +39,18 @@ public class MainActivity extends FragmentHubActivity
         setContentView(R.layout.main_activity);
         fm = getSupportFragmentManager();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+
+        handler = new Handler(getMainLooper());
+        attachFragment();
         menuScreen = findViewById(R.id.mainScreen);
         btnConfig = findViewById(R.id.btnConfig);
+        btnAbout = findViewById(R.id.btnAbout);
         btnAccount = findViewById(R.id.btnAccount);
         tvUsername = findViewById(R.id.tvUsername);
         btnChooseSkin = findViewById(R.id.btnChooseSkin);
-
-        menuScreen.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
-        handler = new Handler(getMainLooper());
-        attachFragment();
+        btnSpeaker = findViewById(R.id.btnSpeaker);
+        //menuScreen.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
 
         attachListener();
         initManager();
@@ -84,8 +89,10 @@ public class MainActivity extends FragmentHubActivity
 
     private void attachListener() {
         btnConfig.setOnClickListener(this);
+        btnAbout.setOnClickListener(this);
         btnAccount.setOnClickListener(this);
         btnChooseSkin.setOnClickListener(this);
+        btnSpeaker.setOnClickListener(this);
     }
 
     private void attachFragment() {
@@ -323,16 +330,32 @@ public class MainActivity extends FragmentHubActivity
     public void onClick(View v) {
         soundManager.playSound(this, SoundManager.SoundType.BTN_BLOP);
         if(v.getId() == R.id.btnConfig) {
+            btnConfig.playAnimation();
             showFragment(settingFragment);
-        }else if(v.getId() == R.id.btnAccount){
-
+        }else if(v.getId() == R.id.btnAbout){
+            btnAbout.playAnimation();
+            showFragment(creditsFragment);
+        }
+        else if(v.getId() == R.id.btnAccount){
+            btnAccount.playAnimation();
             if(Player.getInstance().hasLogin())
                 showFragment(logoutFormFragment);
             else
                 showFragment(loginFormFragment);
 
         }else if (v.getId() == R.id.btnChooseSkin){
+            btnChooseSkin.playAnimation();
             showFragment(skinSelectionFragment);
+        }else if(v.getId() == R.id.btnSpeaker){
+            btnSpeaker.playAnimation();
+            if(SoundManager.getInstance().isSoundOn()){
+                SoundManager.getInstance().setSoundOn(false);
+                btnSpeaker.setAnimation("animated_ui/btn_speaker_mute.json");
+            }
+            else{
+                SoundManager.getInstance().setSoundOn(true);
+                btnSpeaker.setAnimation("animated_ui/btn_speaker_enable.json");
+            }
         }
     }
 
@@ -349,6 +372,6 @@ public class MainActivity extends FragmentHubActivity
     private View menuScreen;
     private FragmentManager fm;
     private Handler handler;
-    private Button btnConfig, btnAccount, btnChooseSkin;
+    private LottieAnimationView btnConfig,btnAbout, btnAccount, btnChooseSkin, btnSpeaker;
     private Fragment currentFragment;
 }

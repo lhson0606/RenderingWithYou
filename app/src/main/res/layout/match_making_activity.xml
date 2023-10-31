@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/screenView"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_main_menu">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="0.69"
-        android:background="@color/light_blue"
+        android:alpha="1"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -69,61 +69,34 @@
                 android:weightSum="12"
                 android:gravity="center">
 
-                <LinearLayout
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/btnExit"
                     android:layout_width="0sp"
-                    android:layout_height="@dimen/default_size"
-                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:background="@drawable/outline_red_background"
-                    android:gravity="center"
-                    android:paddingStart="20sp"
-                    android:paddingEnd="20sp">
 
-                    <Button
-                        android:id="@+id/btnExit"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/ic_cross"
-                        android:foreground="?attr/selectableItemBackground" />
+                    app:lottie_autoPlay="false"
+                    app:lottie_loop="false"
+                    app:lottie_fileName="animated_ui/btn_x.json"/>
 
-                </LinearLayout>
-
-                <LinearLayout
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/btnReload"
                     android:layout_width="0sp"
-                    android:layout_height="@dimen/default_size"
-                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:paddingStart="20sp"
-                    android:paddingEnd="20sp"
-                    android:background="@drawable/outline_green_background">
 
-                    <Button
-                        android:id="@+id/btnReload"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/ic_sync"
-                        android:foreground="?attr/selectableItemBackground"/>
+                    app:lottie_autoPlay="false"
+                    app:lottie_loop="false"
+                    app:lottie_fileName="animated_ui/btn_reload.json"/>
 
-                </LinearLayout>
-
-                <LinearLayout
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/btnJoin"
                     android:layout_width="0sp"
-                    android:layout_height="@dimen/default_size"
-
-                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:paddingStart="20sp"
-                    android:paddingEnd="20sp"
-                    android:background="@drawable/outline_light_blue_background">
-
-                    <Button
-                        android:id="@+id/btnJoin"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/ic_join"
-                        android:foreground="?attr/selectableItemBackground"/>
-
-                </LinearLayout>
+                    app:lottie_autoPlay="false"
+                    app:lottie_loop="false"
+                    app:lottie_fileName="animated_ui/btn_join.json"/>
 
             </LinearLayout>
 
@@ -179,6 +152,7 @@
                         android:id="@+id/tvLog"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/black"
                         android:typeface="monospace"
                         android:textSize="@dimen/tiny_size"
                         android:text="Logging begins ...\n"/>
@@ -195,43 +169,25 @@
                 android:weightSum="12"
                 android:gravity="center">
 
-                <LinearLayout
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/btnWifi"
                     android:layout_width="0sp"
-                    android:layout_height="@dimen/default_size"
-                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_height="match_parent"
                     android:layout_weight="5"
-                    android:background="@drawable/outline_white_background"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingStart="25sp"
-                    android:paddingEnd="25sp">
 
-                    <Button
-                        android:id="@+id/btnWifi"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/ic_wifi"
-                        android:foreground="?attr/selectableItemBackground"/>
+                    app:lottie_autoPlay="false"
+                    app:lottie_loop="false"
+                    app:lottie_fileName="animated_ui/btn_wifi.json"/>
 
-                </LinearLayout>
-
-                <LinearLayout
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/btnClear"
                     android:layout_width="0sp"
-                    android:layout_height="@dimen/default_size"
-                    android:layout_margin="@dimen/medium_margin"
+                    android:layout_height="match_parent"
                     android:layout_weight="3"
-                    android:background="@drawable/outline_yellow_background"
-                    android:gravity="center"
-                    android:orientation="horizontal">
 
-                    <Button
-                        android:id="@+id/btnClear"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/ic_delete"
-                        android:foreground="?attr/selectableItemBackground"/>
-
-                </LinearLayout>
+                    app:lottie_autoPlay="false"
+                    app:lottie_loop="false"
+                    app:lottie_fileName="animated_ui/btn_clear.json"/>
 
 
             </LinearLayout>

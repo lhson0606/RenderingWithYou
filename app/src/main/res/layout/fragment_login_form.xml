@@ -2,18 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#330077ff"
     android:alpha="0.69">
 
-    <Button
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/btnClose"
-        android:layout_width="@dimen/default_size"
-        android:layout_height="@dimen/default_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:background="@drawable/ic_exit"
-        android:foreground="?attr/selectableItemBackground"
-        android:foregroundTintMode="add"/>
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_marginTop="@dimen/default_margin"
+
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        app:lottie_fileName="animated_ui/btn_exit.json"/>
 
     <TextView
         android:id="@+id/tvTile"

@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
@@ -22,11 +23,12 @@ import com.dy.app.ui.adapter.AdapterMenuItems;
 import com.dy.app.utils.ImageLoader;
 
 public class FragmentMainMenu extends Fragment
-        implements FragmentCallback, AdapterView.OnItemClickListener {
+        implements FragmentCallback, View.OnClickListener {
     public final static String TAG = "FragmentMainMenu";
     private FragmentHubActivity main;
-    private ListView lvMenuItems;
-    private AdapterMenuItems adapterMenuItems;
+    private LottieAnimationView ltvFindRoom;
+    private LottieAnimationView ltvCredits;
+    private LottieAnimationView ltvQuit;
 
     public static FragmentMainMenu newInstance(){
         FragmentMainMenu fragment = new FragmentMainMenu();
@@ -42,11 +44,12 @@ public class FragmentMainMenu extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mainMenuView = inflater.inflate(R.layout.fragment_menu_items, container, false);
-        lvMenuItems = (ListView)mainMenuView.findViewById(R.id.lvMenuItems);
-        adapterMenuItems = new AdapterMenuItems();
-
-        lvMenuItems.setAdapter(adapterMenuItems);
-        lvMenuItems.setOnItemClickListener(this);
+        ltvFindRoom = mainMenuView.findViewById(R.id.ltvFindRoom);
+        ltvCredits = mainMenuView.findViewById(R.id.ltvCredits);
+        ltvQuit = mainMenuView.findViewById(R.id.ltvQuit);
+        ltvFindRoom.setOnClickListener(this);
+        ltvCredits.setOnClickListener(this);
+        ltvQuit.setOnClickListener(this);
         return mainMenuView;
     }
 
@@ -56,13 +59,15 @@ public class FragmentMainMenu extends Fragment
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final String selected_item = (String)parent.getItemAtPosition(position);
-        if(selected_item.equals("Find room")) {
+    public void onClick(View v) {
+        if(v.getId() == R.id.ltvFindRoom) {
+            ltvFindRoom.playAnimation();
             main.onMsgToMain(TAG, 0, null, null);
-        } else if(selected_item.equals("Credits")) {
+        } else if(v.getId() == R.id.ltvCredits) {
+            ltvCredits.playAnimation();
             main.onMsgToMain(TAG, 1, null, null);
-        } else if(selected_item.equals("Quit")) {
+        } else if(v.getId() == R.id.ltvQuit) {
+            ltvQuit.playAnimation();
             main.onMsgToMain(TAG, 2, null, null);
         }
     }

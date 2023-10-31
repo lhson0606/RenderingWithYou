@@ -146,6 +146,15 @@ public class Piece implements GameEntity {
         tile.getObj().changeState(Obj3D.State.SOURCE);
         //updatePossibleMoves();
         obj.changeState(Obj3D.State.NORMAL);
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(GameEntity entity : EntityManger.getInstance().getEntities()){
+                    entity.update(0);
+                }
+            }
+        });
+        t.start();
         return oldTile;
     }
 

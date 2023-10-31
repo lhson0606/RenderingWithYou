@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
@@ -18,7 +19,8 @@ import com.dy.app.gameplay.Player;
 
 public class FragmentLogoutForm extends Fragment
         implements View.OnClickListener, FragmentCallback {
-    private Button btnClose, btnLogout;
+    private LottieAnimationView btnClose;
+    private Button btnLogout;
     private TextView tvUsername;
 
     public final static String TAG = "FragmentLogoutForm";
@@ -57,6 +59,7 @@ public class FragmentLogoutForm extends Fragment
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnClose){
+            btnClose.playAnimation();
             main.onMsgToMain(TAG, 0, null, null);
         }else if (v.getId() == R.id.btnLogout){
             main.onMsgToMain(TAG, 1, null, null);

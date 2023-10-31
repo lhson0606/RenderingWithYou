@@ -26,13 +26,13 @@ public class PieceManager {
     private Vector<Piece> player_pieces;
     private Vector<Piece> enemy_pieces ;
     
-    public static PieceManager getInstance(){
+    public static synchronized PieceManager getInstance(){
         return instance = (instance == null) ? new PieceManager() : instance;
     }
 
     private static PieceManager instance = null;
 
-    private void init() throws IOException {
+    public void init() throws IOException {
         Player player = Player.getInstance();
         Rival rival = Rival.getInstance();
         Skin playerSkin = AssetManger.getInstance().getSkin(AssetManger.SkinType.PLAYER);
@@ -49,10 +49,12 @@ public class PieceManager {
         }
 
         for(Piece piece : player_pieces){
+            piece.update(0f);
             EntityManger.getInstance().newEntity(piece);
         }
 
         for(Piece piece : enemy_pieces){
+            piece.update(0f);
             EntityManger.getInstance().newEntity(piece);
         }
     }
@@ -190,11 +192,7 @@ public class PieceManager {
     }
 
     private PieceManager(){
-        try {
-            init();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     public void removePiece(Piece piece) {

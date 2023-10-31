@@ -33,6 +33,7 @@ public class GameCore {
     }
 
     private  void init() {
+        EntityManger.getInstance().reset();
 
         gameSetting = new GameSetting();
 
@@ -72,7 +73,7 @@ public class GameCore {
                 new Runnable() {
                     @Override
                     public void run() {
-                        Board.getInstance();
+                        Board.getInstance().newBoard();
                     }
                 },
                 "initializing game board"
@@ -100,7 +101,11 @@ public class GameCore {
                 new Runnable() {
                     @Override
                     public void run() {
-                        PieceManager.getInstance();
+                        try {
+                            PieceManager.getInstance().init();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 },
                 "loading chess pieces"

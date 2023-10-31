@@ -29,7 +29,6 @@ public class FragmentTerrainSelection extends Fragment
     private Button btnNext, btnPrev;
     private final SoundManager soundManager = SoundManager.getInstance();
     private Player player;
-    private int selected_index = 0;
 
     public static FragmentTerrainSelection newInstance(){
         FragmentTerrainSelection fragment = new FragmentTerrainSelection();

@@ -38,6 +38,7 @@ dependencies {
 
     //JSON
     implementation("com.google.code.gson:gson:2.8.9")
+    implementation("com.airbnb.android:lottie:4.2.0")
 
     //emoji lib
     //noinspection GradleCompatible

@@ -96,7 +96,7 @@ public class ConnectionManager {
                     String json = gson.toJson(o);
                     os.write(json.getBytes());
                     os.flush();
-                    Thread.sleep(69);
+                    Thread.sleep(10);
                     Log.d(TAG, "sendOneMessage: " + seq);
                 }
                 Log.d(TAG, "ack: " + seq);
@@ -137,7 +137,7 @@ public class ConnectionManager {
                 public void run() {
                     while(isSending){
                         try {
-                            Thread.sleep(69);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }

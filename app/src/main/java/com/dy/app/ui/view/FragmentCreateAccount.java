@@ -10,6 +10,7 @@ import android.widget.EditText;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.MainActivity;
@@ -17,7 +18,8 @@ import com.dy.app.core.FragmentCallback;
 
 public class FragmentCreateAccount extends Fragment
     implements FragmentCallback, View.OnClickListener{
-    private Button btnClose, btnCancel, btnCreate;
+    private LottieAnimationView btnClose;
+    private Button btnCancel, btnCreate;
     private EditText etMail, etUsername, etPassword, etConfirmPassword;
 
 
@@ -59,6 +61,7 @@ public class FragmentCreateAccount extends Fragment
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnClose){
+            btnClose.playAnimation();
             reset();
             main.onMsgToMain(TAG, 0, null, null);
         }else if (v.getId() == R.id.btnCancel){

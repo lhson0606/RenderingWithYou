@@ -9,6 +9,16 @@ import java.util.Map;
 
 public class SoundManager {
     private static SoundManager instance;
+    private boolean soundOn = true;
+
+    public boolean isSoundOn() {
+        return soundOn;
+    }
+
+    public void setSoundOn(boolean soundOn) {
+        this.soundOn = soundOn;
+    }
+
     public enum SoundType {
         CLICK,
         MOVE,
@@ -59,6 +69,10 @@ public class SoundManager {
     public void playSound(Context context, SoundType type){
         if(context!= currentContext){
             initInContext(context);
+        }
+
+        if(!soundOn){
+            return;
         }
 
         MediaPlayer sound = soundMap.get(type);
