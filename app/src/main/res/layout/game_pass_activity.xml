@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_game_pass">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="3"
+                android:background="@drawable/game_pass_tile_rect">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:weightSum="12"
+                        android:gravity="center">
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:layout_width="0sp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_fileName="animated_ui/anim_firework.json"/>
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:layout_width="0sp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="3"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_fileName="animated_ui/anim_firework.json" />
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:layout_width="0sp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="3"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_fileName="animated_ui/anim_firework.json" />
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:layout_width="0sp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="3"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_fileName="animated_ui/anim_firework.json" />
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:layout_width="0sp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1.5"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_fileName="animated_ui/anim_firework.json"/>
+
+
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:id="@+id/tvLvl"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="40sp"
+                            android:textColor="@color/white"
+                            android:text="wins: 0"
+                            android:fontFamily="@font/lalezar"
+                            android:background="@drawable/bg_wins_tile"
+                            android:textAlignment="center"
+                            android:layout_centerHorizontal="true"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginBottom="-10sp"/>
+
+                    </RelativeLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0sp"
+                android:layout_weight="5"
+                android:weightSum="12"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingStart="@dimen/medium_margin"
+                android:paddingEnd="@dimen/medium_margin"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0sp"
+                    android:layout_weight="2">
+
+                </LinearLayout>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0sp"
+                    android:layout_weight="8"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:id="@+id/llMilestones"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0sp"
+                    android:layout_weight="2"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:gravity="center">
+
+
+                    <LinearLayout
+                        android:layout_width="0sp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="8"
+                        android:orientation="horizontal"
+                        android:background="@drawable/bg_wins_tile"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lalezar"
+                            android:textSize="20sp"
+                            android:textAlignment="center"
+                            android:text="Season ends in "
+                            android:textColor="@color/white"/>
+
+                        <TextView
+                            android:id="@+id/tvSeasonTimeRemaining"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lalezar"
+                            android:textSize="20sp"
+                            android:textAlignment="center"
+                            android:text="00d:00h:00s"
+                            android:textColor="@color/white"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/btnClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="@dimen/default_margin"
+                android:layout_marginTop="@dimen/default_margin"
+
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_fileName="animated_ui/btn_exit.json"/>
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

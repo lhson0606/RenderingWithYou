@@ -42,6 +42,7 @@ public class SoundManager {
         ERROR,
         BTN_BLOP,
         BTN_SKIN_PICKING,
+        COIN_CLINK,
     }
 
     private Context currentContext;
@@ -59,11 +60,17 @@ public class SoundManager {
 
         currentContext = context;
 
-        MediaPlayer mp = MediaPlayer.create(context, R.raw.se_btn_blop);
-        soundMap.put(SoundType.BTN_BLOP, mp); mp.setVolume(0.5f, 0.5f);
+        addSound(SoundType.BTN_BLOP, R.raw.se_btn_blop, 0.5f, 0.5f);
         soundMap.put(SoundType.BTN_SKIN_PICKING, MediaPlayer.create(context, R.raw.se_btn_skin_picking));
+        addSound(SoundType.COIN_CLINK, R.raw.se_coins_clinking, 0.5f, 0.5f);
 
         return this;
+    }
+
+    private void addSound(SoundType type, int res, float leftVolume, float rightVolume){
+        MediaPlayer mp = MediaPlayer.create(currentContext, res);
+        mp.setVolume(leftVolume, rightVolume);
+        soundMap.put(type, mp);
     }
 
     public void playSound(Context context, SoundType type){

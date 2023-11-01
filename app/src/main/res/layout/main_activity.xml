@@ -144,6 +144,34 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/btnAccount"
+                android:layout_alignParentTop="true"
+                android:orientation="horizontal"
+                android:background="@drawable/outline_light_blue_background"
+                android:gravity="center"
+                android:layout_marginTop="5sp">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:layout_width="16sp"
+                    android:layout_height="16sp"
+
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_fileName="animated_ui/anim_shiny_coin.json"/>
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/lalezar"
+                    android:text="x999"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/btnAccount"
                 android:layout_width="wrap_content"
@@ -199,6 +227,22 @@
                 android:layout_height="wrap_content"
                 android:max="100"
                 android:progress="50"/>
+
+            <com.airbnb.lottie.LottieAnimationView
+
+                android:id="@+id/btnGamePass"
+                android:layout_width="50sp"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvLevel"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="@dimen/default_margin"
+                android:layout_marginTop="@dimen/default_margin"
+                android:layout_marginEnd="@dimen/default_margin"
+                android:layout_marginBottom="@dimen/default_margin"
+
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_fileName="animated_ui/btn_gift.json"/>
         </RelativeLayout>
 
     </LinearLayout>

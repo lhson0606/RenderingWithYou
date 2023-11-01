@@ -14,6 +14,7 @@ public class Player {
     private String name = "Player";
     private boolean isHost;
     private float xp = 0;
+    private int pass_lvl = 32;
 
     public boolean isInTurn() {
         return inTurn;
@@ -182,5 +183,8 @@ public class Player {
 
     public void setHost(boolean host) {
         isHost = host;
+    }
+    public int getPassLvl() {
+        return pass_lvl;
     }
 }

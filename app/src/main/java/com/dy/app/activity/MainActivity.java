@@ -1,12 +1,15 @@
 package com.dy.app.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -15,6 +18,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.bumptech.glide.Glide;
 import com.dy.app.R;
 import com.dy.app.core.MainCallback;
 import com.dy.app.gameplay.Player;
@@ -50,10 +54,15 @@ public class MainActivity extends FragmentHubActivity
         tvUsername = findViewById(R.id.tvUsername);
         btnChooseSkin = findViewById(R.id.btnChooseSkin);
         btnSpeaker = findViewById(R.id.btnSpeaker);
+        btnGamePass = findViewById(R.id.btnGamePass);
         //menuScreen.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
 
+        init();
         attachListener();
         initManager();
+    }
+
+    private void init(){
     }
 
     @Override
@@ -93,6 +102,7 @@ public class MainActivity extends FragmentHubActivity
         btnAccount.setOnClickListener(this);
         btnChooseSkin.setOnClickListener(this);
         btnSpeaker.setOnClickListener(this);
+        btnGamePass.setOnClickListener(this);
     }
 
     private void attachFragment() {
@@ -356,6 +366,11 @@ public class MainActivity extends FragmentHubActivity
                 SoundManager.getInstance().setSoundOn(true);
                 btnSpeaker.setAnimation("animated_ui/btn_speaker_enable.json");
             }
+        } else if(v.getId() == R.id.btnGamePass){
+            btnGamePass.playAnimation();
+            //start game pass activity
+            Intent intent = new Intent(this, GamepassActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -373,5 +388,6 @@ public class MainActivity extends FragmentHubActivity
     private FragmentManager fm;
     private Handler handler;
     private LottieAnimationView btnConfig,btnAbout, btnAccount, btnChooseSkin, btnSpeaker;
+    private LottieAnimationView btnGamePass;
     private Fragment currentFragment;
 }

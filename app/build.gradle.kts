@@ -56,4 +56,8 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.3.2")
     implementation("com.nineoldandroids:library:2.4.0")
     implementation("com.daimajia.slider:library:1.1.5@aar")
+
+    //for playing gift
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
 }
