@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 
 import com.dy.app.R;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class SoundManager {
@@ -43,6 +44,7 @@ public class SoundManager {
         BTN_BLOP,
         BTN_SKIN_PICKING,
         COIN_CLINK,
+        FIREWORK_LONG,
     }
 
     private Context currentContext;
@@ -58,11 +60,17 @@ public class SoundManager {
             return this;
         }
 
+        for(MediaPlayer mp : soundMap.values()){
+            if(mp!=null)
+                mp.release();
+        }
+
         currentContext = context;
 
         addSound(SoundType.BTN_BLOP, R.raw.se_btn_blop, 0.5f, 0.5f);
         soundMap.put(SoundType.BTN_SKIN_PICKING, MediaPlayer.create(context, R.raw.se_btn_skin_picking));
         addSound(SoundType.COIN_CLINK, R.raw.se_coins_clinking, 0.5f, 0.5f);
+        addSound(SoundType.FIREWORK_LONG, R.raw.se_firework_long, 0.5f, 0.5f);
 
         return this;
     }
@@ -85,6 +93,22 @@ public class SoundManager {
         MediaPlayer sound = soundMap.get(type);
         if(sound != null){
             sound.start();
+        }
+    }
+
+    public void stopSound(SoundType type){
+        final MediaPlayer sound = soundMap.get(type);
+
+        if(sound != null){
+            if(sound.isPlaying()){
+                sound.stop();
+
+                try {
+                    sound.prepare();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 

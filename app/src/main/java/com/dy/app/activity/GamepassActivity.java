@@ -18,6 +18,7 @@ import com.dy.app.manager.SoundManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Vector;
 
 public class GamepassActivity extends Activity
 implements View.OnClickListener {
@@ -122,6 +123,7 @@ implements View.OnClickListener {
     }
 
     private void init(){
+        fireworks = new Vector<>();
         btnClose = findViewById(R.id.btnClose);
         llMilestones = findViewById(R.id.llMilestones);
         tvLvl = findViewById(R.id.tvLvl);
@@ -144,13 +146,29 @@ implements View.OnClickListener {
                             }
                         });
                     } catch (InterruptedException e) {
-                        finish();
+                        isSeasonTimerRunning = false;
                     }
                 }
             }
         });
 
         seasonTimer.start();
+
+        LottieAnimationView lvFirework0 = findViewById(R.id.lvFirework0);
+        LottieAnimationView lvFirework1 = findViewById(R.id.lvFirework1);
+        LottieAnimationView lvFirework2 = findViewById(R.id.lvFirework2);
+        LottieAnimationView lvFirework3 = findViewById(R.id.lvFirework3);
+        LottieAnimationView lvFirework4 = findViewById(R.id.lvFirework4);
+
+        fireworks.add(lvFirework0);
+        fireworks.add(lvFirework1);
+        fireworks.add(lvFirework2);
+        fireworks.add(lvFirework3);
+        fireworks.add(lvFirework4);
+    }
+
+    private int randInt(int min, int max){
+        return (int)(Math.random() * (max - min + 1) + min);
     }
 
     private void exqListener(){
@@ -159,12 +177,53 @@ implements View.OnClickListener {
 
     @Override
     protected void onPause() {
+        if(fireworksTimer.isAlive()){
+            fireworksTimer.interrupt();
+        }
+
+        SoundManager.getInstance().stopSound(SoundManager.SoundType.FIREWORK_LONG);
+
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        fireworksTimer = new Thread(new Runnable() {
+            boolean isPlaying = true;
+            @Override
+            public void run() {
+                for(int i = 0; i<fireworks.size(); i+=1){
+                    try {
+                        Thread.sleep(1000);
+                        if(!isPlaying){
+                            break;
+                        }
+                        final LottieAnimationView firework = fireworks.get(i);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                firework.playAnimation();
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                        isPlaying = false;
+                    }
+                }
+            }
+        });
+        fireworksTimer.start();
+        SoundManager.getInstance().playSound(getApplicationContext(), SoundManager.SoundType.FIREWORK_LONG);
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
         //prevent memory leak
         if(seasonTimer.isAlive()){
             isSeasonTimerRunning = false;
             seasonTimer.interrupt();
         }
-        super.onPause();
+        super.onDestroy();
     }
 
     @Override
@@ -180,6 +239,7 @@ implements View.OnClickListener {
     private LinearLayout llMilestones;
     private TextView tvLvl;
     private final Date seasonEnd = new Date(2023, 11, 30, 0, 0, 0);
-    private Thread seasonTimer;
+    private Thread seasonTimer, fireworksTimer;
     private boolean isSeasonTimerRunning = false;
+    private Vector<LottieAnimationView> fireworks;
 }

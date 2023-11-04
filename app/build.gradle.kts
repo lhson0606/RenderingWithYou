@@ -60,4 +60,22 @@ dependencies {
     //for playing gift
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    // FirebaseUI for Auth
+    // FirebaseUI for Firebase Realtime Database
+    implementation("com.firebaseui:firebase-ui-database:8.0.2")
+    // FirebaseUI for Cloud Firestore
+    implementation("com.firebaseui:firebase-ui-firestore:8.0.2")
+    // FirebaseUI for Firebase Auth
+    implementation("com.firebaseui:firebase-ui-auth:8.0.2")
+    // FirebaseUI for Cloud Storage
+    implementation("com.firebaseui:firebase-ui-storage:8.0.2")
+    //facebook auth
+    //implementation("com.facebook.android:facebook-android-sdk:16.2.0")
+    implementation ("com.facebook.android:facebook-android-sdk:[8,9)")
 }

@@ -33,39 +33,40 @@
                         android:gravity="center">
 
                         <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lvFirework0"
                             android:layout_width="0sp"
                             android:layout_height="match_parent"
                             android:layout_weight="1.5"
-                            app:lottie_autoPlay="true"
                             app:lottie_loop="true"
                             app:lottie_fileName="animated_ui/anim_firework.json"/>
 
                         <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lvFirework1"
                             android:layout_width="0sp"
                             android:layout_height="match_parent"
                             android:layout_weight="3"
-                            app:lottie_autoPlay="true"
+                            app:lottie_progress="@android:integer/config_longAnimTime"
                             app:lottie_loop="true"
                             app:lottie_fileName="animated_ui/anim_firework.json" />
                         <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lvFirework2"
                             android:layout_width="0sp"
                             android:layout_height="match_parent"
                             android:layout_weight="3"
-                            app:lottie_autoPlay="true"
                             app:lottie_loop="true"
                             app:lottie_fileName="animated_ui/anim_firework.json" />
                         <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lvFirework3"
                             android:layout_width="0sp"
                             android:layout_height="match_parent"
                             android:layout_weight="3"
-                            app:lottie_autoPlay="true"
                             app:lottie_loop="true"
                             app:lottie_fileName="animated_ui/anim_firework.json" />
                         <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lvFirework4"
                             android:layout_width="0sp"
                             android:layout_height="match_parent"
                             android:layout_weight="1.5"
-                            app:lottie_autoPlay="true"
                             app:lottie_loop="true"
                             app:lottie_fileName="animated_ui/anim_firework.json"/>
 
@@ -110,41 +111,13 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0sp"
-                    android:layout_weight="2">
-
-                </LinearLayout>
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="0sp"
-                    android:layout_weight="8"
-                    android:scrollbars="none">
-                    <LinearLayout
-                        android:id="@+id/llMilestones"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal">
-
-
-                    </LinearLayout>
-
-                </HorizontalScrollView>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0sp"
                     android:layout_weight="2"
-                    android:orientation="horizontal"
-                    android:weightSum="12"
                     android:gravity="center">
 
-
                     <LinearLayout
-                        android:layout_width="0sp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="8"
                         android:orientation="horizontal"
-                        android:background="@drawable/bg_wins_tile"
                         android:gravity="center">
 
                         <TextView
@@ -170,6 +143,31 @@
 
                 </LinearLayout>
 
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0sp"
+                    android:layout_weight="8"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/llMilestones"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+                    </LinearLayout>
+
+                </HorizontalScrollView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0sp"
+                    android:layout_weight="2"
+                    android:orientation="horizontal"
+                    android:weightSum="12"
+                    android:gravity="center">
+
+                </LinearLayout>
+
 
             </LinearLayout>
 
@@ -190,7 +188,7 @@
 
                 app:lottie_autoPlay="false"
                 app:lottie_loop="false"
-                app:lottie_fileName="animated_ui/btn_exit.json"/>
+                app:lottie_fileName="animated_ui/btn_exit.json" />
 
         </RelativeLayout>
 
