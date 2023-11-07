@@ -68,8 +68,8 @@ public class FragmentCreateAccount extends Fragment
             reset();
             main.onMsgToMain(TAG, 1, null, null);
         }else if (v.getId() == R.id.btnCreate){
-            reset();
-            main.onMsgToMain(TAG, 2, null, null);
+            main.onMsgToMain(TAG, 2, etMail.getText().toString(), etPassword.getText().toString());
+            //reset();
         }
     }
 

@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -78,4 +79,7 @@ dependencies {
     //facebook auth
     //implementation("com.facebook.android:facebook-android-sdk:16.2.0")
     implementation ("com.facebook.android:facebook-android-sdk:[8,9)")
+    //firebase dynamic link
+    implementation ("com.google.firebase:firebase-dynamic-links")
+    implementation ("com.google.firebase:firebase-analytics")
 }

@@ -13,9 +13,9 @@ import androidx.fragment.app.Fragment;
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
-import com.dy.app.activity.MainActivity;
 import com.dy.app.core.FragmentCallback;
 import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.PlayerProfile;
 
 public class FragmentLogoutForm extends Fragment
         implements View.OnClickListener, FragmentCallback {
@@ -53,7 +53,7 @@ public class FragmentLogoutForm extends Fragment
     }
 
     private void updateContent() {
-        tvUsername.setText(Player.getInstance().getName());
+        tvUsername.setText(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME).toString());
     }
 
     @Override

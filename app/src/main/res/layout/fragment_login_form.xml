@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#330077ff"
-    android:alpha="0.69">
+    android:alpha="1">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/btnClose"
@@ -25,7 +25,8 @@
         android:layout_height="37dp"
         android:text="Account"
         style="@style/tile_1"
-        android:background="@color/light_blue_2"/>
+        android:background="@color/light_blue_2"
+        android:fontFamily="@font/lalezar"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -52,12 +53,13 @@
                     <TextView
                         android:layout_width="0sp"
                         android:layout_height="wrap_content"
-                        android:textSize="@dimen/medium_text_size"
                         android:layout_weight="3"
-                        android:text="Username"
-                        android:typeface="monospace"
+                        android:fontFamily="@font/bangers"
+                        android:text="Gmail"
                         android:textAlignment="center"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/medium_text_size"
+                        android:typeface="monospace"/>
 
                     <EditText
                         android:id="@+id/etUsername"
@@ -92,7 +94,8 @@
                         android:text="Password"
                         android:typeface="monospace"
                         android:textAlignment="center"
-                        android:textColor="@color/white"/>
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/bangers"/>
 
                     <EditText
                         android:id="@+id/etPassword"
@@ -140,7 +143,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0sp"
                 android:layout_weight="1"
-                android:gravity="center"
+                android:gravity="right"
                 android:orientation="horizontal"
                 android:weightSum="12">
 
@@ -150,7 +153,21 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:background="@drawable/light_red_round_background"
+                    android:fontFamily="@font/bangers"
                     android:text="Log In"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/small_text_size"
+                    android:foreground="?attr/selectableItemBackground"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnContinueWith"
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_weight="5"
+                    android:fontFamily="@font/bangers"
+                    android:background="@drawable/dark_blue_round_background"
+                    android:text="or continue with"
                     android:textColor="@color/white"
                     android:textSize="@dimen/small_text_size"
                     android:foreground="?attr/selectableItemBackground"/>

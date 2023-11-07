@@ -85,14 +85,6 @@ implements View.OnClickListener {
         btnReady.setPadding(30, 30, 30, 30);
         btnReady.setTextSize(30);
         isReady = false;
-        // Initialize EmojiCompat
-        FontRequest fontRequest = new FontRequest(
-                "com.google.android.gms.fonts",
-                "com.google.android.gms",
-                "Noto Color Emoji Compat",
-                R.array.com_google_android_gms_fonts_certs);
-        EmojiCompat.Config config = new FontRequestEmojiCompatConfig(this, fontRequest);
-        EmojiCompat.init(config);
 
         chatMsgHandler = new Handler(new Handler.Callback() {
             @Override

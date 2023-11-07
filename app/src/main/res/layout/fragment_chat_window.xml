@@ -24,7 +24,7 @@
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:typeface="monospace"
-                />
+                android:fontFamily="@font/lalezar"/>
 
         </LinearLayout>
 

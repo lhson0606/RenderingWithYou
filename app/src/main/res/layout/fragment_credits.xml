@@ -24,7 +24,8 @@
         android:layout_height="37dp"
         android:text="Credits"
         style="@style/tile_1"
-        android:background="@color/light_blue_2"/>
+        android:background="@color/light_blue_2"
+        android:fontFamily="@font/lalezar"/>
 
     <ScrollView
         android:layout_below="@+id/btnClose"

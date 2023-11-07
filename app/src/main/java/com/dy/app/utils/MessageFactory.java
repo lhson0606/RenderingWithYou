@@ -3,7 +3,7 @@ package com.dy.app.utils;
 
 import com.dy.app.gameplay.Player;
 import com.dy.app.gameplay.Rival;
-import com.dy.app.manager.ConnectionManager;
+import com.dy.app.gameplay.PlayerProfile;
 import com.dy.app.network.Message;
 import com.dy.app.network.MessageType;
 
@@ -14,7 +14,7 @@ public class MessageFactory {
     public Message createChatMessage(String message, int code) {
         Message msg = new Message();
         msg.setType(MessageType.CHAT.ordinal());
-        msg.setSender(player.getName());
+        msg.setSender(player.profile.get(PlayerProfile.KEY_USERNAME).toString());
         msg.setRecipient(rival.getName());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(message.getBytes());
@@ -26,7 +26,7 @@ public class MessageFactory {
     public Message createSystemMessage(String message, int code) {
         Message msg = new Message();
         msg.setType(MessageType.SYSTEM.ordinal());
-        msg.setSender(player.getName());
+        msg.setSender(player.profile.get(PlayerProfile.KEY_USERNAME).toString());
         msg.setRecipient(rival.getName());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(message.getBytes());

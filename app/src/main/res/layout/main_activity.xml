@@ -162,11 +162,12 @@
                     app:lottie_loop="true"
                     app:lottie_fileName="animated_ui/anim_shiny_coin.json"/>
                 <TextView
+                    android:id="@+id/tvUserCoin"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
                     android:fontFamily="@font/lalezar"
-                    android:text="x999"
+                    android:text="x0"
                     android:textColor="@color/white"
                     android:textAlignment="center"/>
 
@@ -193,8 +194,38 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:textSize="16sp"
                 style="@style/style_1"
                 android:text="Login"/>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/btnChooseSkin"
+                android:layout_alignTop="@+id/btnChooseSkin"
+                android:orientation="horizontal"
+                android:background="@drawable/outline_light_blue_background"
+                android:gravity="center">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:layout_width="20sp"
+                    android:layout_height="16sp"
+                    app:lottie_scale="1.2"
+
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_fileName="animation/anim_trophy.json"/>
+                <TextView
+                    android:id="@+id/tvUserElo"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/lalezar"
+                    android:text="x0"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/btnChooseSkin"

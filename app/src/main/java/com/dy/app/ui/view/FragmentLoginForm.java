@@ -20,7 +20,7 @@ import com.dy.app.core.FragmentCallback;
 public class FragmentLoginForm extends Fragment
         implements View.OnClickListener, FragmentCallback {
     private LottieAnimationView btnClose;
-    private Button btnLogin, btnCreateAccount;
+    private Button btnLogin, btnCreateAccount, btnContinueWith;
     private EditText etUsername, etPassword;
 
     public final static String TAG = "FragmentLoginForm";
@@ -48,6 +48,8 @@ public class FragmentLoginForm extends Fragment
         btnCreateAccount.setOnClickListener(this);
         etUsername = view.findViewById(R.id.etUsername);
         etPassword = view.findViewById(R.id.etPassword);
+        btnContinueWith = view.findViewById(R.id.btnContinueWith);
+        btnContinueWith.setOnClickListener(this);
         return view;
     }
 
@@ -60,14 +62,21 @@ public class FragmentLoginForm extends Fragment
             main.onMsgToMain(TAG, 1, etUsername.getText().toString(), etPassword.getText().toString());
         }else if (v.getId() == R.id.btnCreateAccount){
             main.onMsgToMain(TAG, 2, null, null);
+        }else if(v.getId() == R.id.btnContinueWith){
+            main.onMsgToMain(TAG, 3, null, null);
         }
+    }
+
+    @Override
+    public void onResume() {
+        etPassword.setText("");
+        super.onResume();
     }
 
     @Override
     public void onMsgFromMain(String TAG, int type, Object o1, Object o2) {
         switch (type){
             case 0:
-                etPassword.setText("");
                 break;
             case 1:
                 break;

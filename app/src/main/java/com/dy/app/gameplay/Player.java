@@ -5,16 +5,44 @@ import com.dy.app.utils.DyConst;
 public class Player {
     private boolean inTurn = true;
     private boolean whitePiece = false;
-    private int pieceSkinIndex = 0; private int[] piece_skins = {0,1,2};
+    private int pieceSkinIndex = 0; private int[] piece_skins = {0};
     private int backgroundSkinIndex = 0; private int[] back_ground_skins = {0};
-    private int tileSkinIndex = 0; private int[] tile_skins = {0, 1};
+    private int tileSkinIndex = 0; private int[] tile_skins = {0};
     private int boardSkinIndex = 0; private int[] board_skins = {0};
-    private int terrainSkinIndex = 0;private int[] terrain_skins = {0,1,2,3};
+    private int terrainSkinIndex = 0;private int[] terrain_skins = {0};
     private boolean hasLogin = false;
-    private String name = "Player";
     private boolean isHost;
     private float xp = 0;
+    private long coin = 0;
     private int pass_lvl = 32;
+    private long elo = 0;
+    public PlayerProfile profile;
+
+    private Player(){
+        reset();
+    }
+
+    public void reset(){
+        inTurn = true;
+        whitePiece = false;
+        pieceSkinIndex = 0;
+        backgroundSkinIndex = 0;
+        tileSkinIndex = 0;
+        boardSkinIndex = 0;
+        terrainSkinIndex = 0;
+        piece_skins = new int[]{0};
+        back_ground_skins = new int[]{0};
+        tile_skins = new int[]{0};
+        board_skins = new int[]{0};
+        terrain_skins = new int[]{0};
+        hasLogin = false;
+        profile = new PlayerProfile();
+        isHost = false;
+        xp = 0;
+        coin = 0;
+        pass_lvl = 32;
+        elo = 0;
+    }
 
     public boolean isInTurn() {
         return inTurn;
@@ -87,14 +115,9 @@ public class Player {
 
     public void setLoginStatus(boolean hasLogin) {
         this.hasLogin = hasLogin;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        //reset if logout
+        if(!hasLogin)
+            reset();
     }
 
     public float getXp() {
@@ -187,4 +210,37 @@ public class Player {
     public int getPassLvl() {
         return pass_lvl;
     }
+
+    public long getCoin() {
+        return coin;
+    }
+
+    public void setCoin(long coin) {
+        this.coin = coin;
+    }
+
+    public boolean isHasLogin() {
+        return hasLogin;
+    }
+
+    public void setHasLogin(boolean hasLogin) {
+        this.hasLogin = hasLogin;
+    }
+
+    public int getPass_lvl() {
+        return pass_lvl;
+    }
+
+    public void setPass_lvl(int pass_lvl) {
+        this.pass_lvl = pass_lvl;
+    }
+
+    public long getElo() {
+        return elo;
+    }
+
+    public void setElo(long elo) {
+        this.elo = elo;
+    }
+
 }
