@@ -15,11 +15,13 @@ import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.dy.app.R;
 import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.PlayerInventory;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class FragmentTileSelection extends Fragment
         implements View.OnClickListener, ViewPagerEx.OnPageChangeListener {
@@ -45,13 +47,14 @@ public class FragmentTileSelection extends Fragment
     }
 
     public void updateSlides(){
-        int id[] = player.getTile_skins();
+        List<Long> id = (List<Long>)player.inventory.get(PlayerInventory.KEY_TILE_SKIN);
         slider.removeAllSliders();
 
-        for(int i = 0; i<id.length; i++){
+        for(int i = 0; i<id.size(); i++){
+            int skinId = id.get(i).intValue();
             TextSliderView textSliderView = new TextSliderView(slider.getContext());
-            int res = DyConst.tile_skin_thumbnails[id[i]];
-            String name =  Utils.toLocalCapitalize(DyConst.tile_skins[id[i]].substring(0, DyConst.tile_skins[id[i]].length()-4).replace("_", " ").toUpperCase());
+            int res = DyConst.tile_skin_thumbnails[skinId];
+            String name =  Utils.toLocalCapitalize(DyConst.tile_skins[skinId].substring(0, DyConst.tile_skins[skinId].length()-4).replace("_", " ").toUpperCase());
             textSliderView
                     .description(name)
                     .image(res)
@@ -88,10 +91,8 @@ public class FragmentTileSelection extends Fragment
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnNext){
-            //soundManager.playSound(getContext(), SoundManager.SoundType.BTN_SKIN_PICKING);
             slider.moveNextPosition();
         }else if (v.getId() == R.id.btnPrev){
-            //soundManager.playSound(getContext(), SoundManager.SoundType.BTN_SKIN_PICKING);
             slider.movePrevPosition();
         }
     }
@@ -103,7 +104,7 @@ public class FragmentTileSelection extends Fragment
 
     @Override
     public void onPageSelected(int position) {
-        player.setTileSkinIndex(position);
+        player.inventory.set(PlayerInventory.KEY_TILE_SKIN_INDEX, position);
         soundManager.playSound(getContext(), SoundManager.SoundType.BTN_SKIN_PICKING);
     }
 

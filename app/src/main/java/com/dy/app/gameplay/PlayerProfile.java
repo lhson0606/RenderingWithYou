@@ -40,4 +40,10 @@ public class PlayerProfile {
 
         return res;
     }
+
+    public void putAll(Map<String, Object> data){
+        for(String key : data.keySet()){
+            set(key, data.get(key));
+        }
+    }
 }

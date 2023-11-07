@@ -15,11 +15,14 @@ import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.dy.app.R;
 import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.PlayerInventory;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class FragmentTerrainSelection extends Fragment
         implements View.OnClickListener, ViewPagerEx.OnPageChangeListener {
@@ -45,13 +48,14 @@ public class FragmentTerrainSelection extends Fragment
     }
 
     public void updateSlides(){
-        int id[] = player.getTerrain_skins();
+        List<Long> id = (List<Long>)player.inventory.get(PlayerInventory.KEY_TERRAIN_SKIN);
         slider.removeAllSliders();
 
-        for(int i = 0; i<id.length; i++){
+        for(int i = 0; i<id.size(); i++){
+            int skinId = id.get(i).intValue();
             TextSliderView textSliderView = new TextSliderView(slider.getContext());
-            int res = DyConst.terrain_skin_thumbnails[id[i]];
-            String name =  Utils.toLocalCapitalize(DyConst.terrain_models[id[i]].substring(0, DyConst.terrain_models[id[i]].length()-4).replace("_", " ").toUpperCase());
+            int res = DyConst.terrain_skin_thumbnails[skinId];
+            String name =  Utils.toLocalCapitalize(DyConst.terrain_models[skinId].substring(0, DyConst.terrain_models[skinId].length()-4).replace("_", " ").toUpperCase());
             textSliderView
                     .description(name)
                     .image(res)
@@ -103,7 +107,7 @@ public class FragmentTerrainSelection extends Fragment
 
     @Override
     public void onPageSelected(int position) {
-        player.setTerrainSkinIndex(position);
+        player.inventory.set(PlayerInventory.KEY_TERRAIN_SKIN_INDEX, position);
         soundManager.playSound(getContext(), SoundManager.SoundType.BTN_SKIN_PICKING);
     }
 

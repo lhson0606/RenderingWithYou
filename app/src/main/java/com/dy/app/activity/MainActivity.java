@@ -24,6 +24,7 @@ import com.dy.app.core.MainCallback;
 import com.dy.app.db.Database;
 import com.dy.app.db.OnDBRequestListener;
 import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.PlayerInventory;
 import com.dy.app.gameplay.PlayerProfile;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.manager.UIManager;
@@ -55,9 +56,6 @@ public class MainActivity extends FragmentHubActivity
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         handler = new Handler(getMainLooper());
         attachFragment();
-
-        //menuScreen.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
-
         init();
         attachListener();
         initManager();
@@ -87,15 +85,6 @@ public class MainActivity extends FragmentHubActivity
 
     @Override
     protected void onPause() {
-//        FragmentTransaction ft = fm.beginTransaction();
-//        //ft.remove(mainMenuFragment);
-//        ft.remove(settingFragment);
-//        ft.remove(creditsFragment);
-//        ft.remove(loginFormFragment);
-//        ft.remove(logoutFormFragment);
-//        ft.remove(createAccountFragment);
-//        ft.remove(skinSelectionFragment);
-//        ft.commit();
         Database.getInstance().removeAuthStateListener(this);
         super.onPause();
     }
@@ -103,6 +92,7 @@ public class MainActivity extends FragmentHubActivity
     @Override
     protected void onResume() {
         //attachFragment();
+        Database.getInstance().addAuthStateListener(this);
         super.onResume();
     }
 
@@ -124,7 +114,6 @@ public class MainActivity extends FragmentHubActivity
         btnChooseSkin.setOnClickListener(this);
         btnSpeaker.setOnClickListener(this);
         btnGamePass.setOnClickListener(this);
-        Database.getInstance().addAuthStateListener(this);
     }
 
     private void attachFragment() {
@@ -135,31 +124,12 @@ public class MainActivity extends FragmentHubActivity
         ft.show(mainMenuFragment);
 
         settingFragment = (FragmentSetting) UIManager.getInstance().getUI(UIManager.UIType.CONFIG);
-        //ft.add(R.id.flStage, settingFragment, FragmentSetting.TAG);
-        //ft.hide(settingFragment);
-
         creditsFragment = (FragmentCredits) UIManager.getInstance().getUI(UIManager.UIType.CREDITS);
-        //ft.add(R.id.flStage, creditsFragment, FragmentCredits.TAG);
-        //ft.hide(creditsFragment);
-
         loginFormFragment = (FragmentLoginForm) UIManager.getInstance().getUI(UIManager.UIType.LOGIN);
-        //ft.add(R.id.flStage, loginFormFragment, FragmentLoginForm.TAG);
-        //ft.hide(loginFormFragment);
-
         logoutFormFragment = (FragmentLogoutForm) UIManager.getInstance().getUI(UIManager.UIType.LOGOUT);
-        //ft.add(R.id.flStage, logoutFormFragment, FragmentLogoutForm.TAG);
-        //ft.hide(logoutFormFragment);
-
         createAccountFragment = (FragmentCreateAccount) UIManager.getInstance().getUI(UIManager.UIType.CREATE_ACCOUNT);
-        //ft.add(R.id.flStage, createAccountFragment, FragmentCreateAccount.TAG);
-        //ft.hide(createAccountFragment);
-
         skinSelectionFragment = (FragmentSkinSelection) UIManager.getInstance().getUI(UIManager.UIType.SKIN_SELECTION);
-        //ft.add(R.id.flStage, skinSelectionFragment, FragmentSkinSelection.TAG);
-        //ft.hide(skinSelectionFragment);
-
         ft.commit();
-
         currentFragment = mainMenuFragment;
     }
 
@@ -305,9 +275,7 @@ public class MainActivity extends FragmentHubActivity
                         @Override
                         public void onDBRequestCompleted(int result, Object object) {
                             hideLoadingDialog();
-                            if(result == Database.RESULT_SUCCESS){
-                                Player.getInstance().setLoginStatus(true);
-                            }else{
+                            if(result == Database.RESULT_FAILED){
                                 displayAlertMessage((String)object);
                             }
                         }
@@ -372,7 +340,9 @@ public class MainActivity extends FragmentHubActivity
     }
 
     private void loadUserData(){
+        //update UI
         tvUsername.setText(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME).toString());
+        tvUserCoin.setText("x" + Player.getInstance().inventory.get(PlayerInventory.KEY_COIN).toString());
     }
 
 

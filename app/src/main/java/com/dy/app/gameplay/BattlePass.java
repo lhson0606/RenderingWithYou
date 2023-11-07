@@ -1,6 +1,8 @@
 package com.dy.app.gameplay;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BattlePass {
@@ -11,8 +13,9 @@ public class BattlePass {
 
     public BattlePass(){
         data = new HashMap<>();
-        data.put(KEY_LEVEL, 0);
-        data.put(KEY_OBTAIN_ITEMS, new int[]{});
+        data.put(KEY_LEVEL, 0L);
+        List<Long> obtainedItems = new ArrayList<>();
+        data.put(KEY_OBTAIN_ITEMS, obtainedItems);
         data.put(KEY_IS_ACTIVATED, false);
     }
 
@@ -35,5 +38,22 @@ public class BattlePass {
         }
 
         return res;
+    }
+
+    public void putAll(Map<String, Object> data){
+        for(String key : data.keySet()){
+            set(key, data.get(key));
+        }
+    }
+
+    public boolean hasObtained(long i){
+        List<Long> obtainedItems = (List<Long>)get(KEY_OBTAIN_ITEMS);
+        return obtainedItems.contains(i);
+    }
+
+    public void obtainItem(long i) {
+        List<Long> obtainedItems = (List<Long>)get(KEY_OBTAIN_ITEMS);
+        obtainedItems.add(i);
+        set(KEY_OBTAIN_ITEMS, obtainedItems);
     }
 }

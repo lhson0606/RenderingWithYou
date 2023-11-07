@@ -17,11 +17,13 @@ import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.dy.app.R;
 import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.PlayerInventory;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class FragmentPieceSelection extends Fragment
@@ -48,13 +50,14 @@ implements View.OnClickListener, ViewPagerEx.OnPageChangeListener {
     }
 
     public void updateSlides(){
-        int id[] = player.getPiece_skins();
+        List<Long> id = (List<Long>)player.inventory.get(PlayerInventory.KEY_PIECE_SKIN);
         slider.removeAllSliders();
 
-        for(int i = 0; i<id.length; i++){
+        for(int i = 0; i<id.size(); i++){
+            int skinId = id.get(i).intValue();
             TextSliderView textSliderView = new TextSliderView(slider.getContext());
-            int res = DyConst.piece_skin_thumbnails[id[i]];
-            String name =  Utils.toLocalCapitalize(DyConst.piece_skins[id[i]].substring(0, DyConst.piece_skins[id[i]].length()-4).replace("_", " ").toUpperCase());
+            int res = DyConst.piece_skin_thumbnails[skinId];
+            String name =  Utils.toLocalCapitalize(DyConst.piece_skins[skinId].substring(0, DyConst.piece_skins[skinId].length()-4).replace("_", " ").toUpperCase());
             textSliderView
                     .description(name)
                     .image(res)
@@ -106,7 +109,7 @@ implements View.OnClickListener, ViewPagerEx.OnPageChangeListener {
 
     @Override
     public void onPageSelected(int position) {
-        player.setPieceSkinIndex(position);
+        player.inventory.set(PlayerInventory.KEY_PIECE_SKIN_INDEX, position);
         soundManager.playSound(getContext(), SoundManager.SoundType.BTN_SKIN_PICKING);
     }
 

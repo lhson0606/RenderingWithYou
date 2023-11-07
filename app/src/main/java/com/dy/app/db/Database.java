@@ -65,17 +65,6 @@ public class Database {
         return instance;
     }
 
-    public void fetchPlayerElo(OnDBRequestListener listener) {
-        DocumentReference userEloDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
-                .collection("user_data").document("rank");
-
-        getDocument(userEloDocRef, listener);
-    }
-
-    public interface OnAuthStateChanged {
-        void onAuthStateChanged(FirebaseAuth firebaseAuth);
-    }
-
     public void checkForPlayerInitialization(OnDBRequestListener listener){
         if(!isSignedIn()){
             throw new RuntimeException("User is not signed in");
@@ -105,7 +94,7 @@ public class Database {
 
     public void pushAllPlayerData(OnDBRequestListener listener){
         OnDBRequestListener allListener = new OnDBRequestListener() {
-            int count = 1;
+            int count = 3;
             boolean failed = false;
             @Override
             public void onDBRequestCompleted(int result, Object object) {
@@ -124,12 +113,33 @@ public class Database {
                 }
             }
         };
+
         updateUserProfileOnDB(allListener);
+        updateUserInventoryOnDB(allListener);
+        updateBattlePassOnDB(allListener);
+    }
+
+    public void updateUserProfileOnDB(OnDBRequestListener listener){
+        Player player = Player.getInstance();
+        DocumentReference profileRef =  getUserDataColRef().document("profile");
+        updateDocRef(profileRef, player.profile.getData(), listener);
+    }
+
+    private void updateUserInventoryOnDB(OnDBRequestListener listener) {
+        Player player = Player.getInstance();
+        DocumentReference inventoryRef =  getUserDataColRef().document("inventory");
+        updateDocRef(inventoryRef, player.inventory.getData(), listener);
+    }
+
+    private void updateBattlePassOnDB(OnDBRequestListener listener) {
+        Player player = Player.getInstance();
+        DocumentReference battlePassRef =  getUserDataColRef().document("battle_pass");
+        updateDocRef(battlePassRef, player.battlePass.getData(), listener);
     }
 
     public void fetchAllPlayerData(OnDBRequestListener listener){
         OnDBRequestListener allListener = new OnDBRequestListener() {
-            int count = 1;
+            int count = 3;
             boolean failed = false;
             @Override
             public void onDBRequestCompleted(int result, Object object) {
@@ -150,6 +160,8 @@ public class Database {
         };
 
         fetchPlayerProfile(allListener);
+        fetchPlayerInventory(allListener);
+        fetchBattlePass(allListener);
     }
 
     public void signInWithEmailAndPassword(String email, String password, OnDBRequestListener listener) throws ExecutionException, InterruptedException {
@@ -180,8 +192,46 @@ public class Database {
 
     }
 
-    public void fetchPlayerInventory(OnDBRequestListener listener){
+    public void fetchPlayerProfile(OnDBRequestListener listener){
+        selfCheckUserSignedIn();
 
+        DocumentReference userProfileDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
+                .collection("user_data").document("profile");
+
+        getDocument(userProfileDocRef, (res, o)->{
+            if(res == RESULT_SUCCESS){
+                Player.getInstance().profile.putAll((Map<String, Object>) o);
+            }
+            listener.onDBRequestCompleted(res, o);
+        });
+    }
+
+    public void fetchPlayerInventory(OnDBRequestListener listener){
+        selfCheckUserSignedIn();
+
+        DocumentReference userInventoryDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
+                .collection("user_data").document("inventory");
+
+        getDocument(userInventoryDocRef, (res, o)->{
+            if(res == RESULT_SUCCESS){
+                Player.getInstance().inventory.putAll((Map<String, Object>) o);
+            }
+            listener.onDBRequestCompleted(res, o);
+        });
+    }
+
+    private void fetchBattlePass(OnDBRequestListener listener) {
+        selfCheckUserSignedIn();
+
+        DocumentReference userBattlePassDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
+                .collection("user_data").document("battle_pass");
+
+        getDocument(userBattlePassDocRef, (res, o)->{
+            if(res == RESULT_SUCCESS){
+                Player.getInstance().battlePass.putAll((Map<String, Object>) o);
+            }
+            listener.onDBRequestCompleted(res, o);
+        });
     }
 
     public void fetchPlayerStatistics(OnDBRequestListener listener){
@@ -208,20 +258,10 @@ public class Database {
 
     }
 
-    public void fetchPlayerProfile(OnDBRequestListener listener){
+    private void selfCheckUserSignedIn(){
         if(!isSignedIn()){
-            listener.onDBRequestCompleted(RESULT_FAILED, "User is not signed in");
-            return;
+            throw new RuntimeException("User is not signed in");
         }
-        DocumentReference userProfileDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
-                .collection("user_data").document("profile");
-
-        getDocument(userProfileDocRef, (res, o)->{
-            if(res == RESULT_SUCCESS){
-                Player.getInstance().profile.getData().putAll((Map<String, Object>) o);
-            }
-            listener.onDBRequestCompleted(res, o);
-        });
     }
 
     public boolean isSignedIn(){
@@ -236,9 +276,11 @@ public class Database {
                     })
                     .addOnFailureListener(e -> {
                         listener.onDBRequestCompleted(RESULT_FAILED, getUserMessage(e));
+                        throw new RuntimeException(e.getMessage());
                     });
         }catch (Exception e){
             listener.onDBRequestCompleted(RESULT_FAILED, getUserMessage(e));
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -248,12 +290,6 @@ public class Database {
         }
         return db.collection("users").document(auth.getCurrentUser().getUid())
                 .collection("user_data");
-    }
-
-    public void updateUserProfileOnDB(OnDBRequestListener listener){
-        Player player = Player.getInstance();
-        DocumentReference profileRef =  getUserDataColRef().document("profile");
-        updateDocRef(profileRef, player.profile.getData(), listener);
     }
 
     public void getDocument(DocumentReference docRef, OnDBRequestListener listener){

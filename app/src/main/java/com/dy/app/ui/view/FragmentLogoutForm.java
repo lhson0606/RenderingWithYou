@@ -57,6 +57,12 @@ public class FragmentLogoutForm extends Fragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        tvUsername.setText(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME).toString());
+    }
+
+    @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnClose){
             btnClose.playAnimation();

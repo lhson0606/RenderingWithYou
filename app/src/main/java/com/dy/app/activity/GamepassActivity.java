@@ -13,10 +13,13 @@ import androidx.annotation.Nullable;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
+import com.dy.app.gameplay.BattlePass;
 import com.dy.app.gameplay.Player;
 import com.dy.app.manager.SoundManager;
+import com.dy.app.ui.listener.BattlePassItemListener;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 
@@ -42,66 +45,18 @@ implements View.OnClickListener {
     }
 
     private void displayItems() {
-        final int player_lvl = Player.getInstance().getPassLvl();
-        for(int i = 0; i<=player_lvl/5; i+=1){
-            View v = LayoutInflater.from(this).inflate(R.layout.lvl_milestone, llMilestones, false);
-            ImageView ivRoad = v.findViewById(R.id.ivRoad);
-            ImageView ivItem = v.findViewById(R.id.ivItem);
-            LottieAnimationView lvCelebration = v.findViewById(R.id.lvCelebration);
-            TextView tvLvl = v.findViewById(R.id.tvLvl);
-            tvLvl.setText(String.valueOf(i*5));
-            ivItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    lvCelebration.playAnimation();
-                    ivItem.setEnabled(false);
-                    ivItem.setImageResource(R.drawable.item_collected);
-                    SoundManager.getInstance().playSound(getApplicationContext(), SoundManager.SoundType.COIN_CLINK);
-                }
-            });
+        final BattlePass battlePass = Player.getInstance().battlePass;
+        final int player_pass_lvl = ((Long)battlePass.get(BattlePass.KEY_LEVEL)).intValue();
 
-            if(i == 0){
-                ivRoad.setImageResource(R.drawable.road_start_active);
-            }else if(i == items.length/5){
-                ivRoad.setImageResource(R.drawable.road_end_active);
-            }else {
-                ivRoad.setImageResource(R.drawable.road_mid_active);
-            }
-
-            switch (items[i]){
-                case 0:
-                    ivItem.setImageResource(R.drawable.game_item_chest);
-                    break;
-                case 1:
-                    ivItem.setImageResource(R.drawable.game_item_coins_x1);
-                    break;
-                case 2:
-                    ivItem.setImageResource(R.drawable.game_item_coins_x2);
-                    break;
-                case 3:
-                    ivItem.setImageResource(R.drawable.game_item_coins_x3);
-                    break;
-            }
-
-            llMilestones.addView(v);
-        }
-
-        for(int i = player_lvl/5 + 1; i<=items.length/5; i+=1){
+        for(int i = 0; i<=items.length/5; i++){
             View v = getLayoutInflater().inflate(R.layout.lvl_milestone, llMilestones, false);
             ImageView ivRoad = v.findViewById(R.id.ivRoad);
             ImageView ivItem = v.findViewById(R.id.ivItem);
             LottieAnimationView lvCelebration = v.findViewById(R.id.lvCelebration);
             TextView tvLvl = v.findViewById(R.id.tvLvl);
+            //index of items
             tvLvl.setText(String.valueOf(i*5));
-
-            if(i == 0){
-                ivRoad.setImageResource(R.drawable.road_start_inactive);
-            }else if(i == items.length/5){
-                ivRoad.setImageResource(R.drawable.road_end_inactive);
-            }else {
-                ivRoad.setImageResource(R.drawable.road_mid_inactive);
-            }
-
+            //get image of item
             switch (items[i]){
                 case 0:
                     ivItem.setImageResource(R.drawable.game_item_chest);
@@ -116,10 +71,40 @@ implements View.OnClickListener {
                     ivItem.setImageResource(R.drawable.game_item_coins_x3);
                     break;
             }
+            //***displaying items first
+            //check if it is obtained
+            if(battlePass.hasObtained(i)){
+                ivItem.setImageResource(R.drawable.item_collected);
+            //it is not obtained and has index < player_lvl
+            }else if(i<=player_pass_lvl){
+                BattlePassItemListener onClickListener = new BattlePassItemListener(this, battlePass, lvCelebration, ivItem, items[i], i*5);
+                ivItem.setOnClickListener(onClickListener);
+            }//else it's not available yet we don't have to add listener
 
+            //***displaying road
+            if(i*5<=player_pass_lvl) {
+                //it is activated
+                if(i == 0){
+                    ivRoad.setImageResource(R.drawable.road_start_active);
+                }else if (i == items.length/5) {
+                    ivRoad.setImageResource(R.drawable.road_end_active);
+                }else{
+                    ivRoad.setImageResource(R.drawable.road_mid_active);
+                }
+            }else{
+                //it is not activated
+                if(i == 0){
+                    ivRoad.setImageResource(R.drawable.road_start_inactive);
+                }else if (i == items.length/5) {
+                    ivRoad.setImageResource(R.drawable.road_end_inactive);
+                }else {
+                    ivRoad.setImageResource(R.drawable.road_mid_inactive);
+                }
+            }
+
+            //finally we add the view to the layout
             llMilestones.addView(v);
         }
-
     }
 
     private void init(){
@@ -127,7 +112,7 @@ implements View.OnClickListener {
         btnClose = findViewById(R.id.btnClose);
         llMilestones = findViewById(R.id.llMilestones);
         tvLvl = findViewById(R.id.tvLvl);
-        tvLvl.setText("Wins: " + String.valueOf(Player.getInstance().getPassLvl()));
+        tvLvl.setText("Wins: " + String.valueOf(Player.getInstance().battlePass.get(BattlePass.KEY_LEVEL)));
         tvSeasonTimeRemaining = findViewById(R.id.tvSeasonTimeRemaining);
         isSeasonTimerRunning = true;
         seasonTimer = new Thread(new Runnable() {
