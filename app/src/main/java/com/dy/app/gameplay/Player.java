@@ -1,6 +1,13 @@
 package com.dy.app.gameplay;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+
+import com.dy.app.R;
 import com.dy.app.utils.DyConst;
+import com.dy.app.utils.ImageLoader;
+
+import java.io.IOException;
 
 public class Player {
     private boolean inTurn = true;
@@ -12,6 +19,9 @@ public class Player {
     public PlayerProfile profile;
     public PlayerInventory inventory;
     public BattlePass battlePass;
+    public PlayerStatistics statistics;
+    public PlayerPreferences preferences;
+    public PlayerPurchase purchase;
 
     private Player(){
         reset();
@@ -24,6 +34,9 @@ public class Player {
         profile = new PlayerProfile();
         inventory = new PlayerInventory();
         battlePass = new BattlePass();
+        statistics = new PlayerStatistics();
+        preferences = new PlayerPreferences();
+        purchase = new PlayerPurchase();
         isHost = false;
         xp = 0;
         elo = 0;
@@ -112,6 +125,21 @@ public class Player {
 
     public void setHost(boolean host) {
         isHost = host;
+    }
+
+    public Drawable getDrawableAvatar(Context context) throws IOException {
+        String avatarPath = (String)profile.get(PlayerProfile.KEY_PHOTO_URL);
+        Drawable res = null;
+
+        if(avatarPath == "" || avatarPath == null) {
+            //create drawable from resource ic_no_image
+            res = context.getDrawable(R.drawable.ic_no_image);
+        }else{
+            //create drawable from url
+            res = ImageLoader.drawableFromUrl(avatarPath);
+        }
+
+        return res;
     }
 
 }

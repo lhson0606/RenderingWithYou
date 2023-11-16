@@ -63,6 +63,7 @@ public class MainActivity extends FragmentHubActivity
 
     private void init(){
         btnConfig = findViewById(R.id.btnConfig);
+        btnStatistics = findViewById(R.id.btnStatistics);
         btnAbout = findViewById(R.id.btnAbout);
         btnAccount = findViewById(R.id.btnAccount);
         tvUsername = findViewById(R.id.tvUsername);
@@ -112,6 +113,7 @@ public class MainActivity extends FragmentHubActivity
 
     private void attachListener() {
         btnConfig.setOnClickListener(this);
+        btnStatistics.setOnClickListener(this);
         btnAbout.setOnClickListener(this);
         btnAccount.setOnClickListener(this);
         btnChooseSkin.setOnClickListener(this);
@@ -437,7 +439,11 @@ public class MainActivity extends FragmentHubActivity
         if(v.getId() == R.id.btnConfig) {
             btnConfig.playAnimation();
             showFragment(settingFragment);
-        }else if(v.getId() == R.id.btnAbout){
+        } else if(v.getId() == R.id.btnStatistics){
+            btnStatistics.playAnimation();
+            Intent intent = new Intent(this, StatisticsActivity.class);
+            startActivity(intent);
+        } else if(v.getId() == R.id.btnAbout){
             btnAbout.playAnimation();
             showFragment(creditsFragment);
         }
@@ -617,7 +623,7 @@ public class MainActivity extends FragmentHubActivity
     private TextView tvUsername, tvUserCoin, tvUserElo;
     private FragmentManager fm;
     private Handler handler;
-    private LottieAnimationView btnConfig,btnAbout, btnAccount, btnChooseSkin, btnSpeaker, btnShop;
+    private LottieAnimationView btnConfig,btnAbout, btnAccount, btnChooseSkin, btnSpeaker, btnShop, btnStatistics;
     private LottieAnimationView btnGamePass;
     private Fragment currentFragment;
 }

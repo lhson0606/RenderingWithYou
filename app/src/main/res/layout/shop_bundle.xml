@@ -10,6 +10,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
+        <ImageView
+            android:id="@+id/ivItem"
+            android:layout_width="180sp"
+            android:layout_height="180sp"
+            android:padding="10sp"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
 
         <RelativeLayout
             android:layout_width="180sp"

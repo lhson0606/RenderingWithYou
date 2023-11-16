@@ -95,7 +95,7 @@ public class Database {
 
     public void pushAllPlayerData(OnDBRequestListener listener){
         OnDBRequestListener allListener = new OnDBRequestListener() {
-            int count = 3;
+            int count = 6;
             boolean failed = false;
             @Override
             public void onDBRequestCompleted(int result, Object object) {
@@ -122,6 +122,9 @@ public class Database {
         updateUserProfileOnDB(allListener);
         updateUserInventoryOnDB(allListener);
         updateBattlePassOnDB(allListener);
+        updateUserStatisticsOnDB(allListener);
+        updateUserPurchaseOnDB(allListener);
+        updateUserPreferencesOnDB(allListener);
     }
 
     public void updateUserProfileOnDB(OnDBRequestListener listener){
@@ -146,9 +149,28 @@ public class Database {
         updateDocRef(battlePassRef, player.battlePass.getData(), listener);
     }
 
+    private void updateUserStatisticsOnDB(OnDBRequestListener allListener) {
+        Player player = Player.getInstance();
+        DocumentReference statisticsRef =  getUserDataColRef().document("statistics");
+        updateDocRef(statisticsRef, player.statistics.getData(), allListener);
+    }
+
+
+    private void updateUserPurchaseOnDB(OnDBRequestListener allListener) {
+        Player player = Player.getInstance();
+        DocumentReference purchaseRef =  getUserDataColRef().document("purchase");
+        updateDocRef(purchaseRef, player.purchase.getData(), allListener);
+    }
+
+    private void updateUserPreferencesOnDB(OnDBRequestListener allListener) {
+        Player player = Player.getInstance();
+        DocumentReference preferencesRef =  getUserDataColRef().document("preferences");
+        updateDocRef(preferencesRef, player.preferences.getData(), allListener);
+    }
+
     public void fetchAllPlayerData(OnDBRequestListener listener){
         OnDBRequestListener allListener = new OnDBRequestListener() {
-            int count = 3;
+            int count = 6;
             boolean failed = false;
             @Override
             public void onDBRequestCompleted(int result, Object object) {
@@ -171,6 +193,9 @@ public class Database {
         fetchPlayerProfile(allListener);
         fetchPlayerInventory(allListener);
         fetchBattlePass(allListener);
+        fetchPlayerStatistics(allListener);
+        fetchPlayerPurchase(allListener);
+        fetchPlayerPreferences(allListener);
     }
 
     public void signInWithEmailAndPassword(String email, String password, OnDBRequestListener listener) throws ExecutionException, InterruptedException {
@@ -244,7 +269,45 @@ public class Database {
     }
 
     public void fetchPlayerStatistics(OnDBRequestListener listener){
+        selfCheckUserSignedIn();
 
+        DocumentReference userStatisticDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
+                .collection("user_data").document("statistics");
+
+        getDocument(userStatisticDocRef, (res, o)->{
+            if(res == RESULT_SUCCESS){
+                Player.getInstance().statistics.putAll((Map<String, Object>) o);
+            }
+            listener.onDBRequestCompleted(res, o);
+        });
+    }
+
+    private void fetchPlayerPreferences(OnDBRequestListener allListener) {
+        selfCheckUserSignedIn();
+
+        DocumentReference userPreferencesDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
+                .collection("user_data").document("preferences");
+
+        getDocument(userPreferencesDocRef, (res, o)->{
+            if(res == RESULT_SUCCESS){
+                Player.getInstance().preferences.putAll((Map<String, Object>) o);
+            }
+            allListener.onDBRequestCompleted(res, o);
+        });
+    }
+
+    private void fetchPlayerPurchase(OnDBRequestListener allListener) {
+        selfCheckUserSignedIn();
+
+        DocumentReference userPurchaseDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
+                .collection("user_data").document("purchase");
+
+        getDocument(userPurchaseDocRef, (res, o)->{
+            if(res == RESULT_SUCCESS){
+                Player.getInstance().purchase.putAll((Map<String, Object>) o);
+            }
+            allListener.onDBRequestCompleted(res, o);
+        });
     }
 
     public void fetchPlayerAchievement(OnDBRequestListener listener){
@@ -260,10 +323,6 @@ public class Database {
     }
 
     public void fetchPlayerRelationships(OnDBRequestListener listener){
-
-    }
-
-    public void fetchPlayerPreferences(OnDBRequestListener listener){
 
     }
 
@@ -384,7 +443,7 @@ public class Database {
         }
 
         if(auth.getCurrentUser().getDisplayName() == null){
-            return "unknown";
+            return "";
         }
 
         return auth.getCurrentUser().getDisplayName();
@@ -396,7 +455,7 @@ public class Database {
         }
 
         if(auth.getCurrentUser().getEmail() == null){
-            return "unknown";
+            return "";
         }
 
         return auth.getCurrentUser().getEmail();
@@ -408,7 +467,7 @@ public class Database {
         }
 
         if(auth.getCurrentUser().getPhoneNumber() == null){
-            return "unknown";
+            return "";
         }
 
         return auth.getCurrentUser().getPhoneNumber();
@@ -420,7 +479,7 @@ public class Database {
         }
 
         if(auth.getCurrentUser().getPhotoUrl() == null){
-            return "unknown";
+            return "";
         }
 
         return auth.getCurrentUser().getPhotoUrl();
@@ -428,11 +487,11 @@ public class Database {
 
     public String getUserUID(){
         if(auth.getCurrentUser() == null){
-            return "unknown";
+            return "";
         }
 
         if(auth.getCurrentUser().getUid() == null){
-            return "unknown";
+            return "";
         }
 
         return auth.getCurrentUser().getUid();

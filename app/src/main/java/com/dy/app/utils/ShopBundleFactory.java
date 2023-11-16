@@ -34,6 +34,8 @@ public class ShopBundleFactory {
         inflater.inflate(R.layout.shop_bundle, frameLayout, true);
         frameLayout.setBackgroundResource(R.drawable.bg_epic_bundle);
         addDetail(item, frameLayout);
+        ImageView itemView = frameLayout.findViewById(R.id.ivItem);
+        itemView.setImageResource(item.getGameItem().itemInfo.res);
         bundles.addView(frameLayout);
         return frameLayout;
     }
@@ -44,6 +46,8 @@ public class ShopBundleFactory {
         inflater.inflate(R.layout.shop_bundle, frameLayout, true);
         frameLayout.setBackgroundResource(R.drawable.bg_rare_bundle);
         addDetail(item, frameLayout);
+        ImageView itemView = frameLayout.findViewById(R.id.ivItem);
+        itemView.setImageResource(item.getGameItem().itemInfo.res);
         bundles.addView(frameLayout);
         return frameLayout;
     }
@@ -54,6 +58,8 @@ public class ShopBundleFactory {
         inflater.inflate(R.layout.shop_bundle, frameLayout, true);
         frameLayout.setBackgroundResource(R.drawable.bg_common_bundle);
         addDetail(item, frameLayout);
+        ImageView itemView = frameLayout.findViewById(R.id.ivItem);
+        itemView.setImageResource(item.getGameItem().itemInfo.res);
         bundles.addView(frameLayout);
         return frameLayout;
     }
@@ -64,6 +70,8 @@ public class ShopBundleFactory {
         inflater.inflate(R.layout.shop_bundle, frameLayout, true);
         frameLayout.setBackgroundResource(R.drawable.bg_legendary_bundle);
         addDetail(item, frameLayout);
+        ImageView itemView = frameLayout.findViewById(R.id.ivItem);
+        itemView.setImageResource(item.getGameItem().itemInfo.res);
         bundles.addView(frameLayout);
         return frameLayout;
     }
