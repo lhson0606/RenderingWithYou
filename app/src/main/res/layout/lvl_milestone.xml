@@ -27,9 +27,9 @@
 
             <ImageView
                 android:id="@+id/ivItem"
-                android:layout_width="35sp"
-                android:layout_height="35sp"
-                android:layout_centerInParent="true"/>
+                android:layout_width="50sp"
+                android:layout_height="50sp"
+                android:layout_centerInParent="true" />
 
             <TextView
                 android:id="@+id/tvLvl"
@@ -41,6 +41,17 @@
                 android:fontFamily="@font/lalezar"/>
 
 
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/ivStatus"
+                android:layout_width="40sp"
+                android:layout_height="40sp"
+                android:layout_centerInParent="true" />
         </RelativeLayout>
 
         <com.airbnb.lottie.LottieAnimationView

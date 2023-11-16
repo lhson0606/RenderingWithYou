@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
@@ -23,15 +24,21 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 
-public class GamepassActivity extends Activity
+public class GamepassActivity extends FragmentActivity
 implements View.OnClickListener {
     int[] items = {
-            0, 1, 2, 3, 1, 1, 0, 1, 1, 3,
-            3, 2, 0, 1, 1, 0, 3, 1, 1, 3,
-            3, 2, 0, 1, 1, 0, 3, 1, 1, 3,
-            3, 2, 0, 1, 1, 0, 3, 1, 1, 3,
-            3, 2, 0, 1, 1, 0, 3, 1, 1, 3,
+            CHEST, NO_REWARD, NO_REWARD, NO_REWARD, COINS_X1, COINS_X3, NO_REWARD, NO_REWARD, NO_REWARD, NO_REWARD,
+            CHEST   , NO_REWARD, NO_REWARD, NO_REWARD, COINS_X1, COINS_X3, NO_REWARD, NO_REWARD, NO_REWARD, NO_REWARD,
+            COINS_X3, NO_REWARD, NO_REWARD, NO_REWARD, COINS_X1, COINS_X3, NO_REWARD, NO_REWARD, NO_REWARD, NO_REWARD,
+            COINS_X2, NO_REWARD, NO_REWARD, NO_REWARD, COINS_X1, COINS_X1, NO_REWARD, NO_REWARD, NO_REWARD, NO_REWARD,
+            COINS_X3, NO_REWARD, NO_REWARD, NO_REWARD, COINS_X1, COINS_X3, NO_REWARD, NO_REWARD, NO_REWARD, NO_REWARD, COINS_X3
     };
+
+    public static int NO_REWARD = -1;
+    public static int CHEST = 0;
+    public static int COINS_X1 = 1;
+    public static int COINS_X2 = 2;
+    public static int COINS_X3 = 3;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,17 +54,26 @@ implements View.OnClickListener {
     private void displayItems() {
         final BattlePass battlePass = Player.getInstance().battlePass;
         final int player_pass_lvl = ((Long)battlePass.get(BattlePass.KEY_LEVEL)).intValue();
+        final int step = 5;
+        final int finalLvl = ((int)(items.length-1)/step)*step;
 
-        for(int i = 0; i<=items.length/5; i++){
+        for(int i = 0; i<items.length; i++){
+            int curLvl = i;
+
+            if(curLvl%step != 0){
+                continue;
+            }
+
             View v = getLayoutInflater().inflate(R.layout.lvl_milestone, llMilestones, false);
             ImageView ivRoad = v.findViewById(R.id.ivRoad);
             ImageView ivItem = v.findViewById(R.id.ivItem);
             LottieAnimationView lvCelebration = v.findViewById(R.id.lvCelebration);
             TextView tvLvl = v.findViewById(R.id.tvLvl);
+            ImageView ivStatus = v.findViewById(R.id.ivStatus);
             //index of items
-            tvLvl.setText(String.valueOf(i*5));
+            tvLvl.setText(String.valueOf(curLvl));
             //get image of item
-            switch (items[i]){
+            switch (items[curLvl]){
                 case 0:
                     ivItem.setImageResource(R.drawable.game_item_chest);
                     break;
@@ -73,20 +89,23 @@ implements View.OnClickListener {
             }
             //***displaying items first
             //check if it is obtained
-            if(battlePass.hasObtained(i)){
-                ivItem.setImageResource(R.drawable.item_collected);
+            if(battlePass.hasObtained(curLvl)){
+                ivStatus.setImageResource(R.drawable.item_collected);
+                ivItem.setImageAlpha((int)(255*0.8f));
             //it is not obtained and has index < player_lvl
-            }else if(i<=player_pass_lvl){
-                BattlePassItemListener onClickListener = new BattlePassItemListener(this, battlePass, lvCelebration, ivItem, items[i], i*5);
-                ivItem.setOnClickListener(onClickListener);
-            }//else it's not available yet we don't have to add listener
-
+            }else if(curLvl<=player_pass_lvl){
+                BattlePassItemListener onClickListener = new BattlePassItemListener(this, battlePass, lvCelebration, ivStatus, ivItem,items[i], curLvl);
+                ivStatus.setOnClickListener(onClickListener);
+            }else {//else it's not available yet we don't have to add listener
+                ivStatus.setImageResource(R.drawable.item_lock);
+                ivStatus.setImageAlpha((int)(255*0.5f));
+            }
             //***displaying road
-            if(i*5<=player_pass_lvl) {
+            if(curLvl<=player_pass_lvl) {
                 //it is activated
-                if(i == 0){
+                if(curLvl == 0){
                     ivRoad.setImageResource(R.drawable.road_start_active);
-                }else if (i == items.length/5) {
+                }else if (curLvl == finalLvl) {
                     ivRoad.setImageResource(R.drawable.road_end_active);
                 }else{
                     ivRoad.setImageResource(R.drawable.road_mid_active);
@@ -95,7 +114,7 @@ implements View.OnClickListener {
                 //it is not activated
                 if(i == 0){
                     ivRoad.setImageResource(R.drawable.road_start_inactive);
-                }else if (i == items.length/5) {
+                }else if (curLvl == finalLvl) {
                     ivRoad.setImageResource(R.drawable.road_end_inactive);
                 }else {
                     ivRoad.setImageResource(R.drawable.road_mid_inactive);

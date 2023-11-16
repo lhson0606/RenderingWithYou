@@ -69,6 +69,7 @@ public class MainActivity extends FragmentHubActivity
         btnChooseSkin = findViewById(R.id.btnChooseSkin);
         btnSpeaker = findViewById(R.id.btnSpeaker);
         btnGamePass = findViewById(R.id.btnGamePass);
+        btnShop = findViewById(R.id.btnShop);
         tvUserCoin = findViewById(R.id.tvUserCoin);
         tvUserElo = findViewById(R.id.tvUserElo);
         // Initialize EmojiCompat
@@ -81,17 +82,19 @@ public class MainActivity extends FragmentHubActivity
         EmojiCompat.init(config);
         loadingDialog = new LoadingDialog();
         //#todo loadingDialog.onDismiss();
+
     }
 
     @Override
     protected void onPause() {
         Database.getInstance().removeAuthStateListener(this);
+        savePlayerData();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        //attachFragment();
+        loadUserData();
         Database.getInstance().addAuthStateListener(this);
         super.onResume();
     }
@@ -114,6 +117,7 @@ public class MainActivity extends FragmentHubActivity
         btnChooseSkin.setOnClickListener(this);
         btnSpeaker.setOnClickListener(this);
         btnGamePass.setOnClickListener(this);
+        btnShop.setOnClickListener(this);
     }
 
     private void attachFragment() {
@@ -219,7 +223,8 @@ public class MainActivity extends FragmentHubActivity
             //create account
             case 2:
             {
-                Database.getInstance().signUpWithEmailAndPassword((String)o1, (String)o2, new OnDBRequestListener() {
+                registerInformation = (FragmentCreateAccount.RegisterInformation) o1;
+                Database.getInstance().signUpWithEmailAndPassword(registerInformation, new OnDBRequestListener() {
                     @Override
                     public void onDBRequestCompleted(int result, Object object) {
                         if(result == Database.RESULT_SUCCESS){
@@ -245,8 +250,25 @@ public class MainActivity extends FragmentHubActivity
             //logout
             case 1:
             {
-                Database.getInstance().logOut();
-                showFragment(loginFormFragment);
+                if(Database.getInstance().isSignedInAsAnonymous()){
+                    //if user is signed in as anonymous, we need to announce them data will be lost
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("You are signed in as guest, if you log out, all your data will be lost!");
+                    builder.setPositiveButton("I understand!", (dialog, which) -> {
+                        Database.getInstance().logOut();
+                        showFragment(loginFormFragment);
+                    });
+                    builder.setNegativeButton("Cancel", (dialog, which) -> {
+                        dialog.dismiss();
+                    });
+
+                    builder.create().show();
+
+                }else{
+                    Database.getInstance().logOut();
+                    showFragment(loginFormFragment);
+                }
+
                 break;
             }
         }
@@ -267,7 +289,7 @@ public class MainActivity extends FragmentHubActivity
             //sign in
             case 1:
             {
-                showLoadingDialog();
+                showLoadingDialog(false);
                 final String email = (String)o1;
                 final String password = (String)o2;
                 try {
@@ -339,7 +361,7 @@ public class MainActivity extends FragmentHubActivity
         }
     }
 
-    private void loadUserData(){
+    private synchronized void loadUserData(){
         //update UI
         tvUsername.setText(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME).toString());
         tvUserCoin.setText("x" + Player.getInstance().inventory.get(PlayerInventory.KEY_COIN).toString());
@@ -390,7 +412,7 @@ public class MainActivity extends FragmentHubActivity
     }
 
     private void showFragment(Fragment fragment){
-        if(currentFragment == fragment){
+        if(currentFragment == fragment || isFinishing()){
             return;
         }
 
@@ -402,8 +424,11 @@ public class MainActivity extends FragmentHubActivity
 //        ft.hide(currentFragment);
 
         ft.show(fragment);
-        ft.commit();
-        currentFragment = fragment;
+        if(!isFinishing() && !fragment.isAdded()){
+            ft.commit();
+            currentFragment = fragment;
+        }
+
     }
 
     @Override
@@ -437,20 +462,31 @@ public class MainActivity extends FragmentHubActivity
                 btnSpeaker.setAnimation("animated_ui/btn_speaker_enable.json");
             }
         } else if(v.getId() == R.id.btnGamePass){
+            if(!Database.getInstance().isSignedIn()){
+                displayAlertMessage("Please sign in first");
+                return;
+            }
+
             btnGamePass.playAnimation();
             //start game pass activity
             Intent intent = new Intent(this, GamepassActivity.class);
             startActivity(intent);
+
+        } else if(v.getId() == R.id.btnShop){
+            btnShop.playAnimation();
+            Intent intent = new Intent(this, ShopActivity.class);
+            startActivity(intent);
         }
     }
 
-    private void showLoadingDialog(){
+    private void showLoadingDialog(boolean cancelable){
         //prevent UI leak
         if(loadingDialog == null || loadingDialog.isVisible() || isFinishing()){
             return;
         }
 
         loadingDialog = new LoadingDialog();
+        loadingDialog.setCancelable(cancelable);
         loadingDialog.show(getSupportFragmentManager(), "LoadingDialog");
     }
 
@@ -469,29 +505,16 @@ public class MainActivity extends FragmentHubActivity
         builder.create().show();
     }
 
-    private SoundManager soundManager;
-    public final String TAG = getClass().getSimpleName();
-    private FragmentMainMenu mainMenuFragment;
-    private FragmentSetting settingFragment;
-    private FragmentCredits creditsFragment;
-    private FragmentLoginForm loginFormFragment;
-    private FragmentLogoutForm logoutFormFragment;
-    private FragmentCreateAccount createAccountFragment;
-    private FragmentSkinSelection skinSelectionFragment;
-    private TextView tvUsername, tvUserCoin, tvUserElo;
-    private FragmentManager fm;
-    private Handler handler;
-    private LottieAnimationView btnConfig,btnAbout, btnAccount, btnChooseSkin, btnSpeaker;
-    private LottieAnimationView btnGamePass;
-    private Fragment currentFragment;
-
     public void pullPlayerData(PullCallback callback){
         Database.getInstance().fetchAllPlayerData((res, o)->{
-            if(res == Database.RESULT_SUCCESS){
-                loadUserData();
-            }
             callback.onPullCompleted(res, o);
         });
+    }
+
+    public void savePlayerData(){
+        if(Player.getInstance().hasLogin()){
+            Database.getInstance().pushAllPlayerData(null);
+        }
     }
 
     public void pushPlayerData(){
@@ -506,7 +529,15 @@ public class MainActivity extends FragmentHubActivity
 
     private void initPlayer(){
         Player.getInstance().reset();
-        Player.getInstance().profile.set(PlayerProfile.KEY_USERNAME, Database.getInstance().getUserDisplayName());
+        if(registerInformation != null){
+            //if user used email and password to register
+            Player.getInstance().profile.set(PlayerProfile.KEY_USERNAME, registerInformation.username);
+            //reset register information
+            registerInformation = null;
+        }else{
+            //else we get user name from auth
+            Player.getInstance().profile.set(PlayerProfile.KEY_USERNAME, Database.getInstance().getUserDisplayName());
+        }
         Player.getInstance().profile.set(PlayerProfile.KEY_EMAIL, Database.getInstance().getUserEmail());
         Player.getInstance().profile.set(PlayerProfile.KEY_PHONE, Database.getInstance().getUserPhoneNumber());
         Player.getInstance().profile.set(PlayerProfile.KEY_PHOTO_URL, Database.getInstance().getUserPhotoUrl());
@@ -518,13 +549,17 @@ public class MainActivity extends FragmentHubActivity
     }
 
     private void signUserSignIn(){
+        showLoadingDialog(false);
+        btnGamePass.setEnabled(false);
         Database.getInstance().checkForPlayerInitialization((result, object) -> {
             if(result == Database.RESULT_SUCCESS){
                 if((boolean)object) {
                     //player is initialized
                     pullPlayerData((res, o)->{
+                        hideLoadingDialog();
                         if(res == Database.RESULT_SUCCESS){
                             Player.getInstance().setLoginStatus(true);
+                            onUserDataReady();
                             showFragment(logoutFormFragment);
                         }else{
                             displayAlertMessage((String)o);
@@ -536,19 +571,29 @@ public class MainActivity extends FragmentHubActivity
                     initPlayer();
                     Player.getInstance().setLoginStatus(true);
                     pushPlayerData();
+                    hideLoadingDialog();
+                    onUserDataReady();
                     showFragment(logoutFormFragment);
                 }
+
             }else{
                 displayAlertMessage((String)object);
             }
         });
     }
 
+    private void onUserDataReady() {
+        //enable game pass button
+        btnGamePass.setEnabled(true);
+        loadUserData();
+    }
+
     @Override
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         //login scenario
         if(firebaseAuth.getCurrentUser() != null){
-            signUserSignIn();
+            if(!Player.getInstance().hasLogin())
+                signUserSignIn();
         //logout scenario
         }else{
             Player.getInstance().reset();
@@ -557,4 +602,22 @@ public class MainActivity extends FragmentHubActivity
             loadUserData();
         }
     }
+
+    //store the register information if user sign up with email and password
+    private FragmentCreateAccount.RegisterInformation registerInformation = null;
+    private SoundManager soundManager;
+    public final String TAG = getClass().getSimpleName();
+    private FragmentMainMenu mainMenuFragment;
+    private FragmentSetting settingFragment;
+    private FragmentCredits creditsFragment;
+    private FragmentLoginForm loginFormFragment;
+    private FragmentLogoutForm logoutFormFragment;
+    private FragmentCreateAccount createAccountFragment;
+    private FragmentSkinSelection skinSelectionFragment;
+    private TextView tvUsername, tvUserCoin, tvUserElo;
+    private FragmentManager fm;
+    private Handler handler;
+    private LottieAnimationView btnConfig,btnAbout, btnAccount, btnChooseSkin, btnSpeaker, btnShop;
+    private LottieAnimationView btnGamePass;
+    private Fragment currentFragment;
 }

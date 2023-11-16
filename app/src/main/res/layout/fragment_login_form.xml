@@ -55,14 +55,14 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
                         android:fontFamily="@font/bangers"
-                        android:text="Gmail"
+                        android:text="Email"
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="@dimen/medium_text_size"
                         android:typeface="monospace"/>
 
                     <EditText
-                        android:id="@+id/etUsername"
+                        android:id="@+id/etEmail"
                         android:layout_width="0sp"
                         android:layout_height="wrap_content"
                         android:layout_weight="7"

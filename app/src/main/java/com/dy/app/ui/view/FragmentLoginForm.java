@@ -21,7 +21,7 @@ public class FragmentLoginForm extends Fragment
         implements View.OnClickListener, FragmentCallback {
     private LottieAnimationView btnClose;
     private Button btnLogin, btnCreateAccount, btnContinueWith;
-    private EditText etUsername, etPassword;
+    private EditText etEmail, etPassword;
 
     public final static String TAG = "FragmentLoginForm";
     private FragmentHubActivity main;
@@ -46,7 +46,7 @@ public class FragmentLoginForm extends Fragment
         btnLogin.setOnClickListener(this);
         btnCreateAccount = view.findViewById(R.id.btnCreateAccount);
         btnCreateAccount.setOnClickListener(this);
-        etUsername = view.findViewById(R.id.etUsername);
+        etEmail = view.findViewById(R.id.etEmail);
         etPassword = view.findViewById(R.id.etPassword);
         btnContinueWith = view.findViewById(R.id.btnContinueWith);
         btnContinueWith.setOnClickListener(this);
@@ -59,7 +59,7 @@ public class FragmentLoginForm extends Fragment
             btnClose.playAnimation();
             main.onMsgToMain(TAG, 0, null, null);
         }else if(v.getId() == R.id.btnLogin){
-            main.onMsgToMain(TAG, 1, etUsername.getText().toString(), etPassword.getText().toString());
+            main.onMsgToMain(TAG, 1, etEmail.getText().toString(), etPassword.getText().toString());
         }else if (v.getId() == R.id.btnCreateAccount){
             main.onMsgToMain(TAG, 2, null, null);
         }else if(v.getId() == R.id.btnContinueWith){

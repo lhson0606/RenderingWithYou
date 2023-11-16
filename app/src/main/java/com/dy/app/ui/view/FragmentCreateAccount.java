@@ -31,6 +31,12 @@ public class FragmentCreateAccount extends Fragment
         return fragment;
     }
 
+    public class RegisterInformation{
+        public String email;
+        public String username;
+        public String password;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,8 +74,11 @@ public class FragmentCreateAccount extends Fragment
             reset();
             main.onMsgToMain(TAG, 1, null, null);
         }else if (v.getId() == R.id.btnCreate){
-            main.onMsgToMain(TAG, 2, etMail.getText().toString(), etPassword.getText().toString());
-            //reset();
+            RegisterInformation registerInformation = new RegisterInformation();
+            registerInformation.email = etMail.getText().toString();
+            registerInformation.username = etUsername.getText().toString();
+            registerInformation.password = etPassword.getText().toString();
+            main.onMsgToMain(TAG, 2, registerInformation, null);
         }
     }
 

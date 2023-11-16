@@ -70,6 +70,11 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"/>
 
+        <activity android:name=".activity.ShopActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="true"/>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

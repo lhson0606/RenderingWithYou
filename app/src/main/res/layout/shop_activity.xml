@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_shop">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/shopItemsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="top">
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="150sp"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/chainDecoration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="top">
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="150sp"/>
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+
+        </ScrollView>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="150sp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:weightSum="50">
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="16"
+                    android:orientation="vertical"
+                    android:weightSum="2">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0sp"
+                        android:layout_weight="1"
+                        android:weightSum="2"
+                        android:layout_marginTop="30sp">
+                        <ImageView
+                            android:layout_width="0sp"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/bg_light_brown_wooden"
+                            android:layout_weight="1"
+
+                            android:minHeight="40dp"
+                            android:layout_margin="5dp"/>
+                    </LinearLayout>
+
+
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="0sp"
+                        android:src="@drawable/bg_gradient_purple"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="18"
+                    android:src="@drawable/bg_shop_logo" />
+
+                <LinearLayout
+                    android:layout_width="0sp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="16"
+                    android:weightSum="2"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0sp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:weightSum="2"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="30sp">
+                        <LinearLayout
+                            android:layout_width="0sp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_light_brown_wooden"
+                            android:minHeight="30sp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_margin="@dimen/default_margin"
+                            android:orientation="horizontal"
+                            android:weightSum="12"
+                            android:layout_weight="1">
+
+                            <ImageView
+                                android:layout_width="0sp"
+                                android:minWidth="25dp"
+                                android:layout_height="25dp"
+                                android:src="@drawable/item_gem"
+                                android:layout_margin="5dp"
+                                android:layout_weight="2"/>
+
+                            <TextView
+                                android:id="@+id/tvGemAmount"
+                                android:layout_width="0sp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="8"
+                                android:background="@drawable/bg_brown_wooden"
+                                android:layout_margin="5dp"/>
+
+                            <com.airbnb.lottie.LottieAnimationView
+                                android:layout_width="0sp"
+                                android:minWidth="25dp"
+                                android:layout_height="25dp"
+                                android:layout_margin="5dp"
+                                android:layout_weight="2"
+                                app:lottie_autoPlay="false"
+                                app:lottie_loop="false"
+                                app:lottie_fileName="animated_ui/btn_plus.json"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0sp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_light_brown_wooden"
+                            android:minHeight="30sp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_margin="@dimen/default_margin"
+                            android:orientation="horizontal"
+                            android:weightSum="12"
+                            android:layout_weight="1">
+
+                            <com.airbnb.lottie.LottieAnimationView
+                                android:layout_width="0sp"
+                                android:minWidth="25dp"
+                                android:layout_height="25dp"
+                                android:layout_margin="5dp"
+                                android:layout_weight="2"
+                                app:lottie_autoPlay="true"
+                                app:lottie_loop="true"
+                                app:lottie_fileName="animated_ui/anim_shiny_coin.json"/>
+
+                            <TextView
+                                android:id="@+id/tvCoinAmount"
+                                android:layout_width="0sp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="8"
+                                android:background="@drawable/bg_brown_wooden"
+                                android:layout_margin="5dp"/>
+
+                            <com.airbnb.lottie.LottieAnimationView
+                                android:layout_width="0sp"
+                                android:minWidth="25dp"
+                                android:layout_height="25dp"
+                                android:layout_margin="5dp"
+                                android:layout_weight="2"
+                                app:lottie_autoPlay="false"
+                                app:lottie_loop="false"
+                                app:lottie_fileName="animated_ui/btn_plus.json"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/btnClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="@dimen/default_margin"
+                android:layout_marginTop="@dimen/default_margin"
+
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_fileName="animated_ui/btn_exit.json"/>
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

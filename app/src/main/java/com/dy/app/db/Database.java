@@ -3,6 +3,7 @@ package com.dy.app.db;
 import android.util.Log;
 
 import com.dy.app.gameplay.Player;
+import com.dy.app.ui.view.FragmentCreateAccount;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -26,20 +27,20 @@ public class Database {
         auth = FirebaseAuth.getInstance();
     }
 
-    public void signUpWithEmailAndPassword(String email, String password, OnDBRequestListener listener){
-        if(email == null || email.isEmpty()){
+    public void signUpWithEmailAndPassword(FragmentCreateAccount.RegisterInformation registerInformation, OnDBRequestListener listener){
+        if(registerInformation.email == null || registerInformation.email.isEmpty()){
             listener.onDBRequestCompleted(RESULT_FAILED, "Email is empty");
             return;
         }
 
-        if(password == null || password.isEmpty()){
+        if(registerInformation.password == null || registerInformation.password.isEmpty()){
             listener.onDBRequestCompleted(RESULT_FAILED, "Password is empty");
             return;
         }
 
 
         try {
-            auth.createUserWithEmailAndPassword(email, password)
+            auth.createUserWithEmailAndPassword(registerInformation.email, registerInformation.password)
                 .addOnCompleteListener(task -> {
                     try{
                         if(task.isSuccessful()){
@@ -103,13 +104,17 @@ public class Database {
                         return;
                     }
                     count--;
-                    if(count == 0){
+                    if(count == 0 &&listener != null){
                         listener.onDBRequestCompleted(RESULT_SUCCESS, null);
                     }
                     return;
                 }else{
                     failed = true;
-                    listener.onDBRequestCompleted(RESULT_FAILED, null);
+                    if(listener != null)
+                    {
+                        listener.onDBRequestCompleted(RESULT_FAILED, null);
+                    }
+
                 }
             }
         };
@@ -122,16 +127,20 @@ public class Database {
     public void updateUserProfileOnDB(OnDBRequestListener listener){
         Player player = Player.getInstance();
         DocumentReference profileRef =  getUserDataColRef().document("profile");
-        updateDocRef(profileRef, player.profile.getData(), listener);
+        Map<String, Object> data = player.profile.getData();
+        if(auth.getCurrentUser().isAnonymous()){
+            data.put("isAnonymous", true);
+        }
+        updateDocRef(profileRef, data, listener);
     }
 
-    private void updateUserInventoryOnDB(OnDBRequestListener listener) {
+    public void updateUserInventoryOnDB(OnDBRequestListener listener) {
         Player player = Player.getInstance();
         DocumentReference inventoryRef =  getUserDataColRef().document("inventory");
         updateDocRef(inventoryRef, player.inventory.getData(), listener);
     }
 
-    private void updateBattlePassOnDB(OnDBRequestListener listener) {
+    public void updateBattlePassOnDB(OnDBRequestListener listener) {
         Player player = Player.getInstance();
         DocumentReference battlePassRef =  getUserDataColRef().document("battle_pass");
         updateDocRef(battlePassRef, player.battlePass.getData(), listener);
@@ -192,7 +201,7 @@ public class Database {
 
     }
 
-    public void fetchPlayerProfile(OnDBRequestListener listener){
+    public synchronized void fetchPlayerProfile(OnDBRequestListener listener){
         selfCheckUserSignedIn();
 
         DocumentReference userProfileDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
@@ -206,7 +215,7 @@ public class Database {
         });
     }
 
-    public void fetchPlayerInventory(OnDBRequestListener listener){
+    public synchronized void fetchPlayerInventory(OnDBRequestListener listener){
         selfCheckUserSignedIn();
 
         DocumentReference userInventoryDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
@@ -220,7 +229,7 @@ public class Database {
         });
     }
 
-    private void fetchBattlePass(OnDBRequestListener listener) {
+    public synchronized void fetchBattlePass(OnDBRequestListener listener) {
         selfCheckUserSignedIn();
 
         DocumentReference userBattlePassDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
@@ -293,10 +302,7 @@ public class Database {
     }
 
     public void getDocument(DocumentReference docRef, OnDBRequestListener listener){
-        //if cache contains the document, return the cached document
-
         try{
-
             docRef.get()
                     .addOnSuccessListener(documentSnapshot -> {
                         if(documentSnapshot.exists()){
@@ -311,13 +317,25 @@ public class Database {
         }catch(Exception e){
             listener.onDBRequestCompleted(RESULT_FAILED, getUserMessage(e));
         }
+    }
 
+    public DocumentReference getUserDataDocRef(String name){
+        if(auth == null){
+            throw new RuntimeException("User is not signed in");
+        }
+        return db.collection("users").document(auth.getCurrentUser().getUid()).collection("user_data").document(name);
     }
 
     public void logOut(){
         if(!isSignedIn()){
             return;
         }
+
+        //if user is signed in as anonymous, delete the user
+        if(isSignedInAsAnonymous()){
+            auth.getCurrentUser().delete();
+        }
+
         auth.signOut();
     }
 
@@ -359,6 +377,10 @@ public class Database {
     public String getUserDisplayName(){
         if(auth.getCurrentUser() == null){
             throw new RuntimeException("User is not signed in");
+        }
+        //if user is signed in as anonymous, return "Guest"
+        if(isSignedInAsAnonymous()){
+            return "Guest";
         }
 
         if(auth.getCurrentUser().getDisplayName() == null){
@@ -420,6 +442,10 @@ public class Database {
         auth.removeAuthStateListener(authStateListener);
     }
 
+    public boolean isSignedInAsAnonymous() {
+        return auth.getCurrentUser().isAnonymous();
+    }
+
     public static final String FB_NETWORK_EXCEPTION = "FirebaseNetworkException";
     public static final String FB_USER_COLLISION_EXCEPTION = "FirebaseAuthUserCollisionException";
     public static final String FB_INVALID_EMAIL_EXCEPTION = "FirebaseInvalidEmailException";
@@ -430,4 +456,5 @@ public class Database {
     public static final String FB_TOO_MANY_REQUESTS_EXCEPTION = "FirebaseTooManyRequestsException";
     public static final String FB_INVALID_CREDENTIAL_EXCEPTION = "FirebaseInvalidCredentialsException";
     public static final String FB_INVALID_LOGIN_CREDENTIAL_EXCEPTION = "INVALID_LOGIN_CREDENTIALS";
+
 }

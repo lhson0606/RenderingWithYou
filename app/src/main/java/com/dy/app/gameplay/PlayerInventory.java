@@ -1,5 +1,8 @@
 package com.dy.app.gameplay;
 
+import com.dy.app.db.Database;
+import com.dy.app.db.OnDBRequestListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,4 +70,46 @@ public class PlayerInventory {
         }
     }
 
+    public void obtain(long itemId, OnDBRequestListener listener) {
+        long coin = ((Long)get(KEY_COIN)).longValue();
+        long newCoin = coin;
+        long gems = ((Long)get(KEY_GEMS)).longValue();
+        long pieceSkinIndex = ((Long)get(KEY_PIECE_SKIN_INDEX)).longValue();
+        long terrainSkinIndex = ((Long)get(KEY_TERRAIN_SKIN_INDEX)).longValue();
+        long boardSkinIndex = ((Long)get(KEY_BOARD_SKIN_INDEX)).longValue();
+        long tileSkinIndex = ((Long)get(KEY_TILE_SKIN_INDEX)).longValue();
+        List<Long> pieceSkin = (List<Long>)get(KEY_PIECE_SKIN);
+        List<Long> terrainSkin = (List<Long>)get(KEY_TERRAIN_SKIN);
+        List<Long> boardSkin = (List<Long>)get(KEY_BOARD_SKIN);
+        List<Long> tileSkin = (List<Long>)get(KEY_TILE_SKIN);
+
+        switch ((int)itemId){
+            case 0:
+                //#todo chest
+                newCoin += 1;
+                break;
+            case 1:
+                newCoin += 1;
+                break;
+            case 2:
+                newCoin += 2;
+                break;
+            case 3:
+                newCoin += 3;
+                break;
+        }
+
+        set(KEY_COIN, newCoin);
+
+        Database.getInstance().updateUserInventoryOnDB((res, o)->{
+            if(res == Database.RESULT_SUCCESS) {
+                listener.onDBRequestCompleted(res, o);
+            }else{
+                //rollback as if nothing happened
+                set(KEY_COIN, coin);
+                listener.onDBRequestCompleted(res, o);
+            }
+        });
+
+    }
 }

@@ -1,5 +1,8 @@
 package com.dy.app.gameplay;
 
+import com.dy.app.db.Database;
+import com.dy.app.db.OnDBRequestListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,9 +54,29 @@ public class BattlePass {
         return obtainedItems.contains(i);
     }
 
-    public void obtainItem(long i) {
+    public void obtainItem(long i, long itemId,OnDBRequestListener listener) {
         List<Long> obtainedItems = (List<Long>)get(KEY_OBTAIN_ITEMS);
-        obtainedItems.add(i);
-        set(KEY_OBTAIN_ITEMS, obtainedItems);
+        //will be used to perform rollback data if failed
+        List<Long> newObtainedItems = new ArrayList<>();
+        newObtainedItems.addAll(obtainedItems);
+        newObtainedItems.add(i);
+        set(KEY_OBTAIN_ITEMS, newObtainedItems);
+        Database.getInstance().updateBattlePassOnDB((res, o)->{
+            if(res == Database.RESULT_SUCCESS) {
+                Player.getInstance().inventory.obtain(itemId, (res1, o1)-> {
+                    if (res1 == Database.RESULT_SUCCESS) {
+                        set(KEY_OBTAIN_ITEMS, newObtainedItems);
+                    } else {
+                        //rollback as if nothing happened
+                        set(KEY_OBTAIN_ITEMS, obtainedItems);
+                    }
+                    listener.onDBRequestCompleted(res1, o1);
+                });
+            }else{
+                //rollback as if nothing happened
+                set(KEY_OBTAIN_ITEMS, obtainedItems);
+                listener.onDBRequestCompleted(res, o);
+            }
+        });
     }
 }

@@ -45,6 +45,8 @@ public class SoundManager {
         BTN_SKIN_PICKING,
         COIN_CLINK,
         FIREWORK_LONG,
+        ANGELIC_CHORUS,
+        WOOD_HIT,
     }
 
     private Context currentContext;
@@ -71,6 +73,8 @@ public class SoundManager {
         soundMap.put(SoundType.BTN_SKIN_PICKING, MediaPlayer.create(context, R.raw.se_btn_skin_picking));
         addSound(SoundType.COIN_CLINK, R.raw.se_coins_clinking, 0.5f, 0.5f);
         addSound(SoundType.FIREWORK_LONG, R.raw.se_firework_long, 0.5f, 0.5f);
+        addSound(SoundType.ANGELIC_CHORUS, R.raw.se_angelic_chorus, 1f, 1f);
+        addSound(SoundType.WOOD_HIT, R.raw.se_wood_hit, 1.5f, 1.5f);
 
         return this;
     }
