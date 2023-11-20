@@ -116,7 +116,7 @@ public class FragmentChatLobby extends Fragment
         final String text = "["+Rival.getInstance().getName() +"]:" +chatText;
         tv.setText(text);
         llChat.addView(tv);
-        //scroll down to the last message
+        //scroll down to the latest message
         scrollDown();
     }
 

@@ -56,7 +56,8 @@ public class Player {
 
 
     public String getPieceSkinPath(){
-        int pieceSkinIndex = (int)inventory.get(PlayerInventory.KEY_PIECE_SKIN_INDEX);
+        Long temp = (Long)inventory.get(PlayerInventory.KEY_PIECE_SKIN_INDEX);
+        int pieceSkinIndex = temp.intValue();
 
         if(isWhitePiece()){
             return DyConst.white_piece_tex_path + DyConst.piece_skins[pieceSkinIndex];

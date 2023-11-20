@@ -18,6 +18,7 @@ import com.anychart.core.radar.series.Line;
 import com.anychart.data.Mapping;
 import com.anychart.enums.Align;
 import com.anychart.enums.MarkerType;
+import com.anychart.graphics.vector.GradientKey;
 import com.dy.app.R;
 
 import java.util.ArrayList;
@@ -46,6 +47,11 @@ implements View.OnClickListener {
     }
 
     private void updateUI() {
+        updateWinRateChart();
+        updateEloRecordChart();
+    }
+
+    private void updateWinRateChart() {
         AnyChartView anyChartView = findViewById(R.id.anyChartView);
         anyChartView.setProgressBar(findViewById(R.id.progressBar));
 
@@ -53,7 +59,7 @@ implements View.OnClickListener {
 
         radar.yScale().minimum(0d);
         radar.yScale().minimumGap(0d);
-        radar.yScale().ticks().interval(50d);
+        radar.yScale().ticks().interval(25d);
 
         radar.xAxis().labels().padding(5d, 5d, 5d, 5d);
 
@@ -62,53 +68,35 @@ implements View.OnClickListener {
                 .enabled(true);
 
         List<DataEntry> data = new ArrayList<>();
-        data.add(new CustomDataEntry("Strength", 136, 199, 43));
-        data.add(new CustomDataEntry("Agility", 79, 125, 56));
-        data.add(new CustomDataEntry("Stamina", 149, 173, 101));
-        data.add(new CustomDataEntry("Intellect", 135, 33, 202));
-        data.add(new CustomDataEntry("Spirit", 158, 64, 196));
+        data.add(new ValueDataEntry("Black WR", 70));
+        data.add(new ValueDataEntry("White WR", 40));
+        data.add(new ValueDataEntry("Overall WR", 55));
+        data.add(new ValueDataEntry("Draw", 10));
+        data.add(new ValueDataEntry("Elo", 2500/30));
 
         Set set = Set.instantiate();
         set.data(data);
-        Mapping shamanData = set.mapAs("{ x: 'x', value: 'value' }");
-        Mapping warriorData = set.mapAs("{ x: 'x', value: 'value2' }");
+
         Mapping priestData = set.mapAs("{ x: 'x', value: 'value3' }");
 
-        Line shamanLine = radar.line(shamanData);
-        shamanLine.name("Shaman");
-        shamanLine.markers()
-                .enabled(true)
-                .type(MarkerType.CIRCLE)
-                .size(3d);
-
-        Line warriorLine = radar.line(warriorData);
-        warriorLine.name("Warrior");
-        warriorLine.markers()
-                .enabled(true)
-                .type(MarkerType.CIRCLE)
-                .size(3d);
 
         Line priestLine = radar.line(priestData);
-        priestLine.name("Priest");
+        //priestLine.name("Priest");
         priestLine.markers()
                 .enabled(true)
                 .type(MarkerType.CIRCLE)
-                .size(3d);
+                .size(1d);
 
         radar.tooltip().format("Value: {%Value}");
 
         anyChartView.setChart(radar);
-        anyChartView.setBackgroundColor(Color.TRANSPARENT);
+        GradientKey key = new GradientKey("#2050CA", 0d, 1d);
+        radar.background().enabled(true).fill(key, 0, true, 1);
     }
 
-    private class CustomDataEntry extends ValueDataEntry {
-        public CustomDataEntry(String x, Number value, Number value2, Number value3) {
-            super(x, value);
-            setValue("value2", value2);
-            setValue("value3", value3);
-        }
-    }
+    private void updateEloRecordChart() {
 
+    }
 
     @Override
     public void onClick(View v) {

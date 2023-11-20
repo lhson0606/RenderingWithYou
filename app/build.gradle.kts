@@ -83,6 +83,6 @@ dependencies {
     implementation ("com.google.firebase:firebase-dynamic-links")
     implementation ("com.google.firebase:firebase-analytics")
 
-    //for graphs
+    //Anychart for graphs
     implementation ("com.github.AnyChart:AnyChart-Android:1.1.5")
 }
