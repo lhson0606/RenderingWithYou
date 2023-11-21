@@ -73,6 +73,13 @@ public class ConnectionManager {
         worker.close();
         receiver.close();
         sender.close();
+        //close streams
+        try {
+            is.close();
+            os.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private class Sender extends Thread{
@@ -136,13 +143,13 @@ public class ConnectionManager {
                     sendingQueue.clear();
 
                     synchronized (lock){
-                        //sleep, wait for some threads to wake it up
                         releaseMutex();
-                        //sleep
+                        //sleep, wait for some threads to wake it up
                         lock.wait();
                     }
 
                 } catch (InterruptedException e) {
+                    //it's supposed to call close() method
                     throw new RuntimeException(e);
                 } catch (IOException e) {
                     //throw new RuntimeException(e);

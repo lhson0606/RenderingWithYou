@@ -43,7 +43,6 @@ public class AssetManger {
         String board_skin_path = Player.getInstance().getBoardSkinPath();
         String black_tile_skin_path = Player.getInstance().getBlackTileSkinPath();
         String white_tile_skin_path = Player.getInstance().getWhiteTileSkinPath();
-        String background_skin_path = Player.getInstance().getBackgroundSkinPath();
         String terrain_texture_path = Player.getInstance().getTerrainTexPath();
         Context context = GameCore.getInstance().getGameActivity().getApplicationContext();
 
@@ -72,11 +71,6 @@ public class AssetManger {
                 GLHelper.loadBitmap(context.getAssets().open(white_tile_skin_path))
         );
 
-        Skin background_skin = new Skin(
-                DyConst.default_material,
-                GLHelper.loadBitmap(context.getAssets().open(background_skin_path))
-        );
-
         Material terrain_mtl = new Material(
           0, 0
         );
@@ -91,7 +85,6 @@ public class AssetManger {
         skins.put(SkinType.BOARD, board_skin);
         skins.put(SkinType.BLACK_TILE, black_tile_skin);
         skins.put(SkinType.WHITE_TILE, white_tile_skin);
-        skins.put(SkinType.BACKGROUND, background_skin);
         skins.put(SkinType.TERRAIN_TEXTURE, terrain_texture);
 
     }

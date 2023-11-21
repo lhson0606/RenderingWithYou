@@ -41,4 +41,17 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
+    public static int long2int(long longValue){
+        int intValue;
+
+        try{
+            intValue = Math.toIntExact(longValue);
+        }catch (ArithmeticException e){
+            throw new RuntimeException("long value is too large to convert to int");
+        }
+
+        return intValue;
+
+    }
 }

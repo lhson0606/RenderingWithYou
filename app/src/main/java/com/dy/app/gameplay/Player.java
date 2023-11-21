@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import com.dy.app.R;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.ImageLoader;
+import com.dy.app.utils.Utils;
 
 import java.io.IOException;
 
@@ -69,32 +70,27 @@ public class Player {
     }
 
     public String getBoardSkinPath(){
-        int boardSkinIndex = (int)inventory.get(PlayerInventory.KEY_BOARD_SKIN_INDEX);
+        int boardSkinIndex = Utils.long2int((long)inventory.get(PlayerInventory.KEY_BOARD_SKIN_INDEX));
         return DyConst.board_tex_path + DyConst.board_skins[boardSkinIndex];
     }
 
     public String getBlackTileSkinPath(){
-        int tileSkinIndex = (int)inventory.get(PlayerInventory.KEY_TILE_SKIN_INDEX);
+        int tileSkinIndex = Utils.long2int((long)inventory.get(PlayerInventory.KEY_TILE_SKIN_INDEX));
         return DyConst.black_tile_tex_path + DyConst.tile_skins[tileSkinIndex];
     }
 
     public String getWhiteTileSkinPath(){
-        int tileSkinIndex = (int)inventory.get(PlayerInventory.KEY_TILE_SKIN_INDEX);
+        int tileSkinIndex = Utils.long2int((long)inventory.get(PlayerInventory.KEY_TILE_SKIN_INDEX));
         return DyConst.white_tile_tex_path + DyConst.tile_skins[tileSkinIndex];
     }
 
-    public String getBackgroundSkinPath(){
-        int backgroundSkinIndex = (int)inventory.get(PlayerInventory.KEY_BOARD_SKIN_INDEX);
-        return DyConst.background_tex_path + DyConst.back_ground_skins[backgroundSkinIndex];
-    }
-
     public String getTerrainTexPath(){
-        int terrainSkinIndex = (int)inventory.get(PlayerInventory.KEY_TERRAIN_SKIN_INDEX);
+        int terrainSkinIndex = Utils.long2int((long)inventory.get(PlayerInventory.KEY_TERRAIN_SKIN_INDEX));
         return DyConst.terrain_model_path + DyConst.terrain_tex[terrainSkinIndex];
     }
 
     public String getTerrainModelPath(){
-        int terrainSkinIndex = (int)inventory.get(PlayerInventory.KEY_TERRAIN_SKIN_INDEX);
+        int terrainSkinIndex = Utils.long2int((long)inventory.get(PlayerInventory.KEY_TERRAIN_SKIN_INDEX));
         return DyConst.terrain_model_path + DyConst.terrain_models[terrainSkinIndex];
     }
 

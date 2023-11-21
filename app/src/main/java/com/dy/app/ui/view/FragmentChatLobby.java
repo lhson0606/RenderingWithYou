@@ -87,8 +87,6 @@ public class FragmentChatLobby extends Fragment
 
     @Override
     public void onMsgFromMain(String TAG, int type, Object o1, Object o2) {
-        if(!TAG.equals(ConnectionManager.TAG)) return;
-
         switch (type){
             case ADD_PLAYER_MESSAGE:
                 final String playerMsg = (String)o1;

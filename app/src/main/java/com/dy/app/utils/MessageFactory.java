@@ -18,7 +18,14 @@ public class MessageFactory {
         msg.setRecipient(rival.getName().getBytes());
         msg.setTimestamp(System.currentTimeMillis());
         msg.setData(data);
-        msg.setLength(data.length);
+
+        if(data != null)
+        {
+            msg.setLength(data.length);
+        }else{
+            msg.setLength(0);
+        }
+
         msg.setCode(code);
         return msg;
     }

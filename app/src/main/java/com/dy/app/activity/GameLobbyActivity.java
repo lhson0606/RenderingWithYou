@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -16,6 +17,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.dy.app.R;
 import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.PlayerInventory;
 import com.dy.app.gameplay.PlayerProfile;
 import com.dy.app.gameplay.Rival;
 import com.dy.app.manager.ConnectionManager;
@@ -25,6 +27,8 @@ import com.dy.app.network.Message;
 import com.dy.app.network.MessageCode;
 import com.dy.app.network.PlayerInitialInfo;
 import com.dy.app.ui.view.FragmentChatLobby;
+import com.dy.app.ui.view.FragmentSetting;
+import com.dy.app.ui.view.FragmentSkinSelection;
 import com.dy.app.utils.MessageFactory;
 import com.dy.app.utils.Utils;
 
@@ -43,22 +47,24 @@ implements View.OnClickListener {
 
         init();
         exqListener();
-        attachFragment();
     }
 
     private void attachFragment() {
         FragmentTransaction ft = fm.beginTransaction();
 
-        ft.add(R.id.flChatWindow,fragmentChatLobby, FragmentChatLobby.TAG);
+        ft.replace(R.id.flChatWindow,fragmentChatLobby, FragmentChatLobby.TAG);
         ft.show(fragmentChatLobby);
+        //#todo
+        ft.replace(R.id.flSkinSelection, fragmentSetting, FragmentSkinSelection.TAG);
+        ft.show(fragmentSetting);
 
         ft.commit();
-
     }
 
     private void init(){
         uiManager = UIManager.getInstance();
         fragmentChatLobby = (FragmentChatLobby) UIManager.getInstance().getUI(UIManager.UIType.CHAT);
+        fragmentSetting = (FragmentSetting) UIManager.getInstance().getUI(UIManager.UIType.CONFIG);
         btnQuit = (Button)findViewById(R.id.btnQuit);
         btnQuit.setOnClickListener(this);
         btnReady = (Button)findViewById(R.id.btnReady);
@@ -72,8 +78,6 @@ implements View.OnClickListener {
     }
 
     private void startMatch() {
-        //simulate match
-        //finish();
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }
@@ -89,10 +93,14 @@ implements View.OnClickListener {
         final byte[] data = msg.getData();
 
         switch (code){
-            case MessageCode.PLAYER_INITIAL_MESSAGE:
+            case MessageCode.PLAYER_INITIAL_MESSAGE_CODE:
                 //deserialize data
                 PlayerInitialInfo info = (PlayerInitialInfo) Utils.deserialize(data);
-                Rival.getInstance().setName(info.getName());
+                Rival rival = Rival.getInstance();
+                rival.setName(info.getName());
+                rival.setPieceSkinIndex(info.getPieceSkinIndex());
+                rival.setBoardSkinIndex(info.getBoardSkinIndex());
+                rival.setTileSkinIndex(info.getTileSkinIndex());
                 break;
             case MessageCode.PLAYER_CHAT_MESSAGE_CODE:
                 //get string message and send it to add it to chat window
@@ -101,7 +109,6 @@ implements View.OnClickListener {
                 runOnUiThread(()-> {
                     fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, FragmentChatLobby.ADD_PLAYER_MESSAGE, strnMessage, null);
                 });
-
                 break;
             case MessageCode.SYSTEM_MESSAGE_CODE:
                 //get string message and send it to add it to chat window
@@ -110,19 +117,121 @@ implements View.OnClickListener {
                 runOnUiThread(()-> {
                     fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, FragmentChatLobby.ADD_SYSTEM_MESSAGE, strMessage, null);
                 });
-
                 break;
+            case MessageCode.PLAYER_READY_STATUS_CODE:
+                //deserialize data
+                Boolean isReady = (Boolean) Utils.deserialize(data);
+                Rival.getInstance().setReady(isReady);
+                //update UI
+                if(isReady){
+                    runOnUiThread(()-> {
+                        fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, FragmentChatLobby.ADD_SYSTEM_MESSAGE, Rival.getInstance().getName() + " is ready", null);
+                    });
+                }else{
+                    runOnUiThread(()-> {
+                        fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, FragmentChatLobby.ADD_SYSTEM_MESSAGE, Rival.getInstance().getName() + " is not ready", null);
+                    });
+                }
+                //check if both players are ready
+                if(Player.getInstance().isReady() && Rival.getInstance().isReady()){
+                    //let host start the game
+                    if(Player.getInstance().isHost()) {
+                        startCountDown();
+                    }else{//else request host to start the game
+                        Message o = MessageFactory.getInstance().createDataMessage(null, MessageCode.REQUEST_START_GAME_COUNTDOWN_CODE);
+                        ConnectionManager.getInstance().postMessage(o);
+                    }
+                }else {
+                    //if count down has started, stop it
+                    if(Player.getInstance().isHost()) {
+                        countDownStarted = false;
+                    }else{
+                        //if we are not host, we should send a message to host to stop the count down
+                        Message stopRequestMsg = MessageFactory.getInstance().createDataMessage(null, MessageCode.REQUEST_STOP_GAME_COUNTDOWN_CODE);
+                        ConnectionManager.getInstance().postMessage(stopRequestMsg);
+                    }
+
+                }
+                break;
+            case MessageCode.REQUEST_START_GAME_COUNTDOWN_CODE:
+                    //check if both players are ready
+                    if(Player.getInstance().isReady() && Rival.getInstance().isReady()){
+                        startCountDown();
+                    }else if(countDownStarted){
+                        //if count down has started, stop it
+                        countDownStarted = false;
+                    }
+                    break;
+            case MessageCode.REQUEST_STOP_GAME_COUNTDOWN_CODE:
+                    //if count down has started, stop it
+                    countDownStarted = false;
+                    break;
+            case MessageCode.START_GAME_CODE:
+                    //start game
+                    startMatch();
+                    break;
         }
+    }
+
+    private void startCountDown() {
+        if(countDownStarted) return;
+        countDownStarted = true;
+        CountDownThread thread = new CountDownThread();
+        thread.start();
+    }
+
+    private class CountDownThread extends Thread{
+        int countDownValue = 10;
+        @Override
+        public void run() {
+            while (countDownValue > 0){
+
+                if(!countDownStarted) {
+                    addSystemMessageToPlayerAndPeer("Count down stopped");
+                    break;
+                }
+
+                try {
+                    Thread.sleep(1000);
+                    countDownValue--;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                addSystemMessageToPlayerAndPeer("Game starts in " + countDownValue + " seconds");
+            }
+
+            if(countDownValue == 0) {
+                //inform peer(client) to start the game
+                Message startGameMsg = MessageFactory.getInstance().createDataMessage(null, MessageCode.START_GAME_CODE);
+                ConnectionManager.getInstance().postMessage(startGameMsg);
+                startMatch();
+            }
+        }
+    }
+
+    private void addSystemMessageToPlayerAndPeer(String message){
+        //add message to chat window
+        runOnUiThread(()->{
+            fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, FragmentChatLobby.ADD_SYSTEM_MESSAGE, message, null);
+        });
+        //send message to peer
+        Message msg = MessageFactory.getInstance().createDataMessage(message.getBytes(), MessageCode.SYSTEM_MESSAGE_CODE);
+        ConnectionManager.getInstance().postMessage(msg);
     }
 
     private void sendPlayerInitialData(){
         //create player initial info object
         PlayerInitialInfo info = new PlayerInitialInfo();
-        info.setName(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME).toString());
+        Player player = Player.getInstance();
+        info.setName(player.profile.get(PlayerProfile.KEY_USERNAME).toString());
+        info.setPieceSkinIndex((long)player.inventory.get(PlayerInventory.KEY_PIECE_SKIN_INDEX));
+        info.setBoardSkinIndex((long)player.inventory.get(PlayerInventory.KEY_BOARD_SKIN_INDEX));
+        info.setTileSkinIndex((long)player.inventory.get(PlayerInventory.KEY_TILE_SKIN_INDEX));
         //convert to byte array
         byte[] data = Utils.serialize(info);
         //create message
-        Message msg = MessageFactory.getInstance().createDataMessage(data, MessageCode.PLAYER_INITIAL_MESSAGE);
+        Message msg = MessageFactory.getInstance().createDataMessage(data, MessageCode.PLAYER_INITIAL_MESSAGE_CODE);
         //send message
         ConnectionManager.getInstance().postMessage(msg);
     }
@@ -156,7 +265,7 @@ implements View.OnClickListener {
                     messages.clear();
 
                 } catch (InterruptedException e) {
-                    //#todo
+                    isRunning = false;
                 } finally {
                     lock.unlock();
                 }
@@ -182,7 +291,6 @@ implements View.OnClickListener {
         }
 
         public void close(){
-            isRunning = false;
             interrupt();
         }
     }
@@ -195,11 +303,11 @@ implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
+        attachFragment();
     }
 
     @Override
     protected void onDestroy() {
-        messageHandler.close();
         super.onDestroy();
     }
 
@@ -208,19 +316,30 @@ implements View.OnClickListener {
         if(v.getId() == R.id.btnQuit){
             showConfirmQuitDialog();
         }else if (v.getId() == R.id.btnReady){
-            if(!Player.getInstance().isReady()){
+            boolean isReady = Player.getInstance().isReady();
+            if(!isReady){
                 btnReady.setPadding(0, 0, 0, 0);
                 btnReady.setText("We are ready!");
                 btnReady.setTextSize(16);
-                Player.getInstance().setReady(true);
             }else{
                 btnReady.setText("Ready!!!");
                 btnReady.setPadding(30, 30, 30, 30);
                 btnReady.setTextSize(30);
-                Player.getInstance().setReady(false);
             }
 
+            Player.getInstance().setReady(!isReady);
+            informReadyStatus();
+            //update UI
+            String msg = Player.getInstance().isReady()?ready_msg:not_ready_msg;
+            fragmentChatLobby.onMsgFromMain(TAG, FragmentChatLobby.ADD_SYSTEM_MESSAGE, msg, null);
         }
+    }
+
+    private void informReadyStatus() {
+        Boolean isReady = Player.getInstance().isReady();
+        byte[] data = Utils.serialize(isReady);
+        Message msg = MessageFactory.getInstance().createDataMessage(data, MessageCode.PLAYER_READY_STATUS_CODE);
+        ConnectionManager.getInstance().postMessage(msg);
     }
 
     private void quit(){
@@ -259,14 +378,15 @@ implements View.OnClickListener {
             super.onBackPressed();
     }
 
-    private Fragment fragmentSkinSelection;
     private UIManager uiManager;
     private FragmentManager fm;
     private Button btnQuit, btnReady;
     private FragmentChatLobby fragmentChatLobby;
+    private FragmentSetting fragmentSetting;
     private final static String TAG = "GameLobbyActivity";
-    private final String ready_msg = "I am ready";
-    private final String not_ready_sg = "I am not ready";
+    private final String ready_msg = "You are ready";
+    private final String not_ready_msg = "You are not ready";
     private MessageHandler messageHandler;
+    private boolean countDownStarted = false;
 
 }
