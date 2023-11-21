@@ -6,6 +6,7 @@
     android:textSize="@dimen/small_text_size"
     android:layout_marginBottom="8dp"
     app:emojiSize="@dimen/small_text_size"
-    android:id="@+id/emojiView">
+    android:id="@+id/emojiView"
+    android:textColor="@color/black">
 
 </androidx.emoji.widget.EmojiTextView>

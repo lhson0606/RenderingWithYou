@@ -1,44 +1,36 @@
 package com.dy.app.activity;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.provider.FontRequest;
-import androidx.emoji.text.EmojiCompat;
-import androidx.emoji.text.FontRequestEmojiCompatConfig;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.dy.app.R;
-import com.dy.app.core.dythread.MessageDispatcher;
 import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.PlayerProfile;
 import com.dy.app.gameplay.Rival;
 import com.dy.app.manager.ConnectionManager;
 import com.dy.app.manager.UIManager;
+import com.dy.app.network.IMessageHandler;
+import com.dy.app.network.Message;
+import com.dy.app.network.MessageCode;
+import com.dy.app.network.PlayerInitialInfo;
 import com.dy.app.ui.view.FragmentChatLobby;
-import com.dy.app.ui.view.FragmentSkinSelection;
-import com.dy.app.utils.ImageLoader;
-import com.dy.app.network.MessageType;
 import com.dy.app.utils.MessageFactory;
 import com.dy.app.utils.Utils;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Vector;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class GameLobbyActivity extends FragmentHubActivity
 implements View.OnClickListener {
@@ -57,25 +49,15 @@ implements View.OnClickListener {
     private void attachFragment() {
         FragmentTransaction ft = fm.beginTransaction();
 
-        fragmentSkinSelection = (Fragment) uiManager.getUI(UIManager.UIType.CREDITS);
-        ft.add(R.id.flSkinSelection, fragmentSkinSelection, null);
-        ft.show(fragmentSkinSelection);
-
-
         ft.add(R.id.flChatWindow,fragmentChatLobby, FragmentChatLobby.TAG);
         ft.show(fragmentChatLobby);
 
-
-
         ft.commit();
-        //fragmentSkinSelection.setFragmentManager(getSupportFragmentManager());
+
     }
 
     private void init(){
-        resources = getResources();
         uiManager = UIManager.getInstance();
-        screenView = (View) findViewById(R.id.fullScreen);
-        screenView.setBackground(ImageLoader.loadImage(getResources().openRawResource(R.raw.chess_wallpaper)));
         fragmentChatLobby = (FragmentChatLobby) UIManager.getInstance().getUI(UIManager.UIType.CHAT);
         btnQuit = (Button)findViewById(R.id.btnQuit);
         btnQuit.setOnClickListener(this);
@@ -84,237 +66,125 @@ implements View.OnClickListener {
         btnReady.setText("Ready!!!");
         btnReady.setPadding(30, 30, 30, 30);
         btnReady.setTextSize(30);
-        isReady = false;
-
-        chatMsgHandler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, 0, msg.obj, null);
-                    }
-                });
-
-                return true;
-            }
-        });
-
-        systemMsgHandler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {
-                com.dy.app.network.Message message = (com.dy.app.network.Message)msg.obj;
-                final String sysMsg = new String(message.getData(), StandardCharsets.UTF_8);
-                Integer isWhitePiece;
-                switch(message.getCode()) {
-                    case 0:
-                        if (sysMsg.equals(ready_msg)) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    fragmentChatLobby.addSystemMessage(Rival.getInstance().getName() + " is ready");
-                                }
-                            });
-
-                            if(isReady){
-                                if(Player.getInstance().isHost()){
-                                    countDown();
-                                }
-                                else{
-                                    //send request count down to host
-                                    ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("", 5));
-                                }
-                            }
-
-                        }else{
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    fragmentChatLobby.addSystemMessage(Rival.getInstance().getName() + " is not ready");
-                                    startingMatch = false;
-                                }
-                            });
-                        }
-                    break;
-
-                    case 1://start match
-                        isWhitePiece = Utils.randomInt(0,1);
-                        ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage(isWhitePiece.toString(), 4));
-                        if(isWhitePiece == 1) {
-                            Player.getInstance().setWhitePiece(true);
-                            Rival.getInstance().setWhitePiece(false);
-                            Player.getInstance().setInTurn(true);
-                            Rival.getInstance().setInTurn(false);
-                        }else{
-                            Player.getInstance().setWhitePiece(false);
-                            Player.getInstance().setInTurn(false);
-                            Rival.getInstance().setWhitePiece(true);
-                            Rival.getInstance().setInTurn(true);
-                        }
-                        startMatch();
-                    break;
-                    case 2://count down
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                fragmentChatLobby.addSystemMessage(sysMsg);
-                            }
-                        });
-                    break;
-                    case 3:
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                fragmentChatLobby.addSystemMessage(Rival.getInstance().getName() + " left the lobby");
-                            }
-                        });
-                    break;
-                    case 4://echo match started
-                        Integer isWhite = Integer.parseInt(sysMsg);
-                        if(isWhite == 1) {
-                            Player.getInstance().setWhitePiece(false);
-                            Player.getInstance().setInTurn(false);
-                            Rival.getInstance().setWhitePiece(true);
-                            Rival.getInstance().setInTurn(true);
-                        }else{
-                            Player.getInstance().setWhitePiece(true);
-                            Player.getInstance().setInTurn(true);
-                            Rival.getInstance().setWhitePiece(false);
-                            Rival.getInstance().setInTurn(false);
-                        }
-                        startMatch();
-                    break;
-                    case 5://request count down
-                        if(!startingMatch)
-                            countDown();
-                    break;
-                }
-
-
-                return true;
-            }
-        });
-
+        messageHandler = new MessageHandler();
+        //send player initial data
+        sendPlayerInitialData();
     }
-    private boolean startingMatch = false;
 
     private void startMatch() {
-        fragmentChatLobby.addSystemMessage("Match started");
         //simulate match
         //finish();
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }
 
-    private Thread count_down_thread = null;
-
-    private int count_down = 0;
-    private final int count_down_max = 5;
-
-    private void countDown() {
-        startingMatch = true;
-        count_down = 0;
-        count_down_thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                while(startingMatch && count_down < count_down_max){
-                    try {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                count_down++;
-                                if(count_down != count_down_max) {
-                                    fragmentChatLobby.addSystemMessage("start in " + (count_down_max-count_down) + " seconds");
-                                    ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("start in " + (count_down_max-count_down) + " seconds", 2));
-                                }else{
-
-                                    //signal match starts
-                                    ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("", 1));
-                                }
-                            }
-                        });
-
-                        Thread.sleep(1000);
-
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-        count_down_thread.start();
-    }
-
     private void exqListener() {
         // start listening to incoming messages
+        ConnectionManager.getInstance().startReceiving(messageHandler);
+        messageHandler.start();
+    }
 
+    private void handleMessage(Message msg) {
+        final int code = msg.getCode();
+        final byte[] data = msg.getData();
 
-        if (!MessageDispatcher.getInstance().isAlive()) {
-            MessageDispatcher.getInstance().start();
-        }
-
-        if (!ConnectionManager.getInstance().isListening()) {
-            ConnectionManager.getInstance().startReceiving();
-        }
-
-        //bugs
-        MessageDispatcher.getInstance().subscribe(chatMsgHandler, 0);
-        MessageDispatcher.getInstance().subscribe(systemMsgHandler, 1);
-
-        ConnectionManager.getInstance().setConnectionLostCallback(new ConnectionManager.ConnectionStatusCallback() {
-            @Override
-            public void onConnectionLost() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (!isFinishing()) {  // Check if the activity is finishing
-                            AlertDialog.Builder builder = new AlertDialog.Builder(GameLobbyActivity.this);
-                            builder.setTitle("Connection lost");
-                            builder.setCancelable(false);  // Prevent the dialog from being canceled by clicking outside
-                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Handle the OK button click
-                                    dialog.dismiss();
-                                    // You can finish the activity or take other actions here
-                                    finish();
-                                }
-                            });
-                            AlertDialog dialog = builder.create();
-                            dialog.show();
-                            startingMatch = false;
-                        }
-                    }
+        switch (code){
+            case MessageCode.PLAYER_INITIAL_MESSAGE:
+                //deserialize data
+                PlayerInitialInfo info = (PlayerInitialInfo) Utils.deserialize(data);
+                Rival.getInstance().setName(info.getName());
+                break;
+            case MessageCode.PLAYER_CHAT_MESSAGE_CODE:
+                //get string message and send it to add it to chat window
+                String strnMessage = new String(data, 0, msg.getLength());
+                //make sure that we change UI in UI thread
+                runOnUiThread(()-> {
+                    fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, FragmentChatLobby.ADD_PLAYER_MESSAGE, strnMessage, null);
                 });
+
+                break;
+            case MessageCode.SYSTEM_MESSAGE_CODE:
+                //get string message and send it to add it to chat window
+                String strMessage = new String(data, 0, msg.getLength());
+                //make sure that we change UI in UI thread
+                runOnUiThread(()-> {
+                    fragmentChatLobby.onMsgFromMain(ConnectionManager.TAG, FragmentChatLobby.ADD_SYSTEM_MESSAGE, strMessage, null);
+                });
+
+                break;
+        }
+    }
+
+    private void sendPlayerInitialData(){
+        //create player initial info object
+        PlayerInitialInfo info = new PlayerInitialInfo();
+        info.setName(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME).toString());
+        //convert to byte array
+        byte[] data = Utils.serialize(info);
+        //create message
+        Message msg = MessageFactory.getInstance().createDataMessage(data, MessageCode.PLAYER_INITIAL_MESSAGE);
+        //send message
+        ConnectionManager.getInstance().postMessage(msg);
+    }
+
+    private class MessageHandler extends Thread implements IMessageHandler{
+        private final ReentrantLock lock = new ReentrantLock();
+        private final Condition condition = lock.newCondition();
+        private boolean isRunning = false;
+        private Vector<Message> messages;
+        public MessageHandler(){
+            messages = new Vector<>();
+        }
+
+        @Override
+        public void run() {
+            isRunning = true;
+            Vector<Message> processingMessages = new Vector<>();
+
+            while(isRunning){
+                //check if there is any message
+                lock.lock();
+                processingMessages.clear();
+                try{
+                    //use while instead of if to guard against spurious wake up
+                    while(messages.size() == 0 && isRunning){
+                        condition.await();
+                    }
+
+                    //copy messages to processingMessages
+                    processingMessages.addAll(messages);
+                    messages.clear();
+
+                } catch (InterruptedException e) {
+                    //#todo
+                } finally {
+                    lock.unlock();
+                }
+
+                //process messages
+                for (Message msg:processingMessages){
+                    handleMessage(msg);
+                }
             }
 
-            @Override
-            public void onWeakConnection() {
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if (!isFinishing()) {  // Check if the activity is finishing
-//                            AlertDialog.Builder builder = new AlertDialog.Builder(GameLobbyActivity.this);
-//                            builder.setTitle("Weak connection");
-//                            builder.setCancelable(false);  // Prevent the dialog from being canceled by clicking outside
-//                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    // Handle the OK button click
-//                                    dialog.dismiss();
-//                                    // You can finish the activity or take other actions here
-//                                    //finish();
-//                                }
-//                            });
-//                            AlertDialog dialog = builder.create();
-//                            dialog.show();
-//                        }
-//                    }
-//                });
+            Log.d(TAG, "run: message handler thread closed");
+        }
+
+        @Override
+        public void onNewMessageArrive(Message msg) {
+            lock.lock();
+            try{
+                messages.add(msg);
+                condition.signal();
+            }finally {
+                lock.unlock();
             }
-        });
+        }
+
+        public void close(){
+            isRunning = false;
+            interrupt();
+        }
     }
 
     @Override
@@ -329,66 +199,38 @@ implements View.OnClickListener {
 
     @Override
     protected void onDestroy() {
-        MessageDispatcher.getInstance().unsubscribe(chatMsgHandler, 0);
-        MessageDispatcher.getInstance().unsubscribe(systemMsgHandler, 1);
+        messageHandler.close();
         super.onDestroy();
     }
 
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnQuit){
-            //send left message
-
-            ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage("", 3));
-            if(count_down_thread!=null){
-                while(count_down_thread.isAlive()){
-                    startingMatch = false;
-                    try {
-                        //wait for thread to finish
-                        Thread.sleep(200);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt(); // Re-interrupt the current thread
-                        break;
-                    }
-                }
-            }
-
-            while(ConnectionManager.getInstance().isSending()){
-                try {
-                    //wait for thread to finish
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt(); // Re-interrupt the current thread
-                    break;
-                }
-            }
-
-            ConnectionManager.getInstance().closeConnection();
-            finish();
-
+            showConfirmQuitDialog();
         }else if (v.getId() == R.id.btnReady){
-            if(!isReady){
+            if(!Player.getInstance().isReady()){
                 btnReady.setPadding(0, 0, 0, 0);
                 btnReady.setText("We are ready!");
                 btnReady.setTextSize(16);
-                informPeerReady(true);
-                fragmentChatLobby.addSystemMessage("You are ready");
-                isReady = true;
+                Player.getInstance().setReady(true);
             }else{
                 btnReady.setText("Ready!!!");
                 btnReady.setPadding(30, 30, 30, 30);
                 btnReady.setTextSize(30);
-                informPeerReady(false);
-                fragmentChatLobby.addSystemMessage("You are not ready");
-                isReady = false;
-                startingMatch = false;
+                Player.getInstance().setReady(false);
             }
 
         }
     }
-    @Override
-    public void onBackPressed() {
 
+    private void quit(){
+        ConnectionManager.getInstance().closeConnection();
+        //close message handler
+        messageHandler.close();
+        finish();
+    }
+
+    private void showConfirmQuitDialog(){
         new AlertDialog.Builder(this)
                 .setTitle("Confirmation")
                 .setMessage("Do you want to exit this lobby?")
@@ -396,7 +238,7 @@ implements View.OnClickListener {
                     public void onClick(DialogInterface dialog, int which) {
                         // Perform any necessary actions here before exiting
                         // For example, you can call super.onBackPressed() to navigate back
-                        GameLobbyActivity.super.onBackPressed();
+                        quit();
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -405,33 +247,26 @@ implements View.OnClickListener {
                     }
                 })
                 .show();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        showConfirmQuitDialog();
 
         //to prevent compiler from complaining
         if(false)
             super.onBackPressed();
     }
 
-    private void informPeerReady(boolean isReady){
-        if(isReady) {
-            ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage(ready_msg, 0));
-        }
-        else {
-            ConnectionManager.getInstance().postMessage(MessageFactory.getInstance().createSystemMessage(not_ready_sg, 0));
-        }
-    }
-
-    private Handler chatMsgHandler = null;
-    private Handler systemMsgHandler = null;
-    private View screenView;
     private Fragment fragmentSkinSelection;
     private UIManager uiManager;
     private FragmentManager fm;
     private Button btnQuit, btnReady;
     private FragmentChatLobby fragmentChatLobby;
-    private Resources resources;
-    private boolean isReady = false;
     private final static String TAG = "GameLobbyActivity";
     private final String ready_msg = "I am ready";
     private final String not_ready_sg = "I am not ready";
+    private MessageHandler messageHandler;
 
 }

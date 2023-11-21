@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fullScreen"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_main_menu">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -87,16 +87,17 @@
                         android:layout_height="wrap_content"
                         android:text="Time"
                         android:textSize="@dimen/small_text_size"
-                        android:layout_above="@+id/time"
+                        android:layout_above="@+id/spnTime"
                         android:textAlignment="center"
                         android:background="@drawable/outline_gradient_gray_background"/>
 
                     <Spinner
-                        android:id="@+id/time"
+                        android:id="@+id/spnTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-                        android:foreground="?attr/selectableItemBackground"/>
+                        android:foreground="?attr/selectableItemBackground">
+                    </Spinner>
 
                 </RelativeLayout>
 

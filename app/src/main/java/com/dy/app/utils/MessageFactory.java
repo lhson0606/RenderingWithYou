@@ -11,26 +11,14 @@ public class MessageFactory {
     private Player player = null;
     private Rival rival = null;
 
-    public Message createChatMessage(String message, int code) {
+    public Message createDataMessage(byte[] data, int code) {
         Message msg = new Message();
-        msg.setType(MessageType.CHAT.ordinal());
-        msg.setSender(player.profile.get(PlayerProfile.KEY_USERNAME).toString());
-        msg.setRecipient(rival.getName());
+        msg.setType(MessageType.DATA_MESSAGE_TYPE);
+        msg.setSender(player.profile.get(PlayerProfile.KEY_USERNAME).toString().getBytes());
+        msg.setRecipient(rival.getName().getBytes());
         msg.setTimestamp(System.currentTimeMillis());
-        msg.setData(message.getBytes());
-        msg.setLength(message.getBytes().length);
-        msg.setCode(code);
-        return msg;
-    }
-
-    public Message createSystemMessage(String message, int code) {
-        Message msg = new Message();
-        msg.setType(MessageType.SYSTEM.ordinal());
-        msg.setSender(player.profile.get(PlayerProfile.KEY_USERNAME).toString());
-        msg.setRecipient(rival.getName());
-        msg.setTimestamp(System.currentTimeMillis());
-        msg.setData(message.getBytes());
-        msg.setLength(message.getBytes().length);
+        msg.setData(data);
+        msg.setLength(data.length);
         msg.setCode(code);
         return msg;
     }

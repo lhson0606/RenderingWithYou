@@ -7,11 +7,9 @@ public class Message {
     private int length;
     private int code;
     private int type;
-    private String sender;
-    private String recipient;
+    private byte[] sender;
+    private byte[] recipient;
     private long timestamp;
-    private int ack;
-    private int seq;
     public Message(){
         this.data = null;
         this.length = 0;
@@ -19,8 +17,6 @@ public class Message {
         this.sender = null;
         this.recipient = null;
         this.timestamp = 0;
-        this.ack = 0;
-        this.seq = 0;
     }
 
     public byte[] getData() {
@@ -47,19 +43,19 @@ public class Message {
         this.type = type;
     }
 
-    public String getSender() {
+    public byte[] getSender() {
         return sender;
     }
 
-    public void setSender(String sender) {
+    public void setSender(byte[] sender) {
         this.sender = sender;
     }
 
-    public String getRecipient() {
+    public byte[] getRecipient() {
         return recipient;
     }
 
-    public void setRecipient(String recipient) {
+    public void setRecipient(byte[] recipient) {
         this.recipient = recipient;
     }
 
@@ -71,21 +67,6 @@ public class Message {
         this.timestamp = timestamp;
     }
 
-    public int getAck() {
-        return ack;
-    }
-
-    public void setAck(int ack) {
-        this.ack = ack;
-    }
-
-    public int getSeq() {
-        return seq;
-    }
-
-    public void setSeq(int seq) {
-        this.seq = seq;
-    }
 
     public int getCode() {
         return code;
@@ -99,13 +80,11 @@ public class Message {
     @Override
     public Object clone() throws CloneNotSupportedException {
         Message msg = new Message();
-        msg.setAck(this.ack);
         msg.setCode(this.code);
         msg.setData(this.data);
         msg.setLength(this.length);
-        msg.setRecipient(new String(this.recipient));
-        msg.setSender(new String(this.sender));
-        msg.setSeq(this.seq);
+        msg.setRecipient(recipient);
+        msg.setSender(sender);
         msg.setTimestamp(this.timestamp);
         msg.setType(this.type);
         return msg;

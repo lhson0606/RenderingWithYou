@@ -22,6 +22,7 @@ public class Player {
     public PlayerStatistics statistics;
     public PlayerPreferences preferences;
     public PlayerPurchase purchase;
+    private boolean isReady = false;
 
     private Player(){
         reset();
@@ -143,4 +144,11 @@ public class Player {
         return res;
     }
 
+    public boolean isReady() {
+        return isReady;
+    }
+
+    public void setReady(boolean ready) {
+        isReady = ready;
+    }
 }

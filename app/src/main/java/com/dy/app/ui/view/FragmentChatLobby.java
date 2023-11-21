@@ -20,6 +20,7 @@ import com.dy.app.core.FragmentCallback;
 import com.dy.app.gameplay.Rival;
 import com.dy.app.manager.ConnectionManager;
 import com.dy.app.network.Message;
+import com.dy.app.network.MessageCode;
 import com.dy.app.utils.MessageFactory;
 import com.vanniktech.emoji.EmojiPopup;
 
@@ -35,6 +36,8 @@ public class FragmentChatLobby extends Fragment
     private EmojiPopup popup;
     private LinearLayout llChat;
     private ScrollView svChat;
+    public static final int ADD_PLAYER_MESSAGE = 0;
+    public static final int ADD_SYSTEM_MESSAGE = 1;
 
     public static FragmentChatLobby newInstance() {
         FragmentChatLobby fragment = new FragmentChatLobby();
@@ -87,12 +90,15 @@ public class FragmentChatLobby extends Fragment
         if(!TAG.equals(ConnectionManager.TAG)) return;
 
         switch (type){
-            case 0:
-                final Message msg = (Message)o1;
-                String chatText = new String(msg.getData(), 0, msg.getLength());
-                addMessageFromPeer(chatText);
+            case ADD_PLAYER_MESSAGE:
+                final String playerMsg = (String)o1;
+                addMessageFromPeer(playerMsg);
                 break;
-            case 1:
+            case ADD_SYSTEM_MESSAGE:
+                final String systemMsg = (String)o1;
+                addSystemMessage(systemMsg);
+                break;
+            case 2:
                 //connection lost
                 break;
         }
@@ -106,14 +112,14 @@ public class FragmentChatLobby extends Fragment
         //scroll down to the last message
         scrollDown();
         //send message to the other player
-        Message o = MessageFactory.getInstance().createChatMessage(chatText, 0);
+        Message o = MessageFactory.getInstance().createDataMessage(chatText.getBytes(), MessageCode.PLAYER_CHAT_MESSAGE_CODE);
         ConnectionManager.getInstance().postMessage(o);
     }
 
     private void addMessageFromPeer(String chatText){
         androidx.emoji.widget.EmojiTextView tv = LayoutInflater.from(getContext()).inflate(R.layout.emoji_text_view, llChat, false).findViewById(R.id.emojiView);
         tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-        final String text = "["+Rival.getInstance().getName() +"]:" +chatText;
+        final String text = "["+Rival.getInstance().getName() +"] " +chatText;
         tv.setText(text);
         llChat.addView(tv);
         //scroll down to the latest message
@@ -129,7 +135,7 @@ public class FragmentChatLobby extends Fragment
         });
     }
 
-    public void addSystemMessage(String s) {
+    private void addSystemMessage(String s) {
         TextView tv = LayoutInflater.from(getContext()).inflate(R.layout.system_text_view, llChat, false).findViewById(R.id.tvMsg);
         tv.setText(s);
         llChat.addView(tv);

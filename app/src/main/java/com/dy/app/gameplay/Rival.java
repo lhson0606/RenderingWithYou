@@ -9,6 +9,7 @@ public class Rival {
     private int backgroundSkinIndex = 0;
     private int tileSkinIndex = 0;
     private int boardSkinIndex = 0;
+    private String name = "Rival";
 
     public boolean isInTurn() {
         return inTurn;
@@ -69,6 +70,10 @@ public class Rival {
     }
 
     public String getName() {
-        return "Rival";
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
