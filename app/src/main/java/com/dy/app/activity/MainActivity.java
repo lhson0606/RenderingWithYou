@@ -404,7 +404,17 @@ public class MainActivity extends FragmentHubActivity
                 finish();
                 break;
             }
+            case 3:{
+                startScriptsGame();
+                break;
+            }
         }
+    }
+
+    private void startScriptsGame(){
+        Intent intent = new Intent(this, RunScriptsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 
     private void startFindingLobby(){

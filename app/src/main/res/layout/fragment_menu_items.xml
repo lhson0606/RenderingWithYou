@@ -12,15 +12,23 @@
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/ltvFindRoom"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:lottie_autoPlay="false"
             app:lottie_loop="false"
             app:lottie_fileName="animated_ui/btn_item_find_room.json"
             android:layout_weight="1"/>
         <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/ltvRunScripts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false"
+            app:lottie_fileName="animated_ui/btn_item_run_scripts.json"
+            android:layout_weight="1"/>
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/ltvCredits"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:lottie_autoPlay="false"
             app:lottie_loop="false"
@@ -28,7 +36,7 @@
             android:layout_weight="1"/>
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/ltvQuit"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:lottie_autoPlay="false"
             app:lottie_loop="false"

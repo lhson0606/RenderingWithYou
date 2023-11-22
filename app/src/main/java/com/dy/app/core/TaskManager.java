@@ -4,12 +4,13 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 
+import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.GameActivity;
 
 import java.util.Vector;
 
 public class TaskManager{
-    private GameActivity activity;
+    private FragmentHubActivity activity;
     private boolean isSet = false;
     private boolean isRunning = false;
     private Vector<Runnable> tasks;
@@ -50,7 +51,7 @@ public class TaskManager{
 
     private static TaskManager instance = null;
 
-    public void setActivity(GameActivity activity) {
+    public void setActivity(FragmentHubActivity activity) {
         if(isSet) return;
         isSet = true;
 

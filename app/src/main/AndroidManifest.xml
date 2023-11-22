@@ -47,6 +47,13 @@
         </activity>
 
         <activity
+            android:name=".activity.RunScriptsActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="true">
+        </activity>
+
+        <activity
             android:name=".activity.MatchMakingActivity"
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden"

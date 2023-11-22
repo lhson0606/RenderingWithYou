@@ -1,6 +1,7 @@
 package com.dy.app.graphic.display;
 
 import android.graphics.drawable.BitmapDrawable;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -48,4 +49,8 @@ public class GameFragment extends Fragment implements FragmentCallback {
     }
 
     private void handleFromCore(int type, Object o1, Object o2){    }
+
+    public GameSurface getSurfaceView() {
+        return surface;
+    }
 }

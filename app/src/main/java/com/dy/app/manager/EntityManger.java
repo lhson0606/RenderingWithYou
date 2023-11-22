@@ -7,18 +7,24 @@ import com.dy.app.gameplay.piece.Piece;
 import org.w3c.dom.Entity;
 
 import java.util.Vector;
+import java.util.concurrent.Semaphore;
 
 public class EntityManger {
 
     private Vector<GameEntity> entities;
-    private Vector<GameEntity> removeList = new Vector<>();
+    private final Semaphore mutex = new Semaphore(1);
 
-    public void reset(){
+    public void cleanUp(){
+        try {
+            mutex.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         for(GameEntity e: entities){
             e.destroy();
         }
         entities.clear();
-        removeList.clear();
+        mutex.release();
     }
 
     public static synchronized EntityManger getInstance(){
@@ -34,21 +40,20 @@ public class EntityManger {
 
     private EntityManger(){
         entities = new Vector<>();
-        removeList = new Vector<>();
     }
 
     private static EntityManger instance = null;
 
-    public Vector<GameEntity> getEntities() {
-//        for(GameEntity e: removeList){
-//            e.destroy();
-//        }
-//        entities.removeAll(removeList);
-//        removeList.clear();
+    public synchronized Vector<GameEntity> getEntities() {
+        try {
+            mutex.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return entities;
     }
 
-    public void removeEntity(GameEntity e) {
-        removeList.add(e);
+    public void releaseMutex() {
+        mutex.release();
     }
 }

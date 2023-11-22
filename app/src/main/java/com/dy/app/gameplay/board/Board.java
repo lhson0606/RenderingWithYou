@@ -77,7 +77,6 @@ public class Board implements GameEntity {
                 tiles[i][j].init();
             }
         }
-        //tiles[0][0].init();
     }
 
     @Override

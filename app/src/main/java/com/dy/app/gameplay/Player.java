@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class Player {
     private boolean inTurn = true;
-    private boolean whitePiece = false;
+    private boolean whitePiece = true;
     private boolean hasLogin = false;
     private boolean isHost;
     private float xp = 0;
@@ -31,7 +31,7 @@ public class Player {
 
     public void reset(){
         inTurn = true;
-        whitePiece = false;
+        whitePiece = true;
         hasLogin = false;
         profile = new PlayerProfile();
         inventory = new PlayerInventory();

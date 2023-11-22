@@ -5,7 +5,7 @@ import com.dy.app.utils.Utils;
 
 public class Rival {
     private boolean inTurn = true;
-    private boolean whitePiece = true;
+    private boolean whitePiece = false;
     private long pieceSkinIndex = 0;
     private long backgroundSkinIndex = 0;
     private long tileSkinIndex = 0;

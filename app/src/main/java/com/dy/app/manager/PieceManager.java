@@ -49,12 +49,10 @@ public class PieceManager {
         }
 
         for(Piece piece : player_pieces){
-            piece.update(0f);
             EntityManger.getInstance().newEntity(piece);
         }
 
         for(Piece piece : enemy_pieces){
-            piece.update(0f);
             EntityManger.getInstance().newEntity(piece);
         }
     }
@@ -193,15 +191,5 @@ public class PieceManager {
 
     private PieceManager(){
 
-    }
-
-    public void removePiece(Piece piece) {
-        if(piece.isOnPlayerSide()){
-            player_pieces.remove(piece);
-        }else{
-            enemy_pieces.remove(piece);
-        }
-
-        EntityManger.getInstance().removeEntity(piece);
     }
 }

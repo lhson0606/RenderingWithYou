@@ -3,8 +3,10 @@ package com.dy.app.core;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 
+import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.activity.GameActivity;
 import com.dy.app.common.maths.Vec3;
+import com.dy.app.core.thread.GameLoop;
 import com.dy.app.gameplay.Player;
 import com.dy.app.gameplay.Rival;
 import com.dy.app.gameplay.board.Board;
@@ -22,7 +24,7 @@ import com.dy.app.utils.DyConst;
 import java.io.IOException;
 
 public class GameCore {
-    private GameActivity gameActivity;
+    private FragmentHubActivity gameActivity;
     private GameSetting gameSetting;
     public static final String TAG = "GameCore";
 
@@ -30,11 +32,10 @@ public class GameCore {
         SET_LOADING_BACKGROUND,
         SET_GAME_SURFACE,
         SET_GAME_BACKGROUND,
+        START_GAME,
     }
 
     private  void init() {
-        EntityManger.getInstance().reset();
-
         gameSetting = new GameSetting();
 
         //background
@@ -43,85 +44,35 @@ public class GameCore {
         gameActivity.onMsgToMain(TAG, -1, TaskType.SET_LOADING_BACKGROUND, bgm.getRandomLoadingBackground());
 
         //assets
-        TaskManager.getInstance().addTask(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            AssetManger.getInstance().loadSkin();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                },
-                "initializing game assets"
-        );
+        try {
+            AssetManger.getInstance().loadSkin();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         //Obj
-        TaskManager.getInstance().addTask(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        ObjManager.getInstance().init();
-                    }
-                },
-                "initializing game objects"
-        );
+        ObjManager.getInstance().init();
 
         //board
-        TaskManager.getInstance().addTask(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        Board.getInstance().newBoard();
-                    }
-                },
-                "initializing game board"
-        );
+        Board.getInstance().newBoard();
 
         //terrain
-        TaskManager.getInstance().addTask(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            EntityManger.getInstance().newEntity(Terrain.newInstance());
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                },
-                "loading terrain"
-        );
+        try {
+            EntityManger.getInstance().newEntity(Terrain.newInstance());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         //load board boundary
 
         //load chess pieces
-        TaskManager.getInstance().addTask(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            PieceManager.getInstance().init();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                },
-                "loading chess pieces"
-        );
+        try {
+            PieceManager.getInstance().init();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-
-        TaskManager.getInstance().addTask(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        startGame();
-                    }
-                },
-                "starting game"
-        );
-
+        startGame();
     }
 
     public static GameCore getInstance() {
@@ -132,13 +83,13 @@ public class GameCore {
 
     private static GameCore instance = null;
 
-    public void setActivity(GameActivity gameActivity) {
+    public void setActivity(FragmentHubActivity gameActivity) {
         if(this.gameActivity == gameActivity) return;
         this.gameActivity = gameActivity;
         instance.init();
     }
 
-    public GameActivity getGameActivity() {
+    public FragmentHubActivity getGameActivity() {
         return gameActivity;
     }
 
@@ -155,5 +106,6 @@ public class GameCore {
         }else{
             Camera.getInstance().setPos(DyConst.default_black_cam_pos);
         }
+        gameActivity.onMsgToMain(TAG, -1, TaskType.START_GAME, null);
     }
 }

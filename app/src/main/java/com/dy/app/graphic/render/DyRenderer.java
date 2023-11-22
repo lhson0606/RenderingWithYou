@@ -9,6 +9,8 @@ import com.dy.app.graphic.display.GameSurface;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.EntityManger;
 
+import java.util.concurrent.Semaphore;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -16,17 +18,20 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     private GameSurface gameSurface;
     private TilePicker tilePicker;
     private boolean pickerIsSet = false;
+    private Semaphore semSurfaceCreated;
 
-    public DyRenderer(GameSurface gameSurface) {
+    public DyRenderer(GameSurface gameSurface, Semaphore semSurfaceCreated) {
         this.gameSurface = gameSurface;
         tilePicker = new TilePicker(0,0);
         gameSurface.setGestureDetector(new GestureDetector(gameSurface.getContext(), tilePicker));
+        this.semSurfaceCreated = semSurfaceCreated;
     }
 
     //private Obj3D test1 = null;
     //private Obj3D test2 = null;
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
         init();
         GLES30.glClearColor ( 255, 255, 255, 1 );
         GLES30.glEnable(GLES30.GL_DEPTH_TEST);
@@ -37,9 +42,11 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     }
 
     private void init() {
+
         for(GameEntity e: EntityManger.getInstance().getEntities()){
             e.init();
         }
+        EntityManger.getInstance().releaseMutex();
     }
 
     @Override
@@ -54,19 +61,10 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
 
     @Override
     public void onDrawFrame(GL10 gl) {
-//        try {
-//            Thread.sleep(1000/60);
-//        } catch (InterruptedException e) {
-//            //
-//        }
         GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
-
-//        for(GameEntity e: EntityManger.getInstance().getEntities()){
-//            e.update(0f);
-//        }
-
         for(GameEntity e: EntityManger.getInstance().getEntities()){
             e.draw();
         }
+        EntityManger.getInstance().releaseMutex();
     }
 }

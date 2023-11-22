@@ -1,27 +1,25 @@
 package com.dy.app.activity;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.app.ProgressDialog;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.view.WindowManager;
+
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.dy.app.R;
 import com.dy.app.core.GameCore;
-import com.dy.app.core.MainCallback;
 import com.dy.app.core.TaskManager;
 import com.dy.app.core.thread.GameLoop;
+import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.graphic.display.GameFragment;
-import com.dy.app.utils.ImageLoader;
 
-public class GameActivity extends FragmentHubActivity
-implements MainCallback {
+import java.io.IOException;
+import java.io.InputStream;
+
+public class RunScriptsActivity extends FragmentHubActivity{
     private ProgressDialog progressDialog;
     private Handler mainHandler;
     private GameFragment gameFragment;
@@ -37,6 +35,26 @@ implements MainCallback {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         mainHandler = new Handler(getMainLooper());
         initCore();
+        runScript("scripts/carlsen_kasparov_2004.pgn");
+    }
+
+    private void runScript(String src) {
+
+        TaskManager.getInstance().addTask(new Runnable() {
+
+            @Override
+            public void run() {
+                InputStream is = null;
+                try {
+                    is = getAssets().open(src);
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                ScriptsRunner runner = new ScriptsRunner(is);
+                runner.start();
+            }
+        }, "initializing core");
     }
 
     @Override
@@ -45,12 +63,7 @@ implements MainCallback {
     }
 
     private void initCore() {
-        TaskManager.getInstance().addTask(new Runnable() {
-            @Override
-            public void run() {
-                GameCore.getInstance().setActivity(GameActivity.this);
-            }
-        }, "initializing core");
+        GameCore.getInstance().setActivity(RunScriptsActivity.this);
     }
 
     @Override
@@ -119,5 +132,4 @@ implements MainCallback {
                 break;
         }
     }
-
 }

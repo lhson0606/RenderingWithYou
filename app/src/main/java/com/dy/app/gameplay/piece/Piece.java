@@ -41,7 +41,6 @@ public class Piece implements GameEntity {
 
     public void showPossibleMoves(){
         for(Tile tile : possibleMoves){
-
             if(tile.hasPiece()){
                 if(!tile.getPiece().isOnPlayerSide())
                     tile.getObj().changeState(Obj3D.State.ENDANGERED);
@@ -78,13 +77,6 @@ public class Piece implements GameEntity {
 
     @Override
     public void update(float dt) {
-        if(isPicking){
-            showPossibleMoves();
-            obj.changeState(Obj3D.State.SELECTED);
-        }else{
-            unhighlightPossibleMoves();
-            obj.changeState(Obj3D.State.NORMAL);
-        }
         updatePossibleMoves();
     }
 
@@ -112,7 +104,6 @@ public class Piece implements GameEntity {
         this.onPlayerSide = onPlayerSide;
         this.possibleMoves = new Vector<Tile>();
         this.pieceColor = pieceColor;
-        updatePossibleMoves();
         EntityManger.getInstance().newEntity(this);
     }
 
@@ -144,22 +135,13 @@ public class Piece implements GameEntity {
         tile.setPiece(this);
 
         tile.getObj().changeState(Obj3D.State.SOURCE);
-        //updatePossibleMoves();
         obj.changeState(Obj3D.State.NORMAL);
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for(GameEntity entity : EntityManger.getInstance().getEntities()){
-                    entity.update(0);
-                }
-            }
-        });
-        t.start();
+
         return oldTile;
     }
 
     public void capture(Piece piece){
-        PieceManager.getInstance().removePiece(piece);
+
     }
 
     public Vector<Tile> getPossibleMoves(){

@@ -1,6 +1,7 @@
 package com.dy.app.graphic.display;
 
 import android.content.Context;
+import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -18,17 +19,21 @@ import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.render.DyRenderer;
 import com.dy.app.utils.DyConst;
 
+import java.util.concurrent.Semaphore;
+
 public class GameSurface extends android.opengl.GLSurfaceView{
+    private final Semaphore semSurfaceCreated = new Semaphore(0);
 
     public GameSurface(Context context) {
         super(context);
         mContext = context;
         setEGLContextClientVersion(3);
-        mRenderer = new DyRenderer(this);
+        mRenderer = new DyRenderer(this, semSurfaceCreated);
         setRenderer(mRenderer);
         mScaleListener = new ScaleListener(Camera.getInstance());
         mScaleDetector = new ScaleGestureDetector(context, mScaleListener);
         setPreserveEGLContextOnPause(true);
+        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     protected Context mContext;
@@ -74,6 +79,10 @@ public class GameSurface extends android.opengl.GLSurfaceView{
     }
     public void setGestureDetector(GestureDetector gestureDetector){
         mGestureDetector = gestureDetector;
+    }
+
+    public void waitForSurfaceToCreate() throws InterruptedException {
+        semSurfaceCreated.acquire();
     }
 
 }
