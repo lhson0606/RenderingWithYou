@@ -28,13 +28,3 @@ void main()
 
 	bToCameraVec = (inverse(uViewMat)*vec4(0.0, 0.0, 0.0, 1.0)).xyz - worldPos.xyz;
 }
-
-//handle texture coords to frag
-//bTexCoords = aTexCoord;
-//handle normal vector: calculate its world position and normalize its
-//bUnitNormalVec = normalize(uModelMat*vec4(aNormalVec, 0.0)).xyz;
-//handle light direction to mesh
-//bToLightDirVec = (uLightModelMat*vec4(uLightPos,1.0)).xyz - worldPos.xyz;
-//handle direction to camera for caculating reflection
-//vec3 cameraPos = (inverse(uViewMat)*vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-//bUnitVecToCameraVec = normalize(cameraPos - worldPos.xyz);

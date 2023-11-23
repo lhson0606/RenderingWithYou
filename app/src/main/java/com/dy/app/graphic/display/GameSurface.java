@@ -17,6 +17,7 @@ import com.dy.app.graphic.listener.ScaleListener;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.render.DyRenderer;
+import com.dy.app.manager.EntityManger;
 import com.dy.app.utils.DyConst;
 
 import java.util.concurrent.Semaphore;
@@ -24,11 +25,11 @@ import java.util.concurrent.Semaphore;
 public class GameSurface extends android.opengl.GLSurfaceView{
     private final Semaphore semSurfaceCreated = new Semaphore(0);
 
-    public GameSurface(Context context) {
+    public GameSurface(Context context, EntityManger entityManger, Board board) {
         super(context);
         mContext = context;
         setEGLContextClientVersion(3);
-        mRenderer = new DyRenderer(this, semSurfaceCreated);
+        mRenderer = new DyRenderer(this, semSurfaceCreated, entityManger, board);
         setRenderer(mRenderer);
         mScaleListener = new ScaleListener(Camera.getInstance());
         mScaleDetector = new ScaleGestureDetector(context, mScaleListener);

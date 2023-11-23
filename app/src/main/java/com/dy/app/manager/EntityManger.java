@@ -27,10 +27,6 @@ public class EntityManger {
         mutex.release();
     }
 
-    public static synchronized EntityManger getInstance(){
-        return instance = (instance == null) ? new EntityManger() : instance;
-    }
-
     public GameEntity newEntity(GameEntity e){
         if(entities.contains(e))
             return e;
@@ -38,11 +34,9 @@ public class EntityManger {
         return e;
     }
 
-    private EntityManger(){
+    public EntityManger(){
         entities = new Vector<>();
     }
-
-    private static EntityManger instance = null;
 
     public synchronized Vector<GameEntity> getEntities() {
         try {

@@ -1,5 +1,6 @@
 package com.dy.app.gameplay.board;
 
+import android.content.Context;
 import android.graphics.Shader;
 
 import com.dy.app.common.maths.Mat4;
@@ -19,12 +20,20 @@ import java.io.IOException;
 
 public class Board implements GameEntity {
     private Tile tiles[][];
+    private final Context context;
+    private final EntityManger entityManger;
+    private final ObjManager objManager;
+    private final AssetManger assetManger;
 
-    private Board(){
+    public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
+        this.context = context;
+        this.entityManger = entityManger;
+        this.objManager = objManager;
+        this.assetManger = assetManger;
 
     }
 
-    public void newBoard(){
+    public void load(){
         tiles = new Tile[DyConst.row_count][DyConst.col_count];
         for(int i = 0; i < DyConst.row_count; i++){
             for(int j = 0; j < DyConst.col_count; j++)
@@ -33,16 +42,16 @@ public class Board implements GameEntity {
             }
 
         }
-        EntityManger.getInstance().newEntity(this);
+        entityManger.newEntity(this);
     }
 
     private void createTile(int i, int j){
-        tiles[i][j] = new Tile(ObjManager.getInstance().getObj(DyConst.tile), new Vec2i(i, j), null);
+        tiles[i][j] = new Tile(objManager.getObj(DyConst.tile), new Vec2i(i, j), null);
 
         try {
             String verCode = null;
-            verCode = ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.tile_ver_glsl_path));
-            String fragCode = ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.tile_frag_glsl_path));
+            verCode = ShaderHelper.getInstance().readShader(context.getAssets().open(DyConst.tile_ver_glsl_path));
+            String fragCode = ShaderHelper.getInstance().readShader(context.getAssets().open(DyConst.tile_frag_glsl_path));
             TileShader shader = new TileShader(verCode, fragCode);
             shader.setTile(tiles[i][j]);
             tiles[i][j].getObj().setShader(shader);
@@ -64,17 +73,13 @@ public class Board implements GameEntity {
         return tiles[pos.x][pos.y];
     }
 
-    public static synchronized Board getInstance(){
-        return instance = (instance == null) ? new Board() : instance;
-    }
-
     private static Board instance = null;
 
     @Override
     public void init() {
         for(int i = 0; i < DyConst.row_count; i++){
             for(int j = 0; j < DyConst.col_count; j++){
-                tiles[i][j].init();
+                tiles[i][j].init(assetManger);
             }
         }
     }

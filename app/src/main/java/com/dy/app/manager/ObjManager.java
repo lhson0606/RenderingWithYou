@@ -1,5 +1,6 @@
 package com.dy.app.manager;
 
+import android.content.Context;
 import android.graphics.Shader;
 
 import com.dy.app.core.GameCore;
@@ -16,12 +17,12 @@ import java.util.Map;
 
 public class ObjManager {
     private Map<String, Obj3D> obj3Ds;
+    private Context context;
 
-    public static ObjManager getInstance(){
-        return instance = (instance == null) ? new ObjManager() : instance;
+    public ObjManager(Context context){
+        obj3Ds = new HashMap<>();
+        this.context = context;
     }
-
-    private static ObjManager instance = null;
 
     public void init(){
         loadPieceModel();
@@ -32,7 +33,7 @@ public class ObjManager {
     private void loadTerrain() {
         String path = Player.getInstance().getTerrainModelPath();
         try{
-            Obj3D terrain = ObjLoader.load(path);
+            Obj3D terrain = ObjLoader.load(context, path);
             obj3Ds.put(DyConst.terrain, terrain);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -42,7 +43,7 @@ public class ObjManager {
     private void loadTile() {
         String path = DyConst.tile_model_path;
         try {
-            Obj3D tile = ObjLoader.load(path);
+            Obj3D tile = ObjLoader.load(context, path);
             tile.setMaterial(DyConst.default_material);
             obj3Ds.put(DyConst.tile, tile);
         } catch (IOException e) {
@@ -54,7 +55,7 @@ public class ObjManager {
         for(String pieceName:DyConst.piece_model){
             String path = DyConst.piece_model_path + pieceName;
             try {
-                Obj3D obj3D =  ObjLoader.load(path);
+                Obj3D obj3D =  ObjLoader.load(context, path);
                 if(pieceName.startsWith(DyConst.king)){
                     obj3Ds.put(DyConst.king, obj3D);
                 }else if(pieceName.startsWith(DyConst.queen)) {
@@ -73,10 +74,6 @@ public class ObjManager {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    public ObjManager(){
-        obj3Ds = new HashMap<>();
     }
 
     public Obj3D getObj(String name){

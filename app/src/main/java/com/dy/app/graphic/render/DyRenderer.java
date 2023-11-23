@@ -4,6 +4,7 @@ import android.opengl.GLES30;
 import android.view.GestureDetector;
 
 import com.dy.app.core.GameEntity;
+import com.dy.app.gameplay.board.Board;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.display.GameSurface;
 import com.dy.app.graphic.listener.TilePicker;
@@ -19,10 +20,14 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     private TilePicker tilePicker;
     private boolean pickerIsSet = false;
     private Semaphore semSurfaceCreated;
+    private Board board;
+    private EntityManger entityManger;
 
-    public DyRenderer(GameSurface gameSurface, Semaphore semSurfaceCreated) {
+    public DyRenderer(GameSurface gameSurface, Semaphore semSurfaceCreated, EntityManger entityManger, Board board) {
+        this.board = board;
+        this.entityManger = entityManger;
         this.gameSurface = gameSurface;
-        tilePicker = new TilePicker(0,0);
+        tilePicker = new TilePicker(0,0, board);
         gameSurface.setGestureDetector(new GestureDetector(gameSurface.getContext(), tilePicker));
         this.semSurfaceCreated = semSurfaceCreated;
     }
@@ -31,22 +36,20 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     //private Obj3D test2 = null;
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
         init();
         GLES30.glClearColor ( 255, 255, 255, 1 );
         GLES30.glEnable(GLES30.GL_DEPTH_TEST);
         GLES30.glEnable(GLES30.GL_BLEND);
         GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA);
         gl.glFrontFace(GL10.GL_CCW);
-
     }
 
     private void init() {
 
-        for(GameEntity e: EntityManger.getInstance().getEntities()){
+        for(GameEntity e: entityManger.getEntities()){
             e.init();
         }
-        EntityManger.getInstance().releaseMutex();
+        entityManger.releaseMutex();
     }
 
     @Override
@@ -62,9 +65,9 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
-        for(GameEntity e: EntityManger.getInstance().getEntities()){
+        for(GameEntity e: entityManger.getEntities()){
             e.draw();
         }
-        EntityManger.getInstance().releaseMutex();
+        entityManger.releaseMutex();
     }
 }

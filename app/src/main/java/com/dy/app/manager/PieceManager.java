@@ -1,5 +1,7 @@
 package com.dy.app.manager;
 
+import android.content.Context;
+
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.core.GameCore;
 import com.dy.app.gameplay.Player;
@@ -17,6 +19,7 @@ import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.shader.PieceShader;
 import com.dy.app.graphic.shader.ShaderHelper;
+import com.dy.app.setting.GameSetting;
 import com.dy.app.utils.DyConst;
 
 import java.io.IOException;
@@ -25,18 +28,29 @@ import java.util.Vector;
 public class PieceManager {
     private Vector<Piece> player_pieces;
     private Vector<Piece> enemy_pieces ;
-    
-    public static synchronized PieceManager getInstance(){
-        return instance = (instance == null) ? new PieceManager() : instance;
-    }
 
     private static PieceManager instance = null;
+    private Context context;
+    private Board board;
+    private ObjManager objManager;
+    private AssetManger assetManger;
+    private EntityManger entityManger;
+    private GameSetting gameSetting;
+
+    public PieceManager(Context context, EntityManger entityManger, Board board, ObjManager objManager, AssetManger assetManger, GameSetting gameSetting){
+        this.entityManger = entityManger;
+        this.context = context;
+        this.board = board;
+        this.objManager = objManager;
+        this.assetManger = assetManger;
+        this.gameSetting = gameSetting;
+    }
 
     public void init() throws IOException {
         Player player = Player.getInstance();
         Rival rival = Rival.getInstance();
-        Skin playerSkin = AssetManger.getInstance().getSkin(AssetManger.SkinType.PLAYER);
-        Skin rivalSkin = AssetManger.getInstance().getSkin(AssetManger.SkinType.RIVAL);
+        Skin playerSkin = assetManger.getSkin(AssetManger.SkinType.PLAYER);
+        Skin rivalSkin = assetManger.getSkin(AssetManger.SkinType.RIVAL);
         boolean playerIsWhite = Player.getInstance().isWhitePiece();
 
 
@@ -49,17 +63,17 @@ public class PieceManager {
         }
 
         for(Piece piece : player_pieces){
-            EntityManger.getInstance().newEntity(piece);
+            entityManger.newEntity(piece);
         }
 
         for(Piece piece : enemy_pieces){
-            EntityManger.getInstance().newEntity(piece);
+            entityManger.newEntity(piece);
         }
     }
 
     private Piece loadSinglePiece(Board board, boolean onPlayerSide, Skin skin, String pieceName, Vec2i pos, Piece.PieceColor pieceColor) throws IOException {
         Tile tile = board.getTile(pos);
-        Obj3D obj = ObjManager.getInstance().getObj(pieceName);
+        Obj3D obj = objManager.getObj(pieceName);
         obj.setModelMat(tile.getObj().getModelMat().clone());
         obj.setTex(skin.getTexture());
         obj.setMaterial(skin.getMaterial());
@@ -72,7 +86,8 @@ public class PieceManager {
                         tile,
                         obj,
                         onPlayerSide,
-                        pieceColor
+                        pieceColor,
+                        board
                 );
                 break;
             case DyConst.rook:
@@ -80,7 +95,8 @@ public class PieceManager {
                         tile,
                         obj,
                         onPlayerSide,
-                        pieceColor
+                        pieceColor,
+                        board
                 );
                 break;
             case DyConst.knight:
@@ -88,7 +104,8 @@ public class PieceManager {
                         tile,
                         obj,
                         onPlayerSide,
-                        pieceColor
+                        pieceColor,
+                        board
                 );
                 break;
             case DyConst.bishop:
@@ -96,7 +113,8 @@ public class PieceManager {
                         tile,
                         obj,
                         onPlayerSide,
-                        pieceColor
+                        pieceColor,
+                        board
                 );
                 break;
             case DyConst.queen:
@@ -104,7 +122,8 @@ public class PieceManager {
                         tile,
                         obj,
                         onPlayerSide,
-                        pieceColor
+                        pieceColor,
+                        board
                 );
                 break;
             case DyConst.king:
@@ -112,7 +131,8 @@ public class PieceManager {
                         tile,
                         obj,
                         onPlayerSide,
-                        pieceColor
+                        pieceColor,
+                        board
                 );
                 break;
         }
@@ -120,8 +140,9 @@ public class PieceManager {
 
         tile.setPiece(piece);
         PieceShader shader = new PieceShader(
-                ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_ver_glsl_path)),
-                ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_frag_glsl_path))
+                ShaderHelper.getInstance().readShader(context.getAssets().open(DyConst.piece_ver_glsl_path)),
+                ShaderHelper.getInstance().readShader(context.getAssets().open(DyConst.piece_frag_glsl_path)),
+                gameSetting
         );
         shader.setPiece(piece);
         piece.getObj().setShader(shader);
@@ -130,7 +151,6 @@ public class PieceManager {
 
     private Vector<Piece> loadBlackPieces(boolean onPlayerSide, Skin skin) throws IOException {
         Vector<Piece> pieces = new Vector<>();
-        Board board = Board.getInstance();
 
         //8 pawns
         for(int i = 0; i<8; i++){
@@ -160,9 +180,8 @@ public class PieceManager {
 
     private Vector<Piece> loadWhitePieces(boolean onPlayerSide, Skin skin) throws IOException {
         Vector<Piece> pieces = new Vector<>();
-        Board board = Board.getInstance();
-        String verCode  = ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_ver_glsl_path));
-        String fragCode = ShaderHelper.getInstance().readShader(GameCore.getInstance().getGameActivity().getAssets().open(DyConst.piece_frag_glsl_path));
+        String verCode  = ShaderHelper.getInstance().readShader(context.getAssets().open(DyConst.piece_ver_glsl_path));
+        String fragCode = ShaderHelper.getInstance().readShader(context.getAssets().open(DyConst.piece_frag_glsl_path));
         //8 pawns
         for(int i = 0; i<8; i++){
             pieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.pawn, new Vec2i(i, 1), Piece.PieceColor.WHITE));

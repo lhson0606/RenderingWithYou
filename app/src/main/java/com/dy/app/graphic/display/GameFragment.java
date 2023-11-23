@@ -1,5 +1,6 @@
 package com.dy.app.graphic.display;
 
+import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -13,22 +14,20 @@ import androidx.fragment.app.Fragment;
 
 import com.dy.app.core.FragmentCallback;
 import com.dy.app.core.GameCore;
+import com.dy.app.gameplay.board.Board;
+import com.dy.app.manager.EntityManger;
 
 public class GameFragment extends Fragment implements FragmentCallback {
     public static final String TAG = "GameFragment";
     private GameSurface surface;
-
-    public static GameFragment newInstance(){
-        return new GameFragment();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         return surface;
     }
 
-    private GameFragment(){
-        surface = new GameSurface(GameCore.getInstance().getGameActivity());
+    public GameFragment(Context context, EntityManger entityManger, Board board){
+        surface = new GameSurface(context, entityManger, board);
     }
 
     @Override

@@ -27,6 +27,12 @@ public class GameCore {
     private FragmentHubActivity gameActivity;
     private GameSetting gameSetting;
     public static final String TAG = "GameCore";
+    private BackgroundManger backgroundManger;
+    private ObjManager objManager;
+    private PieceManager pieceManager;
+    private EntityManger entityManger;
+    private AssetManger assetManger;
+    private Board board;
 
     public enum TaskType{
         SET_LOADING_BACKGROUND,
@@ -35,58 +41,52 @@ public class GameCore {
         START_GAME,
     }
 
-    private  void init() {
+    public GameCore(FragmentHubActivity gameActivity){
+        this.gameActivity = gameActivity;
+    }
+
+    public void init() {
         gameSetting = new GameSetting();
 
+        //entity manager
+        entityManger = new EntityManger();
+
         //background
-        BackgroundManger bgm = BackgroundManger.getInstance();
-        bgm.load_loading_bg(gameActivity);
-        gameActivity.onMsgToMain(TAG, -1, TaskType.SET_LOADING_BACKGROUND, bgm.getRandomLoadingBackground());
+        backgroundManger = new BackgroundManger();
+        backgroundManger.load_loading_bg(gameActivity);
+        gameActivity.onMsgToMain(TAG, -1, TaskType.SET_LOADING_BACKGROUND, backgroundManger.getRandomLoadingBackground());
 
         //assets
+        assetManger = new AssetManger(gameActivity);
         try {
-            AssetManger.getInstance().loadSkin();
+            assetManger.loadSkin();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         //Obj
-        ObjManager.getInstance().init();
+        objManager = new ObjManager(gameActivity);
+        objManager.init();
 
         //board
-        Board.getInstance().newBoard();
+        board = new Board(gameActivity, entityManger, objManager, assetManger);
+        board.load();
 
         //terrain
-        try {
-            EntityManger.getInstance().newEntity(Terrain.newInstance());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Terrain terrain = new Terrain(gameActivity, objManager, assetManger);
+        entityManger.newEntity(terrain);
 
         //load board boundary
 
         //load chess pieces
+        pieceManager = new PieceManager(gameActivity, entityManger, board, objManager, assetManger, gameSetting);
         try {
-            PieceManager.getInstance().init();
+            pieceManager.init();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         startGame();
-    }
-
-    public static GameCore getInstance() {
-        if(instance != null) return instance;
-        instance = new GameCore();
-        return instance;
-    }
-
-    private static GameCore instance = null;
-
-    public void setActivity(FragmentHubActivity gameActivity) {
-        if(this.gameActivity == gameActivity) return;
-        this.gameActivity = gameActivity;
-        instance.init();
     }
 
     public FragmentHubActivity getGameActivity() {
@@ -107,5 +107,29 @@ public class GameCore {
             Camera.getInstance().setPos(DyConst.default_black_cam_pos);
         }
         gameActivity.onMsgToMain(TAG, -1, TaskType.START_GAME, null);
+    }
+
+    public BackgroundManger getBackgroundManger() {
+        return backgroundManger;
+    }
+
+    public ObjManager getObjManager() {
+        return objManager;
+    }
+
+    public PieceManager getPieceManager() {
+        return pieceManager;
+    }
+
+    public EntityManger getEntityManger() {
+        return entityManger;
+    }
+
+    public AssetManger getAssetManger() {
+        return assetManger;
+    }
+
+    public Board getBoard() {
+        return board;
     }
 }

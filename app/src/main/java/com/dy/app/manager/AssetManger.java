@@ -18,6 +18,7 @@ import java.util.Map;
 
 public class AssetManger {
     private Map<SkinType, Skin> skins;
+    Context context;
     public enum SkinType {
         PLAYER,
         RIVAL,
@@ -28,13 +29,9 @@ public class AssetManger {
         TERRAIN_TEXTURE,
     }
 
-    private static AssetManger instance = null;
-
-    public static AssetManger getInstance() {
-        if(instance != null) return instance;
-
-        instance = new AssetManger();
-        return instance;
+    public AssetManger(Context context){
+        this.context = context;
+        skins = new HashMap<>();
     }
 
     public void loadSkin () throws IOException {
@@ -44,7 +41,6 @@ public class AssetManger {
         String black_tile_skin_path = Player.getInstance().getBlackTileSkinPath();
         String white_tile_skin_path = Player.getInstance().getWhiteTileSkinPath();
         String terrain_texture_path = Player.getInstance().getTerrainTexPath();
-        Context context = GameCore.getInstance().getGameActivity().getApplicationContext();
 
         Skin player_skin = new Skin(
                 DyConst.default_material,

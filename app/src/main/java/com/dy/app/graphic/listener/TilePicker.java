@@ -19,10 +19,12 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
     private float width;
     private float height;
     private boolean isPicking = false;
+    private Board board;
 
-    public TilePicker(float w, float h){
+    public TilePicker(float w, float h, Board board){
         width = w;
         height = h;
+        this.board = board;
     }
 
     public static Tile lastTile = null;
@@ -30,7 +32,7 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
     private boolean firstTouch = true;
 
     private void cancelPicking(){
-        lastPiece.isPicking(false);
+        lastPiece.putDown();
         lastPiece = null;
     }
 
@@ -60,7 +62,7 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                                 return false;
 
                             }else{/*is player piece*/
-                                piece.isPicking(true);
+                                piece.pickUp();
                                 lastPiece = piece;
                                 return false;
                             }
@@ -111,7 +113,7 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
         float ground_height = DyConst.board_height;
         float t = (ground_height - ray_origin.y) / ray_wor.y;
         Vec3 intersection = ray_origin.add(ray_wor.multiply(t));
-        return Board.getInstance().getTile(intersection);
+        return board.getTile(intersection);
     }
 
     private Piece getPiece(float mouse_x, float mouse_y){
@@ -144,7 +146,7 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                 if (lastPiece == null) {
                     //do nothing also :)))
                 } else if (lastPiece == piece) {
-                    lastPiece.isPicking(false);
+                    lastPiece.putDown();
                     lastPiece = null;
                 } else {
                     //do nothing also :))))

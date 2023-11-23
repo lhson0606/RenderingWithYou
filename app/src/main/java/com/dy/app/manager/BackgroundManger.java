@@ -19,15 +19,6 @@ public class BackgroundManger {
         loading_bg = new Vector<BitmapDrawable>();
     }
 
-    private static BackgroundManger instance = null;
-
-    public static BackgroundManger getInstance() {
-        if(instance != null) return instance;
-
-        instance = new BackgroundManger();
-        return instance;
-    }
-
     public void load_loading_bg(Context context){
         Integer count = 0;
         while(true){

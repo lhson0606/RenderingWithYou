@@ -10,28 +10,22 @@ import com.dy.app.manager.EntityManger;
 public class GameLoop extends Thread{
     private boolean isRunning = false;
     private GameSurface surfaceView;
-    private final EntityManger entityManger = EntityManger.getInstance();
+    private final EntityManger entityManger;
 
-    public GameLoop(GameSurface surfaceView){
+    public GameLoop(GameSurface surfaceView, EntityManger entityManger){
         this.surfaceView = surfaceView;
+        this.entityManger = entityManger;
     }
 
     @Override
     public void run(){
         isRunning = true;
-        Thread testThread = new Thread(()->{
-            try {
-                Thread.sleep(7000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            shutDown();
-        });
-        testThread.start();
+
         while(isRunning){
             draw();
             update();
         }
+
         cleanUp();
     }
 

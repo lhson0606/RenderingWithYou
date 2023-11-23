@@ -1,7 +1,5 @@
 package com.dy.app.activity;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -9,16 +7,13 @@ import android.app.ProgressDialog;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.view.WindowManager;
 
 import com.dy.app.R;
 import com.dy.app.core.GameCore;
 import com.dy.app.core.MainCallback;
-import com.dy.app.core.TaskManager;
 import com.dy.app.core.thread.GameLoop;
 import com.dy.app.graphic.display.GameFragment;
-import com.dy.app.utils.ImageLoader;
 
 public class GameActivity extends FragmentHubActivity
 implements MainCallback {
@@ -26,6 +21,7 @@ implements MainCallback {
     private Handler mainHandler;
     private GameFragment gameFragment;
     private GameLoop gameLoop;
+    private GameCore gameCore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +29,6 @@ implements MainCallback {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(false);
         setContentView(R.layout.game_activity);
-        TaskManager.getInstance().setActivity(this);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         mainHandler = new Handler(getMainLooper());
         initCore();
@@ -45,12 +40,8 @@ implements MainCallback {
     }
 
     private void initCore() {
-        TaskManager.getInstance().addTask(new Runnable() {
-            @Override
-            public void run() {
-                GameCore.getInstance().setActivity(GameActivity.this);
-            }
-        }, "initializing core");
+        gameCore = new GameCore(this);
+        gameCore.init();
     }
 
     @Override
@@ -68,9 +59,6 @@ implements MainCallback {
             case GameCore.TAG:
                 handleGameCoreMsg(TAG, type, o1, o2);
                 break;
-            case TaskManager.TAG:
-                handleTaskMangerMsg(TAG, type, o1, o2);
-                break;
         }
     }
 
@@ -83,7 +71,7 @@ implements MainCallback {
             case SET_GAME_SURFACE:
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
-                gameFragment = GameFragment.newInstance();
+                gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
                 ft.replace(R.id.fl_game_surface, gameFragment);
                 ft.commit();
                 break;
@@ -91,33 +79,11 @@ implements MainCallback {
                 gameFragment.onMsgFromMain(TAG, t, o1, o2);
                 break;
             case START_GAME:
-                gameLoop = new GameLoop(gameFragment.getSurfaceView());
+                gameLoop = new GameLoop(gameFragment.getSurfaceView(), gameCore.getEntityManger());
                 gameLoop.start();
                 break;
         }
     }
 
-    private void handleTaskMangerMsg(String TAG, int t, Object o1, Object o2){
-        TaskManager.TaskType taskType = (TaskManager.TaskType) o1;
-        switch (taskType){
-            case INIT:
-                break;
-            case START:
-                break;
-            case UPDATE:
-                progressDialog.setMessage((String) o2);
-                break;
-            case END:
-                break;
-            case SHOW_DIALOG:
-                if(!progressDialog.isShowing()){
-                    //progressDialog.show();
-                }
-                break;
-            case DISMISS_DIALOG:
-                progressDialog.dismiss();
-                break;
-        }
-    }
 
 }

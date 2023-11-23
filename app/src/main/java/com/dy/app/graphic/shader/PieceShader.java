@@ -10,15 +10,18 @@ import com.dy.app.core.GameCore;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.Light;
 import com.dy.app.graphic.camera.Camera;
+import com.dy.app.setting.GameSetting;
 import com.dy.app.utils.GLHelper;
 import com.dy.app.utils.ObjLoader;
 
 public class PieceShader extends Obj3DShader{
     public static final String TAG = "Shader";
     private Piece mPiece = null;
+    private GameSetting gameSetting;
 
-    public PieceShader(String verCode, String fragCode){
+    public PieceShader(String verCode, String fragCode, GameSetting gameSetting){
         super(verCode, fragCode);
+        this.gameSetting = gameSetting;
     }
 
     public void setPiece(Piece piece){
@@ -28,7 +31,7 @@ public class PieceShader extends Obj3DShader{
 
     @Override
     public PieceShader clone(){
-        PieceShader shader = new PieceShader(mVerCode, mFragCode);
+        PieceShader shader = new PieceShader(mVerCode, mFragCode, gameSetting);
         shader.setPiece(null);
         return shader;
     }
@@ -37,10 +40,10 @@ public class PieceShader extends Obj3DShader{
     public void loadUniforms(){
         //load uniforms
         super.loadUniforms();
-        loadLight(GameCore.getInstance().getGameSetting().getLight());
+        loadLight(gameSetting.getLight());
         loadShineDamper(mPiece.getObj().getMaterial().getLightDamper());
         loadReflectivity(mPiece.getObj().getMaterial().getReflectivity());
-        loadAmbient(GameCore.getInstance().getGameSetting().getAmbientFactor());
+        loadAmbient(gameSetting.getAmbientFactor());
         loadHighlightColor(mPiece.getObj().getHighlightColor());
     }
 

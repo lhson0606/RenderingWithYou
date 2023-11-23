@@ -5,6 +5,7 @@ import android.util.Log;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.notation.ChessNotation;
 import com.dy.app.graphic.model.Obj3D;
 
 import java.util.Vector;
@@ -12,8 +13,8 @@ import java.util.Vector;
 public class Pawn extends Piece{
     boolean hasMoved = false;
 
-    public Pawn(Tile tile, Obj3D obj, boolean onPlayerSide, PieceColor pieceColor){
-        super(tile, obj, onPlayerSide, pieceColor);
+    public Pawn(Tile tile, Obj3D obj, boolean onPlayerSide, PieceColor pieceColor, Board board){
+        super(tile, obj, onPlayerSide, pieceColor, board);
     }
 
     @Override
@@ -35,7 +36,6 @@ public class Pawn extends Piece{
 
     private void getPossibleMovesBlack(){
         Vec2i pos = tile.pos;
-        Board board = Board.getInstance();
         Tile tile = null;
 
         //check if pawn is on the edge of the board
@@ -75,7 +75,6 @@ public class Pawn extends Piece{
 
     private void getPossibleMovesWhite(){
         Vec2i pos = tile.pos;
-        Board board = Board.getInstance();
         Tile tile = null;
 
         if(pos.y>6){
@@ -109,5 +108,10 @@ public class Pawn extends Piece{
                 possibleMoves.add(tile);
             }
         }
+    }
+
+    @Override
+    public String getNotation(){
+        return ChessNotation.PAWN;
     }
 }

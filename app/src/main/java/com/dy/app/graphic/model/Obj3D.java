@@ -49,10 +49,10 @@ public class Obj3D implements Cloneable{
         this.modelMat = Mat4.createIdentityMatrix();
         highlightColors = new java.util.HashMap<>();
         highlightColors.put(State.NORMAL, new Vec4(0, 0, 0, 0));
-        highlightColors.put(State.HIGHLIGHTED, new Vec4(1, 1, 0, 0.3f));
-        highlightColors.put(State.SELECTED, new Vec4(0, 1, 0, 0.3f));
-        highlightColors.put(State.SOURCE, new Vec4(0, 0, 1, 0.3f));
-        highlightColors.put(State.ENDANGERED, new Vec4(1, 0, 0, 0.3f));
+        highlightColors.put(State.HIGHLIGHTED, new Vec4(1, 1, 0, 0.1f));
+        highlightColors.put(State.SELECTED, new Vec4(0, 1, 0, 0.1f));
+        highlightColors.put(State.SOURCE, new Vec4(0, 0, 1, 0.1f));
+        highlightColors.put(State.ENDANGERED, new Vec4(1, 0, 0, 0.1f));
         highlightColor = highlightColors.get(State.NORMAL);
     }
 
@@ -143,6 +143,11 @@ public class Obj3D implements Cloneable{
     }
 
     public void translate(Vec3 translation){
+        Matrix.translateM(modelMat.mData, modelMat.mOffset, translation.x, translation.y, translation.z);
+    }
+
+    public void setTranslation(Vec3 translation){
+        Matrix.setIdentityM(modelMat.mData, modelMat.mOffset);
         Matrix.translateM(modelMat.mData, modelMat.mOffset, translation.x, translation.y, translation.z);
     }
 

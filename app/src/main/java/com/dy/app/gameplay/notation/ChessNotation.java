@@ -4,12 +4,12 @@ import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.piece.King;
 
 public class ChessNotation {
-    public static final String King = "K";
-    public static final String Queen = "Q";
-    public static final String Bishop = "B";
-    public static final String Knight = "N";
-    public static final String Rook = "R";
-    public static final String Pawn = "";
+    public static final String KING = "K";
+    public static final String QUEEN = "Q";
+    public static final String BISHOP = "B";
+    public static final String KNIGHT = "N";
+    public static final String ROOK = "R";
+    public static final String PAWN = "";
     public static final String BoardPositions[][]={
             {"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1"},
             {"a2", "b2", "c2", "d2", "e2", "f2", "g2", "h2"},

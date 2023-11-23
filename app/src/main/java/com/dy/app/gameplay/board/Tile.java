@@ -6,6 +6,7 @@ import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.core.GameCore;
+import com.dy.app.gameplay.notation.ChessNotation;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.Material;
 import com.dy.app.graphic.Skin;
@@ -56,7 +57,7 @@ public class Tile {
     }
 
     public Vec3 getWorldPos(){
-        return new Vec3(pos.x, DyConst.board_height, pos.y);
+        return getOffSet(pos.x, pos.y);
     }
 
     public Obj3D getObj(){
@@ -64,14 +65,14 @@ public class Tile {
     }
 
 
-    public void init(){
+    public void init(AssetManger assetManger){
         Skin skin = null;
         if((pos.x + pos.y)%2 == 0){
             color = TileColor.WHITE;
-            skin = AssetManger.getInstance().getSkin(AssetManger.SkinType.WHITE_TILE);
+            skin = assetManger.getSkin(AssetManger.SkinType.WHITE_TILE);
         }else{
             color = TileColor.BLACK;
-            skin = AssetManger.getInstance().getSkin(AssetManger.SkinType.BLACK_TILE);
+            skin = assetManger.getSkin(AssetManger.SkinType.BLACK_TILE);
         }
 
         Texture tex = new Texture(skin.getBitmap());
@@ -84,10 +85,19 @@ public class Tile {
     }
 
     public static Vec3 getOffSet(int x, int y){
-        return new Vec3(DyConst.tile_size*(x -4+ 0.5f) , 0, DyConst.tile_size*(y -4+ 0.5f));
+        //mobile x value is left to right, z value is top to bottom
+        return new Vec3(DyConst.tile_size*(x -3.5f) , 0, DyConst.tile_size*(y - 3.5f));
     }
 
     public static Vec2i getTilePos(Vec3 pos){
-        return new Vec2i((int)(pos.x/DyConst.tile_size + 4), (int)(pos.z/DyConst.tile_size + 4));
+        //mobile x value is left to right, z value is top to bottom
+        //we have use Math.floor() here, say we picked a tile at (-4.9, -4.9), we want to get (-5, -5) instead of (-4, -4)
+        //explain when we don't use floor(), if we pick a tile at (-4.9, -4.9) => (-4, -4), offset by (4, 4) => (-0, -0) => (0, 0) which is a valid tile => wrong since our first tile is from (-3.0, 3.0) -> (-3.999, -3.999)
+        //there is no tile at (-4.9, -4.9)
+        return new Vec2i((int)Math.floor(pos.x/DyConst.tile_size + 4), (int)Math.floor(pos.z/DyConst.tile_size + 4));
+    }
+
+    public String getNotation(){
+        return ChessNotation.BoardPositions[pos.x][pos.y];
     }
 }
