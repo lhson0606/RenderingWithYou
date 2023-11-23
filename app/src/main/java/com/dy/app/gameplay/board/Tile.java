@@ -86,7 +86,7 @@ public class Tile {
 
     public static Vec3 getOffSet(int x, int y){
         //mobile x value is left to right, z value is top to bottom
-        return new Vec3(DyConst.tile_size*(x -3.5f) , 0, DyConst.tile_size*(y - 3.5f));
+        return new Vec3(DyConst.tile_size*(x - 3.5f) , 0, DyConst.tile_size*(y - 3.5f));
     }
 
     public static Vec2i getTilePos(Vec3 pos){

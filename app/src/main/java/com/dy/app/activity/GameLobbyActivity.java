@@ -8,18 +8,16 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.dy.app.R;
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.PlayerInventory;
-import com.dy.app.gameplay.PlayerProfile;
-import com.dy.app.gameplay.Rival;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerInventory;
+import com.dy.app.gameplay.player.PlayerProfile;
+import com.dy.app.gameplay.player.Rival;
 import com.dy.app.manager.ConnectionManager;
 import com.dy.app.manager.UIManager;
 import com.dy.app.network.IMessageHandler;

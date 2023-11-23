@@ -138,7 +138,7 @@ public class Obj3D implements Cloneable{
         this.modelMat = modelMat;
     }
 
-    public void changeState(State state){
+    public synchronized void changeState(State state){
         highlightColor = highlightColors.get(state);
     }
 

@@ -1,9 +1,9 @@
 package com.dy.app.utils;
 
 
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.Rival;
-import com.dy.app.gameplay.PlayerProfile;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.Rival;
+import com.dy.app.gameplay.player.PlayerProfile;
 import com.dy.app.network.Message;
 import com.dy.app.network.MessageType;
 

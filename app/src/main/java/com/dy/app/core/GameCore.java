@@ -1,16 +1,8 @@
 package com.dy.app.core;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-
 import com.dy.app.activity.FragmentHubActivity;
-import com.dy.app.activity.GameActivity;
-import com.dy.app.common.maths.Vec3;
-import com.dy.app.core.thread.GameLoop;
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.Rival;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.board.Board;
-import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.terrain.Terrain;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.manager.AssetManger;

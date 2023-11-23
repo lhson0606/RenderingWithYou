@@ -27,12 +27,16 @@ public class Piece implements GameEntity {
     private Tile srcTile, dstTile = null;
 
     public void pickUp() {
-        isPicking = true;
+        synchronized (this){
+            isPicking = true;
+        }
     }
 
     public void putDown(){
-        isPicking = false;
-        unhighlightPossibleMoves();
+        synchronized (this){
+            isPicking = false;
+            unhighlightPossibleMoves();
+        }
     }
 
     public enum PieceColor{
@@ -49,20 +53,22 @@ public class Piece implements GameEntity {
     }
 
     public void showPossibleMoves(){
-        for(Tile tile : possibleMoves){
-            if(tile.hasPiece()){
-                if(!tile.getPiece().isOnPlayerSide())
-                    tile.getObj().changeState(Obj3D.State.ENDANGERED);
-            }else{
-                tile.getObj().changeState(Obj3D.State.SELECTED);
+        synchronized (this){
+            for(Tile tile : possibleMoves){
+                if(tile.hasPiece()){
+                    if(!tile.getPiece().isOnPlayerSide())
+                        tile.getObj().changeState(Obj3D.State.ENDANGERED);
+                }else{
+                    tile.getObj().changeState(Obj3D.State.SELECTED);
+                }
             }
-        }
 
-        obj.changeState(Obj3D.State.SELECTED);
-        tile.getObj().changeState(Obj3D.State.SELECTED);
+            obj.changeState(Obj3D.State.SELECTED);
+            tile.getObj().changeState(Obj3D.State.SELECTED);
+        }
     }
 
-    public  void unhighlightPossibleMoves(){
+    private void unhighlightPossibleMoves(){
         for(Tile tile : possibleMoves){
             tile.getObj().changeState(Obj3D.State.NORMAL);
         }
@@ -72,10 +78,6 @@ public class Piece implements GameEntity {
     }
 
     private PieceColor pieceColor;
-
-    public void setPieceColor(PieceColor pieceColor){
-        this.pieceColor = pieceColor;
-    }
 
     public boolean isBlack(){
         return pieceColor == PieceColor.BLACK;
@@ -87,22 +89,25 @@ public class Piece implements GameEntity {
 
     @Override
     public void init() {
-        obj.init();
+        synchronized (this){
+            obj.init();
+        }
     }
 
     @Override
     public void update(float dt) {
-        if(!isDoingAnimation){
-            updatePossibleMoves();
+        synchronized (this){
+            if(!isDoingAnimation){
+                updatePossibleMoves();
 
-            if(isPicking) {
-                showPossibleMoves();
+                if(isPicking) {
+                    showPossibleMoves();
+                }
+            } else {
+                //do animation
+                doAnimation(dt);
             }
-        } else {
-            //do animation
-            doAnimation(dt);
         }
-
     }
 
     private float fCurrentAnimationTime = 0f;
@@ -144,37 +149,24 @@ public class Piece implements GameEntity {
     }
 
     public Tile move(Vec2i pos){
-        //perform move
-        tile.setPiece(null);
-        tile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
-        Tile newTile = board.getTile(pos);
-        Tile oldTile = tile;
+        synchronized (this){
+            //perform move
+            tile.setPiece(null);
+            tile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
+            Tile newTile = board.getTile(pos);
+            Tile oldTile = tile;
 
-        tile.setPiece(null);
-        tile = newTile;
-        //check if there is a piece to capture
-        if(tile.getPiece() != null){
-            capture(tile.getPiece());
+            tile.setPiece(null);
+            tile = newTile;
+            //check if there is a piece to capture
+            if(tile.getPiece() != null){
+                capture(tile.getPiece());
+            }
+            tile.setPiece(this);
+            startMoveAnimation(oldTile, newTile);
+
+            return tile;
         }
-        tile.setPiece(this);
-
-
-        //tile.getObj().changeState(Obj3D.State.SOURCE);
-        //this go to on animation finished
-//        if(tile.getPiece() != null){
-//            capture(tile.getPiece());
-//        }
-//
-//        Vec2i trans = new Vec2i(pos.x - oldTile.pos.x, pos.y - oldTile.pos.y);
-//        Vec3 translation = new Vec3(trans.x* DyConst.tile_size, 0, trans.y*DyConst.tile_size);
-//        obj.translate(translation);
-//        tile.setPiece(this);
-//        tile.getObj().changeState(Obj3D.State.SOURCE);
-//        obj.changeState(Obj3D.State.NORMAL);
-        //start animation
-        startMoveAnimation(oldTile, newTile);
-
-        return tile;
     }
 
     private void doAnimation(float dt){
@@ -213,7 +205,7 @@ public class Piece implements GameEntity {
         this.dstTile = dstTile;
     }
 
-    public void capture(Piece piece){
+    private void capture(Piece piece){
 
     }
 

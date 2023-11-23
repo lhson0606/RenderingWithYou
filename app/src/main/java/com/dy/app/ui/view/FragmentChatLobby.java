@@ -11,13 +11,12 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.emoji.widget.EmojiTextView;
 import androidx.fragment.app.Fragment;
 
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.core.FragmentCallback;
-import com.dy.app.gameplay.Rival;
+import com.dy.app.gameplay.player.Rival;
 import com.dy.app.manager.ConnectionManager;
 import com.dy.app.network.Message;
 import com.dy.app.network.MessageCode;

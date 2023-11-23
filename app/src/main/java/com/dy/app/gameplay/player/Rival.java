@@ -1,4 +1,4 @@
-package com.dy.app.gameplay;
+package com.dy.app.gameplay.player;
 
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;

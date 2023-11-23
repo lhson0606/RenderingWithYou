@@ -14,10 +14,10 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.PlayerInventory;
-import com.dy.app.gameplay.PlayerProfile;
-import com.dy.app.gameplay.PlayerPurchase;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerInventory;
+import com.dy.app.gameplay.player.PlayerProfile;
+import com.dy.app.gameplay.player.PlayerPurchase;
 import com.dy.app.gameplay.shop.Shop;
 import com.dy.app.gameplay.shop.ShopItem;
 import com.dy.app.utils.ShopBundleFactory;

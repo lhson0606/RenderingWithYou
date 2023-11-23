@@ -7,12 +7,11 @@ import android.view.View;
 
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.common.maths.Vec4;
-import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.camera.Camera;
-import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.utils.DyConst;
 
 public class TilePicker extends GestureDetector.SimpleOnGestureListener implements View.OnTouchListener {

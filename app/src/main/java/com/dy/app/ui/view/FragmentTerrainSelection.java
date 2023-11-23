@@ -1,7 +1,6 @@
 package com.dy.app.ui.view;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,14 +13,12 @@ import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.dy.app.R;
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.PlayerInventory;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerInventory;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 public class FragmentTerrainSelection extends Fragment

@@ -1,15 +1,12 @@
 package com.dy.app.db;
 
-import android.util.Log;
-
-import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.ui.view.FragmentCreateAccount;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.Map;

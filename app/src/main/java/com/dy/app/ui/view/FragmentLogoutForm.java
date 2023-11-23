@@ -14,8 +14,8 @@ import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.core.FragmentCallback;
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.PlayerProfile;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerProfile;
 
 public class FragmentLogoutForm extends Fragment
         implements View.OnClickListener, FragmentCallback {

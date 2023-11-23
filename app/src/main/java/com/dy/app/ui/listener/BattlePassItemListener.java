@@ -1,24 +1,20 @@
 package com.dy.app.ui.listener;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 
 import androidx.fragment.app.FragmentActivity;
-import androidx.paging.LoadState;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.db.Database;
-import com.dy.app.gameplay.BattlePass;
+import com.dy.app.gameplay.player.BattlePass;
 import com.dy.app.gameplay.item.ItemInfo;
 import com.dy.app.manager.ItemsFinder;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.ui.dialog.LoadingDialog;
 import com.dy.app.ui.dialog.OpenChestDialog;
-import com.dy.app.utils.GameItemsUtils;
 import com.dy.app.utils.Utils;
 
 public class BattlePassItemListener implements View.OnClickListener{

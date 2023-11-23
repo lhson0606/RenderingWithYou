@@ -1,8 +1,6 @@
 package com.dy.app.activity;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -14,13 +12,12 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
-import com.dy.app.gameplay.BattlePass;
-import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.player.BattlePass;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.ui.listener.BattlePassItemListener;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 

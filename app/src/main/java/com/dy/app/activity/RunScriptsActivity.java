@@ -46,7 +46,7 @@ public class RunScriptsActivity extends FragmentHubActivity{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        ScriptsRunner runner = new ScriptsRunner(is);
+        ScriptsRunner runner = new ScriptsRunner(is, gameCore.getBoard());
         runner.start();
     }
 

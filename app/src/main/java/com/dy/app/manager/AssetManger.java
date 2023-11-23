@@ -1,18 +1,15 @@
 package com.dy.app.manager;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 
-import com.dy.app.core.GameCore;
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.Rival;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.Material;
 import com.dy.app.graphic.Skin;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.GLHelper;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 

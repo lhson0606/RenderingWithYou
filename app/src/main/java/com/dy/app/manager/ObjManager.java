@@ -1,13 +1,9 @@
 package com.dy.app.manager;
 
 import android.content.Context;
-import android.graphics.Shader;
 
-import com.dy.app.core.GameCore;
-import com.dy.app.gameplay.Player;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.graphic.model.Obj3D;
-import com.dy.app.graphic.shader.PieceShader;
-import com.dy.app.graphic.shader.ShaderHelper;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.ObjLoader;
 

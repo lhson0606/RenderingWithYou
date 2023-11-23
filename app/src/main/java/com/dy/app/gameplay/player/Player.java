@@ -1,4 +1,4 @@
-package com.dy.app.gameplay;
+package com.dy.app.gameplay.player;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

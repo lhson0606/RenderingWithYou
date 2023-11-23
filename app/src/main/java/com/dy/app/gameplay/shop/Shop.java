@@ -1,11 +1,10 @@
 package com.dy.app.gameplay.shop;
 
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.PlayerPurchase;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerPurchase;
 import com.dy.app.gameplay.item.GameItem;
 
 import java.util.Vector;
-import java.util.regex.Pattern;
 
 public class Shop {
     Vector<ShopItem> shopItems;

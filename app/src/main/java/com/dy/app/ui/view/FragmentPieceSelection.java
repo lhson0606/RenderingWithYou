@@ -1,30 +1,25 @@
 package com.dy.app.ui.view;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.daimajia.slider.library.SliderLayout;
-import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.dy.app.R;
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.PlayerInventory;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerInventory;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class FragmentPieceSelection extends Fragment
 implements View.OnClickListener, ViewPagerEx.OnPageChangeListener {

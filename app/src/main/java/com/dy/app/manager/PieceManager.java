@@ -3,9 +3,8 @@ package com.dy.app.manager;
 import android.content.Context;
 
 import com.dy.app.common.maths.Vec2i;
-import com.dy.app.core.GameCore;
-import com.dy.app.gameplay.Player;
-import com.dy.app.gameplay.Rival;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.Rival;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.piece.Bishop;
