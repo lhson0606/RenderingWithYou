@@ -49,15 +49,18 @@ public class Piece implements GameEntity {
     }
 
     protected void updatePossibleMoves(){
-        possibleMoves.clear();
+        synchronized (this){
+            possibleMoves.clear();
+        }
     }
 
     public void showPossibleMoves(){
         synchronized (this){
             for(Tile tile : possibleMoves){
                 if(tile.hasPiece()){
-                    if(!tile.getPiece().isOnPlayerSide())
+                    if(!tile.getPiece().isTheSameColor(this)) {
                         tile.getObj().changeState(Obj3D.State.ENDANGERED);
+                    }
                 }else{
                     tile.getObj().changeState(Obj3D.State.SELECTED);
                 }
@@ -210,7 +213,9 @@ public class Piece implements GameEntity {
     }
 
     public Vector<Tile> getPossibleMoves(){
-        return possibleMoves;
+        synchronized (this){
+            return possibleMoves;
+        }
     }
 
     public String getNotation(){

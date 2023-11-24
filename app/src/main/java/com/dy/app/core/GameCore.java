@@ -78,6 +78,8 @@ public class GameCore {
             throw new RuntimeException(e);
         }
 
+        board.setPieceManager(pieceManager);
+
         startGame();
     }
 

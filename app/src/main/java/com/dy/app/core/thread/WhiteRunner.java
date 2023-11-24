@@ -35,7 +35,7 @@ public class WhiteRunner extends Thread{
                 throw new RuntimeException(e);
             }
 
-            if(i>1) break;
+            if(i>7) break;
             currentMove = moves.get(i);
             i++;
             String moveData = currentMove.white;
@@ -47,18 +47,32 @@ public class WhiteRunner extends Thread{
     }
 
     private void performMove(String moveData) {
-        ChessMove move = new ChessMove(true, moveData, board);
+        ChessMove move = null;
+        try {
+            move = new ChessMove(true, moveData, board);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Tile srcTile = move.getSrcTile();
         Piece piece = srcTile.getPiece();
-        piece.pickUp();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        Tile desTile = move.getDesTile();
+        piece.pickUp();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         piece.putDown();
-        piece.move(desTile.pos);
+        //piece.move(desTile.pos);
+        try {
+            board.moveByNotation(moveData, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void stopRunning(){

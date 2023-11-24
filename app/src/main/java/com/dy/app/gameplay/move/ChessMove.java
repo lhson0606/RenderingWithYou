@@ -3,22 +3,26 @@ package com.dy.app.gameplay.move;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.piece.Piece;
+
+import java.util.Vector;
 
 public class ChessMove {
-    private String move;
+    private String moveNotation;
     private Board board;
     private Vec2i srcTilePos;
     private Vec2i desTilePos;
     private boolean isWhiteMove;
 
-    public ChessMove(boolean isWhiteMove, String move, Board board){
-        this.move = move;
+    public ChessMove(boolean isWhiteMove, String move, Board board) throws Exception {
+        this.moveNotation = move;
         this.board = board;
         this.isWhiteMove = isWhiteMove;
         interpretMove();
     }
 
-    private void interpretMove() {
+    private void interpretMove() throws Exception {
         if(isWhiteMove){
             interpretWhiteMove();
         }else{
@@ -26,18 +30,79 @@ public class ChessMove {
         }
     }
 
-    private void interpretWhiteMove(){
-        if(move.length() == 2) {
-            desTilePos = new Vec2i(7 - (move.charAt(0) - 'a'), move.charAt(1) - '1');
-            srcTilePos = new Vec2i(7 - (move.charAt(0) - 'a'), 1);
+    private Piece getWhitePieceNotation() throws Exception{
+        Piece result = null;
+
+        for(int i = 0; i<3 ;i++){
+            String notation = null;
+            String desNotation = null;
+
+            notation = moveNotation.substring(0, i);
+            //dest notation is the next 2 chars
+            try{
+                desNotation = moveNotation.substring(i, i+2);
+            }catch (StringIndexOutOfBoundsException e) {
+                continue;
+            }
+
+            if(notation == null || desNotation == null) continue;
+
+            if(desNotation.charAt(0) - 'a' < 0 || desNotation.charAt(0) - 'a' > 7) continue;
+            if(desNotation.charAt(1) - '1' < 0 || desNotation.charAt(1) - '1' > 7) continue;
+
+            desTilePos = new Vec2i(7 - (desNotation.charAt(0) - 'a'), desNotation.charAt(1) - '1');
+            Vector<Piece> pieces = board.getWhitePiecesByNotation(notation, board.getTile(desTilePos));
+
+            if(pieces.size() == 1){
+                result = pieces.get(0);
+                return result;
+            }
         }
+
+        throw new Exception("Invalid move");
     }
 
-    private void interpretBlackMove(){
-        if(move.length() == 2) {
-            desTilePos = new Vec2i(7 - (move.charAt(0) - 'a'), move.charAt(1) - '1');
-            srcTilePos = new Vec2i(7 - (move.charAt(0) - 'a'), 6);
+    private Piece getBlackPieceNotation() throws Exception{
+        Piece result = null;
+
+        for(int i = 0; i<3 ;i++){
+            String notation = null;
+            String desNotation = null;
+
+            notation = moveNotation.substring(0, i);
+            //dest notation is the next 2 chars
+            try{
+                desNotation = moveNotation.substring(i, i+2);
+            }catch (StringIndexOutOfBoundsException e) {
+                continue;
+            }
+
+
+            if(notation == null || desNotation == null) continue;
+
+            if(desNotation.charAt(0) - 'a' < 0 || desNotation.charAt(0) - 'a' > 7) continue;
+            if(desNotation.charAt(1) - '1' < 0 || desNotation.charAt(1) - '1' > 7) continue;
+
+            desTilePos = new Vec2i(7 - (desNotation.charAt(0) - 'a'), desNotation.charAt(1) - '1');
+            Vector<Piece> pieces = board.getBlackPiecesByNotation(notation, board.getTile(desTilePos));
+
+            if(pieces.size() == 1){
+                result = pieces.get(0);
+                return result;
+            }
         }
+
+        throw new Exception("Invalid move");
+    }
+
+    private void interpretWhiteMove() throws Exception{
+        moveNotation = moveNotation.replace("x", "");
+        srcTilePos = getWhitePieceNotation().getTile().pos;
+    }
+
+    private void interpretBlackMove() throws Exception{
+        moveNotation = moveNotation.replace("x", "");
+        srcTilePos = getBlackPieceNotation().getTile().pos;
     }
 
     public Tile getSrcTile(){

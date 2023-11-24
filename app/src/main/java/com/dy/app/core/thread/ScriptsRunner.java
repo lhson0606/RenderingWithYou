@@ -2,7 +2,11 @@ package com.dy.app.core.thread;
 
 import android.util.Log;
 
+import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
+import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.graphic.model.Obj3D;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,6 +36,8 @@ public class ScriptsRunner extends Thread{
 
     @Override
     public void run() {
+        Tile t= board.getTile(new Vec2i(4, 3));
+        t.getObj().changeState(Obj3D.State.SELECTED);
         try {
             parsePGN();
         } catch (IOException e) {

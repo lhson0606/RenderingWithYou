@@ -2,21 +2,29 @@ package com.dy.app.gameplay.board;
 
 import android.content.Context;
 import android.graphics.Shader;
+import android.util.Log;
 
+import com.airbnb.lottie.L;
 import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.core.GameCore;
 import com.dy.app.core.GameEntity;
+import com.dy.app.gameplay.move.ChessMove;
+import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.camera.Camera;
+import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.shader.ShaderHelper;
 import com.dy.app.graphic.shader.TileShader;
 import com.dy.app.manager.AssetManger;
 import com.dy.app.manager.EntityManger;
 import com.dy.app.manager.ObjManager;
+import com.dy.app.manager.PieceManager;
 import com.dy.app.utils.DyConst;
 
 import java.io.IOException;
+import java.util.Vector;
 
 public class Board implements GameEntity {
     private Tile tiles[][];
@@ -24,13 +32,17 @@ public class Board implements GameEntity {
     private final EntityManger entityManger;
     private final ObjManager objManager;
     private final AssetManger assetManger;
+    private PieceManager pieceManager;
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
         this.context = context;
         this.entityManger = entityManger;
         this.objManager = objManager;
         this.assetManger = assetManger;
+    }
 
+    public void setPieceManager(PieceManager pieceManager){
+        this.pieceManager = pieceManager;
     }
 
     public void load(){
@@ -104,5 +116,151 @@ public class Board implements GameEntity {
             for(int j = 0; j < DyConst.col_count; j++)
                 tiles[i][j].getObj().destroy();
         }
+    }
+
+    private Tile prevSrcTile = null;
+    private Tile prevDesTile = null;
+
+    public Vector<Piece> getWhitePiecesByNotation(String pieceNotation, Tile des){
+        Vector<Piece> pieces = pieceManager.getWhitePieces();
+
+        Vector<Piece> result = new Vector<>();
+
+        if(pieceNotation.length() == 0){
+            //can only be pawn
+            for(Piece piece : pieces){
+                if(piece.getPossibleMoves().contains(des) && piece.getNotation().equals(ChessNotation.PAWN)){
+                    result.add(piece);
+                }
+
+                if(piece.tilePos().x == 4 && piece.tilePos().y == 1){
+                    Log.d("pawn", "pawn");
+                }
+            }
+            return result;
+        }else if(pieceNotation.length() == 1){
+            //can be any piece name
+            for(Piece piece : pieces){
+                if(piece.getNotation().equals(pieceNotation) && piece.getPossibleMoves().contains(des)){
+                    result.add(piece);
+                }
+            }
+            //can be file
+            final char file = pieceNotation.charAt(0);
+            final int x = 7 - (file - 'a');
+            for(Piece piece : pieces){
+                if(piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
+                    result.add(piece);
+                }
+            }
+            return result;
+        } else if(pieceNotation.length() == 2){
+            final String pieceName = pieceNotation.substring(0, 1);
+            final char file = pieceNotation.charAt(1);
+            final int x = 7 - (file - 'a');
+            for(Piece piece : pieces){
+                if(piece.getNotation().equals(pieceName) && piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
+                    result.add(piece);
+                }
+            }
+            return result;
+        } else if(pieceNotation.length() == 3){
+            final String pieceName = pieceNotation.substring(0, 1);
+            final char file = pieceNotation.charAt(1);
+            final int x = 7 - (file - 'a');
+            final char rank = pieceNotation.charAt(2);
+            final int y = rank - '1';
+            for(Piece piece : pieces){
+                if(piece.getNotation().equals(pieceName) && piece.getTile().pos.x == x && piece.getTile().pos.y == y && piece.getPossibleMoves().contains(des)){
+                    result.add(piece);
+                }
+            }
+            return result;
+        }
+
+        return result;
+    }
+
+    public Vector<Piece> getBlackPiecesByNotation(String pieceNotation, Tile des){
+        Vector<Piece> pieces = pieceManager.getBlackPieces();
+
+        Vector<Piece> result = new Vector<>();
+
+        if(pieceNotation.length() == 0){
+            //can only be pawn
+            for(Piece piece : pieces){
+                if(piece.getPossibleMoves().contains(des) && piece.getNotation().equals(ChessNotation.PAWN)){
+                    result.add(piece);
+                }
+
+                if(piece.tilePos().x == 4 && piece.tilePos().y == 1){
+                    Log.d("pawn", "pawn");
+                }
+            }
+            return result;
+        }else if(pieceNotation.length() == 1){
+            //can be any piece name
+            for(Piece piece : pieces){
+                if(piece.getNotation().equals(pieceNotation) && piece.getPossibleMoves().contains(des)){
+                    result.add(piece);
+                }
+            }
+            //can be file
+            final char file = pieceNotation.charAt(0);
+            final int x = 7 - (file - 'a');
+            for(Piece piece : pieces){
+                if(piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
+                    result.add(piece);
+                }
+            }
+            return result;
+        } else if(pieceNotation.length() == 2){
+            final String pieceName = pieceNotation.substring(0, 1);
+            final char file = pieceNotation.charAt(1);
+            final int x = 7 - (file - 'a');
+            for(Piece piece : pieces){
+                if(piece.getNotation().equals(pieceName) && piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
+                    result.add(piece);
+                }
+            }
+            return result;
+        } else if(pieceNotation.length() == 3){
+            final String pieceName = pieceNotation.substring(0, 1);
+            final char file = pieceNotation.charAt(1);
+            final int x = 7 - (file - 'a');
+            final char rank = pieceNotation.charAt(2);
+            final int y = rank - '1';
+            for(Piece piece : pieces){
+                if(piece.getNotation().equals(pieceName) && piece.getTile().pos.x == x && piece.getTile().pos.y == y && piece.getPossibleMoves().contains(des)){
+                    result.add(piece);
+                }
+            }
+            return result;
+        }
+
+        return result;
+    }
+
+    public void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
+        if(prevSrcTile != null){
+            prevSrcTile.getObj().changeState(Obj3D.State.NORMAL);
+        }
+        if(prevDesTile != null){
+            prevDesTile.getObj().changeState(Obj3D.State.NORMAL);
+        }
+        ChessMove move = new ChessMove(isWhite, moveNotation, this);
+        Tile srcTile = move.getSrcTile();
+        Piece piece = srcTile.getPiece();
+        piece.pickUp();
+        Tile desTile = move.getDesTile();
+        piece.putDown();
+
+        if(!piece.getPossibleMoves().contains(desTile)){
+            throw new RuntimeException("Invalid move");
+        }
+
+        piece.move(desTile.pos);
+        prevSrcTile = srcTile;
+        prevDesTile = desTile;
     }
 }

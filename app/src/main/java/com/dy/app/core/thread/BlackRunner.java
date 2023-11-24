@@ -36,7 +36,7 @@ public class BlackRunner extends Thread{
                 throw new RuntimeException(e);
             }
 
-            if(i>1) break;
+            if(i>7) break;
             currentMove = moves.get(i);
             i++;
             String moveData = currentMove.black;
@@ -49,18 +49,33 @@ public class BlackRunner extends Thread{
     }
 
     private void performMove(String moveData) {
-        ChessMove move = new ChessMove(false, moveData, board);
+        ChessMove move = null;
+        try {
+            move = new ChessMove(false, moveData, board);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         Tile srcTile = move.getSrcTile();
         Piece piece = srcTile.getPiece();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         piece.pickUp();
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         Tile desTile = move.getDesTile();
         piece.putDown();
-        piece.move(desTile.pos);
+        //piece.move(desTile.pos);
+        try {
+            board.moveByNotation(moveData, false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void stopRunning(){
