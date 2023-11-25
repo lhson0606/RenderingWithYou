@@ -34,7 +34,7 @@ public class Knight extends Piece{
             if(pos.x + translation.x < 0 || pos.x + translation.x > 7 || pos.y + translation.y < 0 || pos.y + translation.y > 7) continue;
             Tile tile = board.getTile(new Vec2i(pos.x + translation.x, pos.y + translation.y));
             if(tile.hasPiece()){
-                if(!tile.getPiece().isOnPlayerSide())
+                if(!tile.getPiece().isTheSameColor(this))
                     possibleMoves.add(tile);
                 continue;
             }

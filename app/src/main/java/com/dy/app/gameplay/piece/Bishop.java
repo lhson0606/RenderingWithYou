@@ -65,52 +65,50 @@ public class Bishop extends Piece{
 
     @Override
     public Vector<Tile> getControlledTiles() {
-        synchronized (this){
-            Vector<Tile> controlledTiles = new Vector<Tile>();
-            Vec2i pos = tile.pos;
+        Vector<Tile> controlledTiles = new Vector<Tile>();
+        Vec2i pos = tile.pos;
 
-            for(int i = 1; i < 8; i++){
-                if(pos.x + i > 7 || pos.y + i > 7) break;
-                Tile tile = board.getTile(new Vec2i(pos.x + i, pos.y + i));
+        for(int i = 1; i < 8; i++){
+            if(pos.x + i > 7 || pos.y + i > 7) break;
+            Tile tile = board.getTile(new Vec2i(pos.x + i, pos.y + i));
+            controlledTiles.add(tile);
+            if(tile.hasPiece()){
                 controlledTiles.add(tile);
-                if(tile.hasPiece()){
-                    controlledTiles.add(tile);
-                    break;
-                }
+                break;
             }
-
-            for(int i = 1; i<8; i++){
-                if(pos.x - i < 0 || pos.y - i < 0) break;
-                Tile tile = board.getTile(new Vec2i(pos.x - i, pos.y - i));
-                controlledTiles.add(tile);
-                if(tile.hasPiece()){
-                    controlledTiles.add(tile);
-                    break;
-                }
-            }
-
-            for(int i = 1; i < 8; i++){
-                if(pos.x + i > 7 || pos.y - i < 0) break;
-                Tile tile = board.getTile(new Vec2i(pos.x + i, pos.y - i));
-                controlledTiles.add(tile);
-                if(tile.hasPiece()){
-                    controlledTiles.add(tile);
-                    break;
-                }
-            }
-
-            for(int i = 1; i < 8; i++){
-                if(pos.x - i < 0 || pos.y + i > 7) break;
-                Tile tile = board.getTile(new Vec2i(pos.x - i, pos.y + i));
-                controlledTiles.add(tile);
-                if(tile.hasPiece()){
-                    controlledTiles.add(tile);
-                    break;
-                }
-            }
-
-            return controlledTiles;
         }
+
+        for(int i = 1; i<8; i++){
+            if(pos.x - i < 0 || pos.y - i < 0) break;
+            Tile tile = board.getTile(new Vec2i(pos.x - i, pos.y - i));
+            controlledTiles.add(tile);
+            if(tile.hasPiece()){
+                controlledTiles.add(tile);
+                break;
+            }
+        }
+
+        for(int i = 1; i < 8; i++){
+            if(pos.x + i > 7 || pos.y - i < 0) break;
+            Tile tile = board.getTile(new Vec2i(pos.x + i, pos.y - i));
+            controlledTiles.add(tile);
+            if(tile.hasPiece()){
+                controlledTiles.add(tile);
+                break;
+            }
+        }
+
+        for(int i = 1; i < 8; i++){
+            if(pos.x - i < 0 || pos.y + i > 7) break;
+            Tile tile = board.getTile(new Vec2i(pos.x - i, pos.y + i));
+            controlledTiles.add(tile);
+            if(tile.hasPiece()){
+                controlledTiles.add(tile);
+                break;
+            }
+        }
+
+        return controlledTiles;
     }
 
     @Override

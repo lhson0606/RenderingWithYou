@@ -95,7 +95,6 @@ public class Camera {
         mPos = newPos;
         //update vector up
         mUp = vecFor.cross(Y_AXIS).cross(vecFor).normalize();
-        Log.d("Camera", "mPos: " + mPos.toString());
         update();
     }
 

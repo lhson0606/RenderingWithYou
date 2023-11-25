@@ -31,19 +31,15 @@ public class GameLoop extends Thread{
 
 
     private void update(){
-        for(GameEntity e: entityManger.getEntities()){
-            e.update(1.0f/60);
-        }
-        entityManger.releaseMutex();
-    }
-
-    private void draw(){
         try {
-            Thread.sleep(1000/60);
+            Thread.sleep(1000/120);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        entityManger.updateEntities(1.0f/120);
+    }
 
+    private void draw(){
         surfaceView.requestRender();
     }
 

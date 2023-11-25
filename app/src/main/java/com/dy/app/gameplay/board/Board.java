@@ -34,6 +34,8 @@ public class Board implements GameEntity {
     private final ObjManager objManager;
     private final AssetManger assetManger;
     private PieceManager pieceManager;
+    private Tile prevSrcTile = null;
+    private Tile prevDesTile = null;
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
         this.context = context;
@@ -119,9 +121,6 @@ public class Board implements GameEntity {
         }
     }
 
-    private Tile prevSrcTile = null;
-    private Tile prevDesTile = null;
-
     public Vector<Piece> getWhitePiecesByNotation(String pieceNotation, Tile des){
         Vector<Piece> pieces = pieceManager.getWhitePieces();
 
@@ -133,22 +132,34 @@ public class Board implements GameEntity {
                 if(piece.getPossibleMoves().contains(des) && piece.getNotation().equals(ChessNotation.PAWN)){
                     result.add(piece);
                 }
-
-                if(piece.tilePos().x == 4 && piece.tilePos().y == 1){
-                    Log.d("pawn", "pawn");
-                }
             }
             return result;
         }else if(pieceNotation.length() == 1){
-            //can be any piece name
+            //can be any piece name except pawn
             for(Piece piece : pieces){
                 if(piece.getNotation().equals(pieceNotation) && piece.getPossibleMoves().contains(des)){
                     result.add(piece);
                 }
             }
-            //can be file
+
+            if(result.size() == 1){
+                return result;
+            }
+
             final char file = pieceNotation.charAt(0);
             final int x = 7 - (file - 'a');
+            //can be pawn
+            for(Piece piece : pieces){
+                if(piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des) && piece.getNotation().equals(ChessNotation.PAWN)){
+                    result.add(piece);
+                }
+            }
+
+            if(result.size() == 1){
+                return result;
+            }
+
+            //can be selected by file
             for(Piece piece : pieces){
                 if(piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
                     result.add(piece);
@@ -333,5 +344,13 @@ public class Board implements GameEntity {
                 tiles[i][j].getObj().changeState(Obj3D.State.NORMAL);
             }
         }
+    }
+
+    public EntityManger getEntityManger() {
+        return entityManger;
+    }
+
+    public PieceManager getPieceManager() {
+        return pieceManager;
     }
 }

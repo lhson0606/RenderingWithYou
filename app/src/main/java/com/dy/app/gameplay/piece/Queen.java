@@ -225,11 +225,9 @@ public class Queen extends Piece{
 
     @Override
     public Vector<Tile> getControlledTiles() {
-        synchronized (this){
-            Vector<Tile> controlledTiles = new Vector<Tile>();
-            controlledTiles.addAll(getDiagonalControlledTiles());
-            controlledTiles.addAll(getStraightControlledTiles());
-            return controlledTiles;
-        }
+        Vector<Tile> controlledTiles = new Vector<Tile>();
+        controlledTiles.addAll(getDiagonalControlledTiles());
+        controlledTiles.addAll(getStraightControlledTiles());
+        return controlledTiles;
     }
 }

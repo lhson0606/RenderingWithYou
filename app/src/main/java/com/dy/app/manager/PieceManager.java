@@ -24,23 +24,21 @@ import com.dy.app.utils.DyConst;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class PieceManager {
-    private Vector<Piece> player_pieces;
-    private Vector<Piece> enemy_pieces ;
-
     private static PieceManager instance = null;
-    private Context context;
-    private Board board;
-    private ObjManager objManager;
-    private AssetManger assetManger;
-    private EntityManger entityManger;
-    private GameSetting gameSetting;
-    private Vector<Piece> blackPieces;
-    private Vector<Piece> whitePieces;
+    private final Context context;
+    private final Board board;
+    private final ObjManager objManager;
+    private final AssetManger assetManger;
+    private final EntityManger entityManger;
+    private final GameSetting gameSetting;
     private King blackKing;
     private King whiteKing;
-    private Vector<Piece> allPieces;
+    private final Vector<Piece> allPieces;
+    private final Vector<Piece> removedPieceList = new Vector<>();
+    private final ReentrantLock mutex = new ReentrantLock();
 
     public PieceManager(Context context, EntityManger entityManger, Board board, ObjManager objManager, AssetManger assetManger, GameSetting gameSetting){
         this.entityManger = entityManger;
@@ -58,6 +56,8 @@ public class PieceManager {
         Skin playerSkin = assetManger.getSkin(AssetManger.SkinType.PLAYER);
         Skin rivalSkin = assetManger.getSkin(AssetManger.SkinType.RIVAL);
         boolean playerIsWhite = Player.getInstance().isWhitePiece();
+        Vector<Piece> player_pieces;
+        Vector<Piece> enemy_pieces ;
 
 
         if(playerIsWhite) {
@@ -68,16 +68,10 @@ public class PieceManager {
             player_pieces = loadBlackPieces(true, playerSkin);
         }
 
-        for(Piece piece : player_pieces){
+        for(Piece piece : allPieces){
             entityManger.newEntity(piece);
         }
 
-        for(Piece piece : enemy_pieces){
-            entityManger.newEntity(piece);
-        }
-
-        allPieces.addAll(player_pieces);
-        allPieces.addAll(enemy_pieces);
     }
 
     private Piece loadSinglePiece(Board board, boolean onPlayerSide, Skin skin, String pieceName, Vec2i pos, Piece.PieceColor pieceColor) throws IOException {
@@ -159,7 +153,7 @@ public class PieceManager {
     }
 
     private Vector<Piece> loadBlackPieces(boolean onPlayerSide, Skin skin) throws IOException {
-        blackPieces = new Vector<>();
+        Vector<Piece> blackPieces = new Vector<>();
 
         //8 pawns
         for(int i = 0; i<8; i++){
@@ -185,11 +179,12 @@ public class PieceManager {
         blackKing = (King) loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(3, 7), Piece.PieceColor.BLACK);
         blackPieces.add(blackKing);
 
+        allPieces.addAll(blackPieces);
         return blackPieces;
     }
 
     private Vector<Piece> loadWhitePieces(boolean onPlayerSide, Skin skin) throws IOException {
-        whitePieces = new Vector<>();
+        Vector<Piece> whitePieces = new Vector<>();
         String verCode  = ShaderHelper.getInstance().readShader(context.getAssets().open(DyConst.piece_ver_glsl_path));
         String fragCode = ShaderHelper.getInstance().readShader(context.getAssets().open(DyConst.piece_frag_glsl_path));
         //8 pawns
@@ -216,15 +211,42 @@ public class PieceManager {
         whiteKing = (King) loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(3, 0), Piece.PieceColor.WHITE);
         whitePieces.add(whiteKing);
 
+        allPieces.addAll(whitePieces);
         return whitePieces;
     }
 
     public Vector<Piece> getBlackPieces(){
-        return blackPieces;
+        try{
+            mutex.lock();
+            Vector<Piece> blackPieces = new Vector<>();
+
+            for(Piece piece : allPieces){
+                if(!piece.isWhite()){
+                    blackPieces.add(piece);
+                }
+            }
+
+            return blackPieces;
+        } finally {
+            mutex.unlock();
+        }
     }
 
     public Vector<Piece> getWhitePieces(){
-        return whitePieces;
+        try{
+            mutex.lock();
+            Vector<Piece> whitePieces = new Vector<>();
+
+            for(Piece piece : allPieces){
+                if(piece.isWhite()){
+                    whitePieces.add(piece);
+                }
+            }
+
+            return whitePieces;
+        } finally {
+            mutex.unlock();
+        }
     }
 
     public King getBlackKing() {
@@ -237,5 +259,18 @@ public class PieceManager {
 
     public Vector<Piece> getAllPieces() {
         return allPieces;
+    }
+
+    public void removePiece(Piece piece){
+        try{
+            mutex.lock();
+            if(piece == null) throw new RuntimeException("Piece is null");
+            if(piece == blackKing || piece == whiteKing) throw new RuntimeException("Cannot remove king");
+            if(!allPieces.contains(piece)) throw new RuntimeException("Piece not found");
+            removedPieceList.add(piece);
+            allPieces.remove(piece);
+        } finally {
+            mutex.unlock();
+        }
     }
 }

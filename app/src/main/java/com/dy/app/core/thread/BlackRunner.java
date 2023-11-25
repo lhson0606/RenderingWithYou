@@ -6,6 +6,7 @@ import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.graphic.model.Obj3D;
 
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
@@ -30,15 +31,12 @@ public class BlackRunner extends Thread{
         ScriptsRunner.Move currentMove = null;
         int i = 0;
 
-
         while(isRunning){
             try{
                 blackSem.acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
-            if(i>10) break;
 
             currentMove = moves.get(i);
             i++;

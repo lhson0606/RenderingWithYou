@@ -37,10 +37,6 @@ public class WhiteRunner extends Thread{
                 throw new RuntimeException(e);
             }
 
-            if(i>10) break;
-            if(i== 7){
-                Log.d("ads", "run: ");
-            }
             currentMove = moves.get(i);
             i++;
             String moveData = currentMove.white;

@@ -3,6 +3,7 @@ package com.dy.app.gameplay.move;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.notation.ChessNotation;
 import com.dy.app.gameplay.piece.King;
 import com.dy.app.gameplay.piece.Piece;
 
@@ -10,10 +11,12 @@ import java.util.Vector;
 
 public class ChessMove {
     private String moveNotation;
-    private Board board;
+    private final Board board;
     private Vec2i srcTilePos;
     private Vec2i desTilePos;
     private boolean isWhiteMove;
+    private boolean isPromotionMove = false;
+    private String promotingPieceNotation;
 
     public ChessMove(boolean isWhiteMove, String move, Board board) throws Exception {
         this.moveNotation = move.trim();
@@ -31,7 +34,7 @@ public class ChessMove {
     }
 
     private boolean isSpecialMove(){
-        return moveNotation.contains("O-O");
+        return moveNotation.contains("O-O") || moveNotation.contains("=");
     }
 
     private Piece getWhitePieceNotation() throws Exception{
@@ -43,13 +46,26 @@ public class ChessMove {
 
             if(moveNotation.contains("O-O-O")){
                 desTilePos = king.getLongCastlingPos();
+                return result;
             }else if(moveNotation.contains("O-O")){
                 desTilePos = king.getShortCastlingPos();
+                return result;
+            }else if(moveNotation.contains("=")){
+                isPromotionMove = true;
+                //our promoting code is one char after the "="
+                promotingPieceNotation = moveNotation.substring(moveNotation.indexOf("=") + 1, moveNotation.indexOf("=") + 2);
+                switch (promotingPieceNotation){
+                    case ChessNotation.QUEEN:
+                    case ChessNotation.ROOK:
+                    case ChessNotation.BISHOP:
+                    case ChessNotation.KNIGHT:
+                        break;
+                    default:
+                        throw new Exception("Invalid move");
+                }
             }else{
                 throw new Exception("Invalid move");
             }
-
-            return result;
         }
 
         for(int i = 0; i<3 ;i++){

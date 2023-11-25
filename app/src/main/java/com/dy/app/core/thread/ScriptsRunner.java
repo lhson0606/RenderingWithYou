@@ -114,6 +114,10 @@ public class ScriptsRunner extends Thread{
                 try{
                     index = Integer.parseInt(curStr.substring(0, curStr.length()-1));
                 }catch (NumberFormatException e){
+                    if(curStr.equals("1-0") || curStr.equals("0-1") || curStr.equals("1/2-1/2")){
+                        break;
+                    }
+
                     throw new RuntimeException("Invalid PGN file");
                 }
 

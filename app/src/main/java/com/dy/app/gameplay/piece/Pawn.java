@@ -36,28 +36,26 @@ public class Pawn extends Piece{
 
     @Override
     public Vector<Tile> getControlledTiles() {
-        synchronized (this){
-            Vector<Tile> controlledTiles = new Vector<Tile>();
-            Vec2i pos = tile.pos;
+        Vector<Tile> controlledTiles = new Vector<Tile>();
+        Vec2i pos = tile.pos;
 
-            if(!isWhite()){
-                if(pos.x != 0 && pos.y != 0){
-                    controlledTiles.add(board.getTile(new Vec2i(pos.x - 1, pos.y - 1)));
-                }
-                if(pos.x != 7 && pos.y != 0){
-                    controlledTiles.add(board.getTile(new Vec2i(pos.x + 1, pos.y - 1)));
-                }
-            }else{
-                if(pos.x != 0 && pos.y != 7){
-                    controlledTiles.add(board.getTile(new Vec2i(pos.x - 1, pos.y + 1)));
-                }
-                if(pos.x != 7 && pos.y != 7){
-                    controlledTiles.add(board.getTile(new Vec2i(pos.x + 1, pos.y + 1)));
-                }
+        if(!isWhite()){
+            if(pos.x != 0 && pos.y != 0){
+                controlledTiles.add(board.getTile(new Vec2i(pos.x - 1, pos.y - 1)));
             }
-
-            return controlledTiles;
+            if(pos.x != 7 && pos.y != 0){
+                controlledTiles.add(board.getTile(new Vec2i(pos.x + 1, pos.y - 1)));
+            }
+        }else{
+            if(pos.x != 0 && pos.y != 7){
+                controlledTiles.add(board.getTile(new Vec2i(pos.x - 1, pos.y + 1)));
+            }
+            if(pos.x != 7 && pos.y != 7){
+                controlledTiles.add(board.getTile(new Vec2i(pos.x + 1, pos.y + 1)));
+            }
         }
+
+        return controlledTiles;
     }
 
     private void getPossibleMovesBlack(){

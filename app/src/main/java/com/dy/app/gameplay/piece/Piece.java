@@ -14,6 +14,7 @@ import com.dy.app.utils.DyConst;
 
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Piece implements GameEntity {
     protected Tile tile;
@@ -27,16 +28,12 @@ public class Piece implements GameEntity {
     private Tile srcTile, dstTile = null;
 
     public void pickUp() {
-        synchronized (this){
-            isPicking = true;
-        }
+        isPicking = true;
     }
 
     public void putDown(){
-        synchronized (this){
-            isPicking = false;
-            unhighlightPossibleMoves();
-        }
+        isPicking = false;
+        unhighlightPossibleMoves();
     }
 
     public enum PieceColor{
@@ -48,24 +45,20 @@ public class Piece implements GameEntity {
         return pieceColor == piece.pieceColor;
     }
 
-    public synchronized void updatePossibleMoves(){
+    public void updatePossibleMoves(){
         possibleMoves.clear();
     }
 
     public void showPossibleMoves(){
-        synchronized (this){
-            for(Tile tile : possibleMoves){
-                if(tile.hasPiece()){
-                    if(!tile.getPiece().isTheSameColor(this)) {
-                        tile.getObj().changeState(Obj3D.State.ENDANGERED);
-                    }
-                }else{
-                    tile.getObj().changeState(Obj3D.State.SELECTED);
-                }
+        for(Tile tile : possibleMoves){
+            if(tile.hasPiece()){
+                tile.getObj().changeState(Obj3D.State.ENDANGERED);
+            }else{
+                tile.getObj().changeState(Obj3D.State.SELECTED);
             }
-
-            obj.changeState(Obj3D.State.SELECTED);
         }
+
+        obj.changeState(Obj3D.State.SELECTED);
     }
 
     private void unhighlightPossibleMoves(){
@@ -85,24 +78,20 @@ public class Piece implements GameEntity {
 
     @Override
     public void init() {
-        synchronized (this){
-            obj.init();
-        }
+        obj.init();
     }
 
     @Override
     public void update(float dt) {
-        synchronized (this){
-            if(!isDoingAnimation){
-                //updatePossibleMoves();
+        if(!isDoingAnimation){
+            //updatePossibleMoves();
 
-                if(isPicking) {
-                    showPossibleMoves();
-                }
-            } else {
-                //do animation
-                doAnimation(dt);
+            if(isPicking) {
+                showPossibleMoves();
             }
+        } else {
+            //do animation
+            doAnimation(dt);
         }
     }
 
@@ -145,25 +134,28 @@ public class Piece implements GameEntity {
     }
 
     public Tile move(Vec2i pos){
-        synchronized (this){
-            //perform move
-            tile.setPiece(null);
-            Tile newTile = board.getTile(pos);
-            Tile oldTile = tile;
+        //perform move
+        tile.setPiece(null);
+        Tile newTile = board.getTile(pos);
+        Tile oldTile = tile;
 
-            tile.setPiece(null);
-            tile = newTile;
-            //check if there is a piece to capture
-            if(tile.getPiece() != null){
-                capture(tile.getPiece());
-            }
-            tile.setPiece(this);
-
-            board.updateBoardState();
-
-            startMoveAnimation(oldTile, newTile);
-            return tile;
+        tile.setPiece(null);
+        tile = newTile;
+        //check if there is a piece to capture
+        if(tile.getPiece() != null){
+            capture(tile.getPiece());
         }
+        tile.setPiece(this);
+
+        board.updateBoardState();
+
+        startMoveAnimation(oldTile, newTile);
+        return tile;
+    }
+
+    private void capture(Piece piece){
+        board.getEntityManger().removeEntity(piece);
+        board.getPieceManager().removePiece(piece);
     }
 
     private void doAnimation(float dt){
@@ -201,20 +193,12 @@ public class Piece implements GameEntity {
         this.dstTile = dstTile;
     }
 
-    private void capture(Piece piece){
-
-    }
-
     public Vector<Tile> getPossibleMoves(){
-        synchronized (this){
-            return possibleMoves;
-        }
+        return possibleMoves;
     }
 
     public Vector<Tile> getControlledTiles(){
-        synchronized (this){
-            return possibleMoves;
-        }
+        return possibleMoves;
     }
 
     public String getNotation(){

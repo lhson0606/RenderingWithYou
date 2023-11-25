@@ -45,11 +45,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     }
 
     private void init() {
-
-        for(GameEntity e: entityManger.getEntities()){
-            e.init();
-        }
-        entityManger.releaseMutex();
+        entityManger.initEntities();
     }
 
     @Override
@@ -65,9 +61,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
-        for(GameEntity e: entityManger.getEntities()){
-            e.draw();
-        }
-        entityManger.releaseMutex();
+        entityManger.drawEntities();
+
     }
 }
