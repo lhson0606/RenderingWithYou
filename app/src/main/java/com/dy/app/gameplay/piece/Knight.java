@@ -6,6 +6,8 @@ import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.notation.ChessNotation;
 import com.dy.app.graphic.model.Obj3D;
 
+import java.util.Vector;
+
 public class Knight extends Piece{
 
     public Knight(Tile tile, Obj3D obj, boolean onPlayerSide, PieceColor pieceColor, Board board){
@@ -43,5 +45,21 @@ public class Knight extends Piece{
     @Override
     public String getNotation(){
         return ChessNotation.KNIGHT;
+    }
+
+    @Override
+    public Vector<Tile> getControlledTiles() {
+        synchronized (this){
+            Vector<Tile> controlledTiles = new Vector<Tile>();
+            Vec2i pos = tile.pos;
+
+            for(Vec2i translation : possibleTranslation){
+                if(pos.x + translation.x < 0 || pos.x + translation.x > 7 || pos.y + translation.y < 0 || pos.y + translation.y > 7) continue;
+                Tile tile = board.getTile(new Vec2i(pos.x + translation.x, pos.y + translation.y));
+                controlledTiles.add(tile);
+            }
+
+            return controlledTiles;
+        }
     }
 }

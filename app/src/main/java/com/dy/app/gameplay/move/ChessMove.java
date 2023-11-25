@@ -3,7 +3,7 @@ package com.dy.app.gameplay.move;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
-import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.piece.King;
 import com.dy.app.gameplay.piece.Piece;
 
 import java.util.Vector;
@@ -16,7 +16,7 @@ public class ChessMove {
     private boolean isWhiteMove;
 
     public ChessMove(boolean isWhiteMove, String move, Board board) throws Exception {
-        this.moveNotation = move;
+        this.moveNotation = move.trim();
         this.board = board;
         this.isWhiteMove = isWhiteMove;
         interpretMove();
@@ -30,8 +30,27 @@ public class ChessMove {
         }
     }
 
+    private boolean isSpecialMove(){
+        return moveNotation.contains("O-O");
+    }
+
     private Piece getWhitePieceNotation() throws Exception{
         Piece result = null;
+
+        if(isSpecialMove()){
+            King king = (King) board.getKing(true);
+            result = king;
+
+            if(moveNotation.contains("O-O-O")){
+                desTilePos = king.getLongCastlingPos();
+            }else if(moveNotation.contains("O-O")){
+                desTilePos = king.getShortCastlingPos();
+            }else{
+                throw new Exception("Invalid move");
+            }
+
+            return result;
+        }
 
         for(int i = 0; i<3 ;i++){
             String notation = null;
@@ -44,8 +63,6 @@ public class ChessMove {
             }catch (StringIndexOutOfBoundsException e) {
                 continue;
             }
-
-            if(notation == null || desNotation == null) continue;
 
             if(desNotation.charAt(0) - 'a' < 0 || desNotation.charAt(0) - 'a' > 7) continue;
             if(desNotation.charAt(1) - '1' < 0 || desNotation.charAt(1) - '1' > 7) continue;
@@ -65,6 +82,21 @@ public class ChessMove {
     private Piece getBlackPieceNotation() throws Exception{
         Piece result = null;
 
+        if(isSpecialMove()){
+            King king = (King) board.getKing(false);
+            result = king;
+
+            if(moveNotation.contains("O-O-O")){
+                desTilePos = king.getLongCastlingPos();
+            }else if(moveNotation.contains("O-O")){
+                desTilePos = king.getShortCastlingPos();
+            }else{
+                throw new Exception("Invalid move");
+            }
+
+            return result;
+        }
+
         for(int i = 0; i<3 ;i++){
             String notation = null;
             String desNotation = null;
@@ -76,9 +108,6 @@ public class ChessMove {
             }catch (StringIndexOutOfBoundsException e) {
                 continue;
             }
-
-
-            if(notation == null || desNotation == null) continue;
 
             if(desNotation.charAt(0) - 'a' < 0 || desNotation.charAt(0) - 'a' > 7) continue;
             if(desNotation.charAt(1) - '1' < 0 || desNotation.charAt(1) - '1' > 7) continue;

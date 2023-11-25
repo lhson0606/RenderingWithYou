@@ -58,6 +58,9 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                                 //do nothing :)
                                 return false;
                             }else if(!piece.isOnPlayerSide()){
+                                //#todo for testing
+                                piece.pickUp();
+                                lastPiece = piece;
                                 return false;
 
                             }else{/*is player piece*/
@@ -74,12 +77,14 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                         return false;
                     }else if(!tile.hasPiece()){
                         //perform move
-                        //lastPiece.move(tile.pos);
+                        lastPiece.putDown();
+                        lastPiece.move(tile.pos);
                         cancelPicking();
                         return false;
                     }else{
                         //perform attack
-                        //lastPiece.move(tile.pos);
+                        lastPiece.putDown();
+                        lastPiece.move(tile.pos);
                         cancelPicking();
                         return false;
                     }
@@ -145,8 +150,10 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                 if (lastPiece == null) {
                     //do nothing also :)))
                 } else if (lastPiece == piece) {
-                    lastPiece.putDown();
-                    lastPiece = null;
+//                    lastPiece.putDown();
+//                    lastPiece = null;
+                    //#todo for testing
+
                 } else {
                     //do nothing also :))))
                 }

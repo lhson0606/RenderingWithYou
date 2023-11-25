@@ -48,10 +48,8 @@ public class Piece implements GameEntity {
         return pieceColor == piece.pieceColor;
     }
 
-    protected void updatePossibleMoves(){
-        synchronized (this){
-            possibleMoves.clear();
-        }
+    public synchronized void updatePossibleMoves(){
+        possibleMoves.clear();
     }
 
     public void showPossibleMoves(){
@@ -67,7 +65,6 @@ public class Piece implements GameEntity {
             }
 
             obj.changeState(Obj3D.State.SELECTED);
-            tile.getObj().changeState(Obj3D.State.SELECTED);
         }
     }
 
@@ -81,10 +78,6 @@ public class Piece implements GameEntity {
     }
 
     private PieceColor pieceColor;
-
-    public boolean isBlack(){
-        return pieceColor == PieceColor.BLACK;
-    }
 
     public boolean isWhite(){
         return pieceColor == PieceColor.WHITE;
@@ -101,7 +94,7 @@ public class Piece implements GameEntity {
     public void update(float dt) {
         synchronized (this){
             if(!isDoingAnimation){
-                updatePossibleMoves();
+                //updatePossibleMoves();
 
                 if(isPicking) {
                     showPossibleMoves();
@@ -155,7 +148,6 @@ public class Piece implements GameEntity {
         synchronized (this){
             //perform move
             tile.setPiece(null);
-            tile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
             Tile newTile = board.getTile(pos);
             Tile oldTile = tile;
 
@@ -166,8 +158,10 @@ public class Piece implements GameEntity {
                 capture(tile.getPiece());
             }
             tile.setPiece(this);
-            startMoveAnimation(oldTile, newTile);
 
+            board.updateBoardState();
+
+            startMoveAnimation(oldTile, newTile);
             return tile;
         }
     }
@@ -192,7 +186,6 @@ public class Piece implements GameEntity {
         // Update game state
         obj.setTranslation(srcTile.getWorldPos());
         obj.translate(translation);
-        dstTile.getObj().changeState(Obj3D.State.SOURCE);
         obj.changeState(Obj3D.State.NORMAL);
         // Reset animation variables
         isDoingAnimation = false;
@@ -213,6 +206,12 @@ public class Piece implements GameEntity {
     }
 
     public Vector<Tile> getPossibleMoves(){
+        synchronized (this){
+            return possibleMoves;
+        }
+    }
+
+    public Vector<Tile> getControlledTiles(){
         synchronized (this){
             return possibleMoves;
         }

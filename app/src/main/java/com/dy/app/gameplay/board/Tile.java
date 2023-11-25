@@ -41,7 +41,9 @@ public class Tile {
     }
 
     public boolean hasPiece(){
-        return piece != null;
+        synchronized (this){
+            return piece != null;
+        }
     }
 
     public Piece getPiece(){

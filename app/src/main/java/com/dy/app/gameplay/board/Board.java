@@ -12,6 +12,7 @@ import com.dy.app.core.GameCore;
 import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.piece.King;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.model.Obj3D;
@@ -241,7 +242,7 @@ public class Board implements GameEntity {
         return result;
     }
 
-    public void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
+    public synchronized void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
         if(prevSrcTile != null){
             prevSrcTile.getObj().changeState(Obj3D.State.NORMAL);
         }
@@ -251,16 +252,86 @@ public class Board implements GameEntity {
         ChessMove move = new ChessMove(isWhite, moveNotation, this);
         Tile srcTile = move.getSrcTile();
         Piece piece = srcTile.getPiece();
-        piece.pickUp();
         Tile desTile = move.getDesTile();
-        piece.putDown();
 
         if(!piece.getPossibleMoves().contains(desTile)){
             throw new RuntimeException("Invalid move");
         }
 
         piece.move(desTile.pos);
+        srcTile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
+        desTile.getObj().changeState(Obj3D.State.SOURCE);
         prevSrcTile = srcTile;
         prevDesTile = desTile;
+    }
+
+    public Vector<Tile> getPieceColorControlledTile(boolean isWhite){
+        if(isWhite){
+            return getWhiteControlledTile();
+        }else{
+            return getBlackControlledTile();
+        }
+    }
+
+    public Vector<Tile> getPieceDifferentColorControlledTile(boolean isWhite){
+        if(isWhite){
+            return getBlackControlledTile();
+        }else{
+            return getWhiteControlledTile();
+        }
+    }
+
+    public Vector<Tile> getBlackControlledTile(){
+        Vector<Piece> blackPieces = pieceManager.getBlackPieces();
+        Vector<Tile> result = new Vector<>();
+
+        for(Piece piece : blackPieces){
+            for(Tile tile : piece.getControlledTiles()){
+                if(!result.contains(tile)){
+                    result.add(tile);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public Vector<Tile> getWhiteControlledTile(){
+        Vector<Piece> whitePieces = pieceManager.getWhitePieces();
+        Vector<Tile> result = new Vector<>();
+
+        for(Piece piece : whitePieces){
+            for(Tile tile : piece.getControlledTiles()){
+                if(!result.contains(tile)){
+                    result.add(tile);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public void updateBoardState(){
+        synchronized (this){
+            for(Piece piece : pieceManager.getAllPieces()){
+                piece.updatePossibleMoves();
+            }
+        }
+    }
+
+    public King getKing(boolean isWhite){
+        if(isWhite){
+            return pieceManager.getWhiteKing();
+        }else{
+            return pieceManager.getBlackKing();
+        }
+    }
+
+    public void unhighlightAllTiles(){
+        for(int i = 0; i < DyConst.row_count; i++){
+            for(int j = 0; j < DyConst.col_count; j++){
+                tiles[i][j].getObj().changeState(Obj3D.State.NORMAL);
+            }
+        }
     }
 }

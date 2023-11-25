@@ -38,6 +38,8 @@ public class PieceManager {
     private GameSetting gameSetting;
     private Vector<Piece> blackPieces;
     private Vector<Piece> whitePieces;
+    private King blackKing;
+    private King whiteKing;
     private Vector<Piece> allPieces;
 
     public PieceManager(Context context, EntityManger entityManger, Board board, ObjManager objManager, AssetManger assetManger, GameSetting gameSetting){
@@ -76,11 +78,6 @@ public class PieceManager {
 
         allPieces.addAll(player_pieces);
         allPieces.addAll(enemy_pieces);
-
-        for(Piece piece : allPieces){
-            //init possible moves
-            piece.update(0);
-        }
     }
 
     private Piece loadSinglePiece(Board board, boolean onPlayerSide, Skin skin, String pieceName, Vec2i pos, Piece.PieceColor pieceColor) throws IOException {
@@ -185,7 +182,8 @@ public class PieceManager {
         blackPieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.queen, new Vec2i(4, 7), Piece.PieceColor.BLACK));
 
         //1 king
-        blackPieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(3, 7), Piece.PieceColor.BLACK));
+        blackKing = (King) loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(3, 7), Piece.PieceColor.BLACK);
+        blackPieces.add(blackKing);
 
         return blackPieces;
     }
@@ -215,7 +213,8 @@ public class PieceManager {
         whitePieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.queen, new Vec2i(4, 0), Piece.PieceColor.WHITE));
 
         //1 king
-        whitePieces.add(loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(3, 0), Piece.PieceColor.WHITE));
+        whiteKing = (King) loadSinglePiece(board, onPlayerSide, skin, DyConst.king, new Vec2i(3, 0), Piece.PieceColor.WHITE);
+        whitePieces.add(whiteKing);
 
         return whitePieces;
     }
@@ -226,5 +225,17 @@ public class PieceManager {
 
     public Vector<Piece> getWhitePieces(){
         return whitePieces;
+    }
+
+    public King getBlackKing() {
+        return blackKing;
+    }
+
+    public King getWhiteKing() {
+        return whiteKing;
+    }
+
+    public Vector<Piece> getAllPieces() {
+        return allPieces;
     }
 }

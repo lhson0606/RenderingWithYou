@@ -1,5 +1,7 @@
 package com.dy.app.core.thread;
 
+import android.util.Log;
+
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.move.ChessMove;
@@ -35,7 +37,10 @@ public class WhiteRunner extends Thread{
                 throw new RuntimeException(e);
             }
 
-            if(i>7) break;
+            if(i>10) break;
+            if(i== 7){
+                Log.d("ads", "run: ");
+            }
             currentMove = moves.get(i);
             i++;
             String moveData = currentMove.white;

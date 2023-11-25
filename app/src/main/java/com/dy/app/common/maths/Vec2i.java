@@ -47,5 +47,7 @@ public class Vec2i {
         return (float) Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
-
+    public boolean isEqual(Vec2i v){
+        return this.x == v.x && this.y == v.y;
+    }
 }

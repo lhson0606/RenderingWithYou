@@ -36,8 +36,6 @@ public class ScriptsRunner extends Thread{
 
     @Override
     public void run() {
-        Tile t= board.getTile(new Vec2i(4, 3));
-        t.getObj().changeState(Obj3D.State.SELECTED);
         try {
             parsePGN();
         } catch (IOException e) {

@@ -6,13 +6,15 @@ import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.notation.ChessNotation;
 import com.dy.app.graphic.model.Obj3D;
 
+import java.util.Vector;
+
 public class Bishop extends Piece{
 
     public Bishop(Tile tile, Obj3D obj, boolean onPlayerSide, PieceColor pieceColor, Board board){
         super(tile, obj, onPlayerSide, pieceColor, board);
     }
     @Override
-    protected void updatePossibleMoves(){
+    public void updatePossibleMoves(){
         super.updatePossibleMoves();
         Vec2i pos = tile.pos;
 
@@ -58,6 +60,56 @@ public class Bishop extends Piece{
                 break;
             }
             possibleMoves.add(tile);
+        }
+    }
+
+    @Override
+    public Vector<Tile> getControlledTiles() {
+        synchronized (this){
+            Vector<Tile> controlledTiles = new Vector<Tile>();
+            Vec2i pos = tile.pos;
+
+            for(int i = 1; i < 8; i++){
+                if(pos.x + i > 7 || pos.y + i > 7) break;
+                Tile tile = board.getTile(new Vec2i(pos.x + i, pos.y + i));
+                controlledTiles.add(tile);
+                if(tile.hasPiece()){
+                    controlledTiles.add(tile);
+                    break;
+                }
+            }
+
+            for(int i = 1; i<8; i++){
+                if(pos.x - i < 0 || pos.y - i < 0) break;
+                Tile tile = board.getTile(new Vec2i(pos.x - i, pos.y - i));
+                controlledTiles.add(tile);
+                if(tile.hasPiece()){
+                    controlledTiles.add(tile);
+                    break;
+                }
+            }
+
+            for(int i = 1; i < 8; i++){
+                if(pos.x + i > 7 || pos.y - i < 0) break;
+                Tile tile = board.getTile(new Vec2i(pos.x + i, pos.y - i));
+                controlledTiles.add(tile);
+                if(tile.hasPiece()){
+                    controlledTiles.add(tile);
+                    break;
+                }
+            }
+
+            for(int i = 1; i < 8; i++){
+                if(pos.x - i < 0 || pos.y + i > 7) break;
+                Tile tile = board.getTile(new Vec2i(pos.x - i, pos.y + i));
+                controlledTiles.add(tile);
+                if(tile.hasPiece()){
+                    controlledTiles.add(tile);
+                    break;
+                }
+            }
+
+            return controlledTiles;
         }
     }
 

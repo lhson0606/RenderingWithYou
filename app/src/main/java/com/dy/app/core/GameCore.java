@@ -79,6 +79,7 @@ public class GameCore {
         }
 
         board.setPieceManager(pieceManager);
+        board.updateBoardState();
 
         startGame();
     }

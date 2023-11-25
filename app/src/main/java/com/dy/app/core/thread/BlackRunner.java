@@ -1,5 +1,7 @@
 package com.dy.app.core.thread;
 
+import android.util.Log;
+
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.move.ChessMove;
@@ -36,7 +38,8 @@ public class BlackRunner extends Thread{
                 throw new RuntimeException(e);
             }
 
-            if(i>7) break;
+            if(i>10) break;
+
             currentMove = moves.get(i);
             i++;
             String moveData = currentMove.black;
