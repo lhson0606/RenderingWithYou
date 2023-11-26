@@ -37,6 +37,11 @@ public class WhiteRunner extends Thread{
                 throw new RuntimeException(e);
             }
 
+            if(i == moves.size()){
+                blackSem.release();
+                break;
+            }
+
             currentMove = moves.get(i);
             i++;
             String moveData = currentMove.white;

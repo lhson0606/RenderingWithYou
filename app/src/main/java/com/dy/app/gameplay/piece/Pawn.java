@@ -6,8 +6,12 @@ import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.graphic.model.Obj3D;
+import com.dy.app.manager.AssetManger;
+import com.dy.app.utils.DyConst;
 
+import java.io.IOException;
 import java.util.Vector;
 
 public class Pawn extends Piece{
@@ -132,6 +136,29 @@ public class Pawn extends Piece{
                 possibleMoves.add(tile);
             }
         }
+    }
+
+    public void promote(String piecePromotionNotation) throws IOException {
+        Piece piece = null;
+        switch (piecePromotionNotation){
+            case ChessNotation.QUEEN:
+                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER),DyConst.queen, tile.pos, pieceColor);
+                break;
+            case ChessNotation.ROOK:
+                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER),DyConst.rook, tile.pos, pieceColor);
+                break;
+            case ChessNotation.BISHOP:
+                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER),DyConst.bishop, tile.pos, pieceColor);
+                break;
+            case ChessNotation.KNIGHT:
+                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER),DyConst.knight, tile.pos, pieceColor);
+                break;
+            default:
+                throw new RuntimeException("Invalid piece promotion notation");
+        }
+
+        board.removePiece(this);
+        board.addPiece(piece);
     }
 
     @Override

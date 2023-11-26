@@ -30,6 +30,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         tilePicker = new TilePicker(0,0, board);
         gameSurface.setGestureDetector(new GestureDetector(gameSurface.getContext(), tilePicker));
         this.semSurfaceCreated = semSurfaceCreated;
+        entityManger.setRenderer(this);
     }
 
     //private Obj3D test1 = null;
@@ -55,13 +56,17 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         Camera.getInstance().getInstance().setHeight(h);
         tilePicker.setScreenSize(w, h);
         if(!pickerIsSet) gameSurface.setOnTouchListener(tilePicker);
-
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
         entityManger.drawEntities();
+    }
 
+    public void initEntityGL(GameEntity entity){
+        gameSurface.queueEvent(() -> {
+            entityManger.initSingleEntity(entity);
+        });
     }
 }

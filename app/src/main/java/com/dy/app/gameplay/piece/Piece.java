@@ -70,7 +70,7 @@ public class Piece implements GameEntity {
         tile.getObj().changeState(Obj3D.State.NORMAL);
     }
 
-    private PieceColor pieceColor;
+    protected PieceColor pieceColor;
 
     public boolean isWhite(){
         return pieceColor == PieceColor.WHITE;
@@ -147,15 +147,12 @@ public class Piece implements GameEntity {
         }
         tile.setPiece(this);
 
-        board.updateBoardState();
-
         startMoveAnimation(oldTile, newTile);
         return tile;
     }
 
     private void capture(Piece piece){
-        board.getEntityManger().removeEntity(piece);
-        board.getPieceManager().removePiece(piece);
+        board.removePiece(piece);
     }
 
     private void doAnimation(float dt){

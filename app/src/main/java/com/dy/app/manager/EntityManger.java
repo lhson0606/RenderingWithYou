@@ -3,6 +3,7 @@ package com.dy.app.manager;
 
 import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.graphic.render.DyRenderer;
 
 import org.w3c.dom.Entity;
 
@@ -14,6 +15,7 @@ public class EntityManger {
     private Vector<GameEntity> entities;
     private final Semaphore mutex = new Semaphore(1);
     private final Vector<GameEntity> removeList = new Vector<>();
+    private DyRenderer renderer;
 
     public void cleanUp(){
         try {
@@ -90,9 +92,6 @@ public class EntityManger {
         }
     }
 
-    public void releaseMutex() {
-        mutex.release();
-    }
     public void removeEntity(GameEntity entity){
         try {
             mutex.acquire();
@@ -115,5 +114,24 @@ public class EntityManger {
         } finally {
             mutex.release();
         }
+    }
+
+    public void setRenderer(DyRenderer renderer){
+        this.renderer = renderer;
+    }
+
+    public void initSingleEntity(GameEntity entity){
+        try {
+            mutex.acquire();
+            entity.init();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            mutex.release();
+        }
+    }
+
+    public DyRenderer getRenderer(){
+        return renderer;
     }
 }

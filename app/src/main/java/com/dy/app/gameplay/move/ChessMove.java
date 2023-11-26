@@ -18,6 +18,10 @@ public class ChessMove {
     private boolean isPromotionMove = false;
     private String promotingPieceNotation;
 
+    public boolean isPromotionMove(){
+        return isPromotionMove;
+    }
+
     public ChessMove(boolean isWhiteMove, String move, Board board) throws Exception {
         this.moveNotation = move.trim();
         this.board = board;
@@ -104,13 +108,26 @@ public class ChessMove {
 
             if(moveNotation.contains("O-O-O")){
                 desTilePos = king.getLongCastlingPos();
+                return result;
             }else if(moveNotation.contains("O-O")){
                 desTilePos = king.getShortCastlingPos();
+                return result;
+            }else if(moveNotation.contains("=")){
+                isPromotionMove = true;
+                //our promoting code is one char after the "="
+                promotingPieceNotation = moveNotation.substring(moveNotation.indexOf("=") + 1, moveNotation.indexOf("=") + 2);
+                switch (promotingPieceNotation){
+                    case ChessNotation.QUEEN:
+                    case ChessNotation.ROOK:
+                    case ChessNotation.BISHOP:
+                    case ChessNotation.KNIGHT:
+                        break;
+                    default:
+                        throw new Exception("Invalid move");
+                }
             }else{
                 throw new Exception("Invalid move");
             }
-
-            return result;
         }
 
         for(int i = 0; i<3 ;i++){
@@ -156,5 +173,9 @@ public class ChessMove {
 
     public Tile getDesTile(){
         return board.getTile(desTilePos);
+    }
+
+    public String getPromotingPieceNotation(){
+        return promotingPieceNotation;
     }
 }

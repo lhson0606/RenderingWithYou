@@ -38,6 +38,11 @@ public class BlackRunner extends Thread{
                 throw new RuntimeException(e);
             }
 
+            if(i == moves.size()){
+                whiteSem.release();
+                break;
+            }
+
             currentMove = moves.get(i);
             i++;
             String moveData = currentMove.black;
@@ -45,7 +50,6 @@ public class BlackRunner extends Thread{
 
             //release white
             whiteSem.release();
-
         }
     }
 
@@ -59,13 +63,13 @@ public class BlackRunner extends Thread{
         Tile srcTile = move.getSrcTile();
         Piece piece = srcTile.getPiece();
         try {
-            Thread.sleep(500);
+            Thread.sleep(0);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         piece.pickUp();
         try {
-            Thread.sleep(500);
+            Thread.sleep(0);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

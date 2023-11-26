@@ -13,6 +13,7 @@ import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.notation.ChessNotation;
 import com.dy.app.gameplay.piece.King;
+import com.dy.app.gameplay.piece.Pawn;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.model.Obj3D;
@@ -253,7 +254,7 @@ public class Board implements GameEntity {
         return result;
     }
 
-    public synchronized void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
+    public void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
         if(prevSrcTile != null){
             prevSrcTile.getObj().changeState(Obj3D.State.NORMAL);
         }
@@ -270,10 +271,25 @@ public class Board implements GameEntity {
         }
 
         piece.move(desTile.pos);
+        checkForPromotionMove(move);
+        updateBoardState();
+
         srcTile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
         desTile.getObj().changeState(Obj3D.State.SOURCE);
         prevSrcTile = srcTile;
         prevDesTile = desTile;
+    }
+
+    private void checkForPromotionMove(ChessMove move){
+        if(move.isPromotionMove()){
+            Piece piece = move.getDesTile().getPiece();
+            Pawn pawn = (Pawn) piece;
+            try {
+                pawn.promote(move.getPromotingPieceNotation());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public Vector<Tile> getPieceColorControlledTile(boolean isWhite){
@@ -352,5 +368,23 @@ public class Board implements GameEntity {
 
     public PieceManager getPieceManager() {
         return pieceManager;
+    }
+
+    public void removePiece(Piece piece) {
+        pieceManager.removePiece(piece);
+    }
+
+    public void addPiece(Piece piece){
+        piece.getTile().setPiece(piece);
+        pieceManager.addPiece(piece);
+        entityManger.getRenderer().initEntityGL(piece);
+    }
+
+    public ObjManager getObjManager() {
+        return objManager;
+    }
+
+    public AssetManger getAssetManger() {
+        return assetManger;
     }
 }

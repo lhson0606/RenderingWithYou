@@ -74,7 +74,7 @@ public class PieceManager {
 
     }
 
-    private Piece loadSinglePiece(Board board, boolean onPlayerSide, Skin skin, String pieceName, Vec2i pos, Piece.PieceColor pieceColor) throws IOException {
+    public Piece loadSinglePiece(Board board, boolean onPlayerSide, Skin skin, String pieceName, Vec2i pos, Piece.PieceColor pieceColor) throws IOException {
         Tile tile = board.getTile(pos);
         Obj3D obj = objManager.getObj(pieceName);
         obj.setModelMat(tile.getObj().getModelMat().clone());
@@ -269,6 +269,19 @@ public class PieceManager {
             if(!allPieces.contains(piece)) throw new RuntimeException("Piece not found");
             removedPieceList.add(piece);
             allPieces.remove(piece);
+            entityManger.removeEntity(piece);
+        } finally {
+            mutex.unlock();
+        }
+    }
+
+    public void addPiece(Piece piece) {
+        try{
+            mutex.lock();
+            if(piece == null) throw new RuntimeException("Piece is null");
+            if(allPieces.contains(piece)) throw new RuntimeException("Piece already exists");
+            allPieces.add(piece);
+            entityManger.newEntity(piece);
         } finally {
             mutex.unlock();
         }
