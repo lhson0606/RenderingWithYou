@@ -49,6 +49,12 @@ public class Piece implements GameEntity {
         possibleMoves.clear();
     }
 
+    public void updatePieceState(){
+    }
+
+    public void resetPieceState() {
+    }
+
     public void showPossibleMoves(){
         for(Tile tile : possibleMoves){
             if(tile.hasPiece()){
@@ -151,7 +157,7 @@ public class Piece implements GameEntity {
         return tile;
     }
 
-    private void capture(Piece piece){
+    protected void capture(Piece piece){
         board.removePiece(piece);
     }
 
@@ -183,7 +189,7 @@ public class Piece implements GameEntity {
         srcTile = null;
     }
 
-    private void startMoveAnimation(Tile srcTile, Tile dstTile){
+    protected void startMoveAnimation(Tile srcTile, Tile dstTile){
         //set do animation to true
         isDoingAnimation = true;
         this.srcTile = srcTile;

@@ -62,13 +62,13 @@ public class WhiteRunner extends Thread{
         Tile srcTile = move.getSrcTile();
         Piece piece = srcTile.getPiece();
         try {
-            Thread.sleep(500);
+            Thread.sleep(0);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         piece.pickUp();
         try {
-            Thread.sleep(500);
+            Thread.sleep(0);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

@@ -79,12 +79,16 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                         //perform move
                         lastPiece.putDown();
                         lastPiece.move(tile.pos);
+                        //#todo for debugging
+                        board.updateBoardState();
                         cancelPicking();
                         return false;
                     }else{
                         //perform attack
                         lastPiece.putDown();
                         lastPiece.move(tile.pos);
+                        //#todo for debugging
+                        board.updateBoardState();
                         cancelPicking();
                         return false;
                     }

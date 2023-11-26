@@ -27,6 +27,7 @@ import com.dy.app.utils.DyConst;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Board implements GameEntity {
     private Tile tiles[][];
@@ -37,6 +38,7 @@ public class Board implements GameEntity {
     private PieceManager pieceManager;
     private Tile prevSrcTile = null;
     private Tile prevDesTile = null;
+    private final ReentrantLock mutex = new ReentrantLock();
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
         this.context = context;
@@ -255,29 +257,35 @@ public class Board implements GameEntity {
     }
 
     public void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
-        if(prevSrcTile != null){
-            prevSrcTile.getObj().changeState(Obj3D.State.NORMAL);
-        }
-        if(prevDesTile != null){
-            prevDesTile.getObj().changeState(Obj3D.State.NORMAL);
-        }
-        ChessMove move = new ChessMove(isWhite, moveNotation, this);
-        Tile srcTile = move.getSrcTile();
-        Piece piece = srcTile.getPiece();
-        Tile desTile = move.getDesTile();
+        try {
+            mutex.lock();
+            if(prevSrcTile != null){
+                prevSrcTile.getObj().changeState(Obj3D.State.NORMAL);
+            }
+            if(prevDesTile != null){
+                prevDesTile.getObj().changeState(Obj3D.State.NORMAL);
+            }
+            ChessMove move = new ChessMove(isWhite, moveNotation, this);
+            Tile srcTile = move.getSrcTile();
+            Piece piece = srcTile.getPiece();
+            Tile desTile = move.getDesTile();
 
-        if(!piece.getPossibleMoves().contains(desTile)){
-            throw new RuntimeException("Invalid move");
+            if(!piece.getPossibleMoves().contains(desTile)){
+                throw new RuntimeException("Invalid move");
+            }
+
+            piece.putDown();
+            piece.move(desTile.pos);
+            checkForPromotionMove(move);
+            updateBoardState();
+
+            srcTile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
+            desTile.getObj().changeState(Obj3D.State.SOURCE);
+            prevSrcTile = srcTile;
+            prevDesTile = desTile;
+        }finally {
+            mutex.unlock();
         }
-
-        piece.move(desTile.pos);
-        checkForPromotionMove(move);
-        updateBoardState();
-
-        srcTile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
-        desTile.getObj().changeState(Obj3D.State.SOURCE);
-        prevSrcTile = srcTile;
-        prevDesTile = desTile;
     }
 
     private void checkForPromotionMove(ChessMove move){
@@ -339,10 +347,16 @@ public class Board implements GameEntity {
     }
 
     public void updateBoardState(){
-        synchronized (this){
-            for(Piece piece : pieceManager.getAllPieces()){
-                piece.updatePossibleMoves();
-            }
+        for(Piece piece : pieceManager.getAllPieces()){
+            piece.updatePossibleMoves();
+        }
+
+        for(Piece piece : pieceManager.getAllPieces()){
+            piece.updatePieceState();
+        }
+
+        for(Piece piece : pieceManager.getAllPieces()){
+            piece.resetPieceState();
         }
     }
 
@@ -377,7 +391,6 @@ public class Board implements GameEntity {
     public void addPiece(Piece piece){
         piece.getTile().setPiece(piece);
         pieceManager.addPiece(piece);
-        entityManger.getRenderer().initEntityGL(piece);
     }
 
     public ObjManager getObjManager() {

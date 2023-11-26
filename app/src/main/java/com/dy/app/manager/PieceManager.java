@@ -281,7 +281,7 @@ public class PieceManager {
             if(piece == null) throw new RuntimeException("Piece is null");
             if(allPieces.contains(piece)) throw new RuntimeException("Piece already exists");
             allPieces.add(piece);
-            entityManger.newEntity(piece);
+            entityManger.getRenderer().addAndInitEntityGL(piece);
         } finally {
             mutex.unlock();
         }

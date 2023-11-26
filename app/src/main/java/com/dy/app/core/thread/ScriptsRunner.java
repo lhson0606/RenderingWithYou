@@ -43,9 +43,9 @@ public class ScriptsRunner extends Thread{
         }
 
         BlackRunner blackRunner = new BlackRunner(moves, board, whiteSem, blackSem);
-        blackRunner.start();
+        //blackRunner.start();
         WhiteRunner whiteRunner = new WhiteRunner(moves, board, whiteSem, blackSem);
-        whiteRunner.start();
+        //whiteRunner.start();
 
         Log.d(TAG, " run: stopped");
     }

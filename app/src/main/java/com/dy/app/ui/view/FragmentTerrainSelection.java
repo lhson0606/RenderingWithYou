@@ -104,7 +104,9 @@ public class FragmentTerrainSelection extends Fragment
 
     @Override
     public void onPageSelected(int position) {
-        player.inventory.set(PlayerInventory.KEY_TERRAIN_SKIN_INDEX, position);
+        Integer intTemp = position;
+        Long longTemp = intTemp.longValue();
+        player.inventory.set(PlayerInventory.KEY_PIECE_SKIN_INDEX, longTemp);
         soundManager.playSound(getContext(), SoundManager.SoundType.BTN_SKIN_PICKING);
     }
 

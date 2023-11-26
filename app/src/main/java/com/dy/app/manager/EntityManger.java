@@ -12,7 +12,7 @@ import java.util.concurrent.Semaphore;
 
 public class EntityManger {
 
-    private Vector<GameEntity> entities;
+    private final Vector<GameEntity> entities = new Vector<>();
     private final Semaphore mutex = new Semaphore(1);
     private final Vector<GameEntity> removeList = new Vector<>();
     private DyRenderer renderer;
@@ -50,7 +50,6 @@ public class EntityManger {
     }
 
     public EntityManger(){
-        entities = new Vector<>();
     }
 
     public void initEntities(){
@@ -120,10 +119,11 @@ public class EntityManger {
         this.renderer = renderer;
     }
 
-    public void initSingleEntity(GameEntity entity){
+    public void addAndInitSingleEntity(GameEntity entity){
         try {
             mutex.acquire();
             entity.init();
+            entities.add(entity);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {

@@ -33,8 +33,6 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         entityManger.setRenderer(this);
     }
 
-    //private Obj3D test1 = null;
-    //private Obj3D test2 = null;
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         init();
@@ -64,9 +62,9 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         entityManger.drawEntities();
     }
 
-    public void initEntityGL(GameEntity entity){
+    public void addAndInitEntityGL(GameEntity entity){
         gameSurface.queueEvent(() -> {
-            entityManger.initSingleEntity(entity);
+            entityManger.addAndInitSingleEntity(entity);
         });
     }
 }

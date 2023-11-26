@@ -15,7 +15,8 @@ import java.io.IOException;
 import java.util.Vector;
 
 public class Pawn extends Piece{
-    boolean hasMoved = false;
+    private boolean hasMoved = false;
+    private boolean justAdvancedTwoTiles = false;
 
     public Pawn(Tile tile, Obj3D obj, boolean onPlayerSide, PieceColor pieceColor, Board board){
         super(tile, obj, onPlayerSide, pieceColor, board);
@@ -23,8 +24,54 @@ public class Pawn extends Piece{
 
     @Override
     public Tile move(Vec2i pos){
+        if(Math.abs(pos.y - tile.pos.y) == 2) {
+            justAdvancedTwoTiles = true;
+        }
+
         hasMoved = true;
-        return super.move(pos);
+
+        if(isAnEnPassantMove(pos)){
+            captureEnPassant(pos);
+        }
+
+        //perform move
+        tile.setPiece(null);
+        Tile newTile = board.getTile(pos);
+        Tile oldTile = tile;
+
+        tile.setPiece(null);
+        tile = newTile;
+        //check if there is a piece to capture
+        if(tile.getPiece() != null){
+            capture(tile.getPiece());
+        }
+
+        tile.setPiece(this);
+
+        startMoveAnimation(oldTile, newTile);
+        return tile;
+    }
+
+    private void captureEnPassant(Vec2i pos) {
+        //get captured piece
+        Vec2i capturedPos = new Vec2i(pos.x, this.tile.pos.y);
+        capture(board.getTile(capturedPos).getPiece());
+    }
+
+    private boolean isAnEnPassantMove(Vec2i pos){
+        Tile dstTile = board.getTile(pos);
+
+        if(pos.x == tile.pos.x) {
+            //evaluate if the pawn is moving diagonally
+            return false;
+        }
+
+        return !dstTile.hasPiece();
+    }
+
+    @Override
+    public void updatePieceState() {
+        super.updatePieceState();
     }
 
     @Override
@@ -36,6 +83,84 @@ public class Pawn extends Piece{
            getPossibleMovesBlack();
        }
 
+       //add any possible existing en passant moves
+       possibleMoves.addAll(getPossibleEnPassantMoves());
+    }
+
+    @Override
+    public void resetPieceState() {
+        justAdvancedTwoTiles = false;
+    }
+
+    public Vector<Tile> getPossibleEnPassantMoves(){
+        Vector<Tile> possibleEnPassantMoves = new Vector<Tile>();
+        Vec2i pos = tile.pos;
+        Tile currentEvaluatedTile = null;
+        Tile enpassantTile = null;
+
+        //if it's white then it should be on the 5th rank
+        if(isWhite() && pos.y == 4){
+            //skip this if x is 0
+            if(pos.x != 0){
+                currentEvaluatedTile = board.getTile(new Vec2i(pos.x - 1, pos.y));
+
+                if(canBeCapturedEnPassant(currentEvaluatedTile)){
+                    enpassantTile = board.getTile(new Vec2i(pos.x - 1, pos.y + 1));
+                    possibleEnPassantMoves.add(enpassantTile);
+                }
+            }
+
+            //skip this if x is 7
+            if(pos.x != 7){
+                currentEvaluatedTile = board.getTile(new Vec2i(pos.x + 1, pos.y));
+
+                if(canBeCapturedEnPassant(currentEvaluatedTile)){
+                    enpassantTile = board.getTile(new Vec2i(pos.x + 1, pos.y + 1));
+                    possibleEnPassantMoves.add(enpassantTile);
+                }
+            }
+        }else if(!isWhite() && pos.y == 3){
+            //skip this if x is 0
+            if(pos.x != 0){
+                currentEvaluatedTile = board.getTile(new Vec2i(pos.x - 1, pos.y));
+
+                if(canBeCapturedEnPassant(currentEvaluatedTile)){
+                    enpassantTile = board.getTile(new Vec2i(pos.x - 1, pos.y - 1));
+                    possibleEnPassantMoves.add(enpassantTile);
+                }
+            }
+
+            //skip this if x is 7
+            if(pos.x != 7){
+                currentEvaluatedTile = board.getTile(new Vec2i(pos.x + 1, pos.y));
+
+                if(canBeCapturedEnPassant(currentEvaluatedTile)){
+                    enpassantTile = board.getTile(new Vec2i(pos.x + 1, pos.y - 1));
+                    possibleEnPassantMoves.add(enpassantTile);
+                }
+            }
+        }
+
+        return possibleEnPassantMoves;
+    }
+
+    private boolean canBeCapturedEnPassant(Tile tile){
+        //same code above but use if-else
+        if(!tile.hasPiece()){
+            //evaluate if the tile has a piece
+            return false;
+        }else if(!tile.getPiece().getNotation().equals(ChessNotation.PAWN)){
+            //evaluate if the piece is a pawn
+            return false;
+        }else if(tile.getPiece().isTheSameColor(this)){
+            //evaluate if the piece has different color
+            return false;
+        }else if(!((Pawn)tile.getPiece()).justAdvancedTwoTiles()){
+            //evaluate if the piece has just advanced two tiles
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -164,5 +289,9 @@ public class Pawn extends Piece{
     @Override
     public String getNotation(){
         return ChessNotation.PAWN;
+    }
+
+    public boolean justAdvancedTwoTiles(){
+        return justAdvancedTwoTiles;
     }
 }
