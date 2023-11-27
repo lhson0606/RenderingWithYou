@@ -57,7 +57,12 @@ public class Piece implements GameEntity {
         possibleMoves.clear();
     }
 
-    public void updatePieceState(){
+    public void updatePieceStateBeforeWritingToHistory(){
+    }
+
+    public void updatePieceStateAfterWritingToHistory(){
+        //we need to prepare the piece state for the next turn
+        currentState.movedInThisTurn = false;
     }
 
     public void showPossibleMoves(){
@@ -165,7 +170,7 @@ public class Piece implements GameEntity {
     }
 
     public void pseudoCapture(Piece piece) {
-        board.pseudoRemove(piece);
+        //board.pseudoRemove(piece);
         piece.currentState.isCaptured = true;
     }
 
@@ -182,51 +187,78 @@ public class Piece implements GameEntity {
             capture(tile.getPiece());
         }
         tile.setPiece(this);
-        //update state pos
-        currentState.pos = tile.pos;
+        //update state
+        currentState.pos = pos;
+        currentState.hasMoved = true;
+        currentState.movedInThisTurn = true;
 
         startMoveAnimation(oldTile, newTile);
         return tile;
     }
 
+    public void setStateAtMoveNumber(int moveNumber){
+        PieceState stateToGo = history.get(moveNumber);
+        currentState = stateToGo;
+        this.tile = board.getTile(stateToGo.pos);
+        this.tile.setPiece(this);
+    }
+
+    public void checkForUndoCapture(int moveNumber){
+        PieceState  stateToGo = history.get(moveNumber);
+        if(!stateToGo.isCaptured && currentState.isCaptured){
+            board.undoCapture(this);
+        }
+
+    }
+
     public void goToMove(int moveNumber) {
         PieceState stateToGo = history.get(moveNumber);
+
+        if(stateToGo.equals(currentState)){
+            return;
+        }
+
         if(!stateToGo.isCaptured && !currentState.isCaptured){
             //we need to reset the piece position
             Tile dstTile = board.getTile(stateToGo.pos);
             Tile srcTile = board.getTile(currentState.pos);
-            final Semaphore sem = new Semaphore(0);
-            startMoveAnimation(srcTile, dstTile,()->{
-                sem.release();
-            });
-            try {
-                sem.acquire();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            //we need to undo its position
+            srcTile.setPiece(null);
+            //dstTile.setPiece(this);
+            //this.tile = dstTile;
+
             //if it's promoted need to promote it
             if(stateToGo.isPromoted && !currentState.isPromoted){
                 try {
-                    ((Pawn)this).promote(stateToGo.promotingNotation);
+                    final Semaphore sem = new Semaphore(0);
+                    startMoveAnimation(srcTile, dstTile,()->{
+                        sem.release();
+                    });
+                    try {
+                        sem.acquire();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    //delay the promotion, wait for animation to finish
+                    ((Pawn)this).promote(stateToGo.promotingNotation, false);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }else if(!stateToGo.isPromoted && currentState.isPromoted){
                 //we need to demote the piece
+                startMoveAnimation(srcTile, dstTile,null);
                 demote();
+            }else{
+                startMoveAnimation(srcTile, dstTile,null);
             }
         }else if(stateToGo.isCaptured && !currentState.isCaptured){
-            //we need to remove the piece from the board
-            board.removePiece(this);
-        }else if(!stateToGo.isCaptured){
-            //we need to add the piece to the board
-            board.addPiece(this);
+            //we need to capture the piece from the board
+            board.capturePiece(this);
         }
-
-
-
-        //update the current state
-        currentState = stateToGo;
+//        else if(!stateToGo.isCaptured){
+//            //we need to add the piece to the board
+//            board.undoCapture(this);
+//        }
     }
 
     private void demote() {
@@ -246,15 +278,12 @@ public class Piece implements GameEntity {
             throw new RuntimeException(e);
         }
 
-        //remove the current piece
-        board.removePiece(this);
-        //add the new piece
-        board.addPiece(piece);
+        board.replacePiece(this, piece, false);
     }
 
     protected void capture(Piece piece){
-        board.removePiece(piece);
-        piece.currentState.isCaptured = true;
+        //board.removePiece(piece);
+        board.capturePiece(piece);
     }
 
     private void doAnimation(float dt){
@@ -271,13 +300,12 @@ public class Piece implements GameEntity {
         }
     }
 
+    public void refreshDisplayPosition(){
+        obj.setModelMat(tile.getObj().getModelMat().clone());
+    }
+
     private void completeAnimation(){
-        Vec2i trans = new Vec2i(dstTile.pos.x - srcTile.pos.x, dstTile.pos.y - srcTile.pos.y);
-        Vec3 translation = new Vec3(trans.x* DyConst.tile_size, 0, trans.y*DyConst.tile_size);
-        // Update game state
-        obj.setTranslation(srcTile.getWorldPos());
-        obj.translate(translation);
-        obj.changeState(Obj3D.State.NORMAL);
+        refreshDisplayPosition();
         // Reset animation variables
         isDoingAnimation = false;
         fCurrentAnimationTime = 0f;
@@ -326,12 +354,14 @@ public class Piece implements GameEntity {
         public boolean isCaptured;
         public boolean isPromoted;
         public String promotingNotation;
+        public boolean movedInThisTurn;
         public PieceState(){
             pos = null;
             hasMoved = false;
             justAdvancedTwoTiles = false;
             isCaptured = false;
             isPromoted = false;
+            movedInThisTurn = false;
         }
 
         @Override
@@ -342,7 +372,13 @@ public class Piece implements GameEntity {
             clone.justAdvancedTwoTiles = justAdvancedTwoTiles;
             clone.isCaptured = isCaptured;
             clone.isPromoted = isPromoted;
+            clone.promotingNotation = promotingNotation;
+            clone.movedInThisTurn = movedInThisTurn;
             return clone;
+        }
+
+        public boolean equals(PieceState pieceState){
+            return pos.isEqual(pieceState.pos) && isCaptured == pieceState.isCaptured;
         }
     }
 }

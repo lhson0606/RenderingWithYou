@@ -40,7 +40,7 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
         //ugly diagram by me
         //https://app.diagrams.net/#G1kvrd5YVAJhFpZ6-JCbSDUIHSVGOq_gVz
 
-        if(!Player.getInstance().isInTurn()) return false;
+        //if(!Player.getInstance().isInTurn()) return false;
 
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:

@@ -1,5 +1,7 @@
 package com.dy.app.gameplay.piece;
 
+import android.util.Log;
+
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
@@ -72,9 +74,9 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public void updatePieceState() {
+    public void updatePieceStateAfterWritingToHistory() {
         currentState.justAdvancedTwoTiles = false;
-        super.updatePieceState();
+        super.updatePieceStateAfterWritingToHistory();
     }
 
     @Override
@@ -200,6 +202,9 @@ public class Pawn extends Piece{
         if(!tile.hasPiece()){
             possibleMoves.add(tile);
             if(!currentState.hasMoved){
+                if(pos.y-2 == -1){
+                    Log.d("Pawn", "y-2 is -1");
+                }
                 tile = board.getTile(new Vec2i(pos.x, pos.y - 2));
                 if(!tile.hasPiece()){
                     possibleMoves.add(tile);
@@ -285,11 +290,11 @@ public class Pawn extends Piece{
                 throw new RuntimeException("Invalid piece promotion notation");
         }
 
-        board.pseudoRemove(this);
-        board.pseudoAdd(piece);
+        //board.pseudoRemove(this);
+        //board.pseudoAdd(piece);
     }
 
-    public void promote(String piecePromotionNotation) throws IOException {
+    public void promote(String piecePromotionNotation, boolean inheritState) throws IOException {
         Piece piece = null;
         Skin skin = null;
 
@@ -322,9 +327,7 @@ public class Pawn extends Piece{
 
         //set the state of the piece
         currentState.isPromoted = true;
-        piece.currentState = currentState;
-        board.removePiece(this);
-        board.addPiece(piece);
+        board.replacePiece(this, piece, inheritState);
     }
 
     @Override

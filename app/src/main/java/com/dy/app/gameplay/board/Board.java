@@ -38,7 +38,7 @@ public class Board implements GameEntity {
     public static int NO_CHECK = 0;
     public static int IS_CHECK = 1;
     public static int IS_CHECKMATE = 2;
-    private int moveCount = 0;
+    private int moveCount = 1;
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
         this.context = context;
@@ -328,7 +328,13 @@ public class Board implements GameEntity {
         }
 
         for(Piece piece : pieceManager.getActivePieces()){
-            piece.updatePieceState();
+            piece.updatePieceStateBeforeWritingToHistory();
+        }
+
+        //no need to write to history
+
+        for(Piece piece : pieceManager.getAllPieces()){
+            piece.updatePieceStateAfterWritingToHistory();
         }
     }
 
@@ -382,7 +388,7 @@ public class Board implements GameEntity {
             Piece piece = move.getDesTile().getPiece();
             Pawn pawn = (Pawn) piece;
             try {
-                pawn.promote(move.getPromotingPieceNotation());
+                pawn.promote(move.getPromotingPieceNotation(), true);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -441,11 +447,15 @@ public class Board implements GameEntity {
         }
 
         for(Piece piece : pieceManager.getActivePieces()){
-            piece.updatePieceState();
+            piece.updatePieceStateBeforeWritingToHistory();
         }
 
         for(Piece piece : pieceManager.getAllPieces()){
             piece.addStateToHistory();
+        }
+
+        for(Piece piece : pieceManager.getActivePieces()){
+            piece.updatePieceStateAfterWritingToHistory();
         }
     }
 
@@ -473,13 +483,23 @@ public class Board implements GameEntity {
         return pieceManager;
     }
 
-    public void removePiece(Piece piece) {
-        pieceManager.removePiece(piece);
+    public void capturePiece(Piece piece) {
+        piece.getTile().setPiece(null);
+        pieceManager.capturePiece(piece);
     }
 
-    public void addPiece(Piece piece){
-        piece.getTile().setPiece(piece);
-        pieceManager.addPiece(piece);
+    public void replacePiece(Piece srcPiece, Piece desPiece, boolean inheritState) {
+        if(inheritState){
+            desPiece.currentState = srcPiece.currentState;
+        }
+        srcPiece.getTile().setPiece(desPiece);
+        pieceManager.replacePiece(srcPiece, desPiece);
+    }
+
+    public void pseudoReplacePiece(Piece srcPiece, Piece desPiece) {
+        desPiece.currentState = srcPiece.currentState;
+        srcPiece.getTile().setPiece(desPiece);
+        pieceManager.pseudoReplace(srcPiece, desPiece);
     }
 
     public ObjManager getObjManager() {
@@ -506,12 +526,18 @@ public class Board implements GameEntity {
         return 0;
     }
 
-    public void pseudoRemove(Piece piece) {
-        pieceManager.ghostRemove(piece);
+    public void pseudoCapture(Piece piece) {
+        pieceManager.capturePiece(piece);
     }
 
-    public void pseudoAdd(Piece piece) {
-        pieceManager.ghostAdd(piece);
+    public void pseudoReplace(Piece src, Piece dst) {
+        //pieceManager.pseduoReplace(src, dst);
+    }
+
+    private void checkForUndoCapture(int moveNumber){
+        for(Piece piece : pieceManager.getAllPieces()){
+            piece.checkForUndoCapture(moveNumber);
+        }
     }
 
     public void goToMove(int moveNumber){
@@ -523,16 +549,19 @@ public class Board implements GameEntity {
 
             if(moveNumber == moveCount) return;
 
-            //first, we need to set containing piece of all tiles to null
-            for(int i = 0; i < DyConst.row_count; i++){
-                for(int j = 0; j < DyConst.col_count; j++){
-                    tiles[i][j].setPiece(null);
-                }
-            }
-
             //perform move to the desired state
             for(Piece piece : pieceManager.getAllPieces()){
                 piece.goToMove(moveNumber);
+            }
+
+            checkForUndoCapture(moveNumber);
+
+            for(Piece piece : pieceManager.getActivePieces()){
+                piece.setStateAtMoveNumber(moveNumber);
+            }
+
+            for(Piece piece: pieceManager.getBlackPieces()){
+                piece.refreshDisplayPosition();
             }
 
             for(Piece piece : pieceManager.getActivePieces()){
@@ -540,7 +569,7 @@ public class Board implements GameEntity {
             }
 
             //update the current count
-            moveCount = moveNumber;
+            //moveCount = moveNumber;
         }finally {
             mutex.unlock();
         }
@@ -553,5 +582,9 @@ public class Board implements GameEntity {
         }finally {
             mutex.unlock();
         }
+    }
+
+    public void undoCapture(Piece piece) {
+        pieceManager.undoCapture(piece);
     }
 }

@@ -50,6 +50,21 @@ public class WhiteRunner extends Thread{
             //release black
             blackSem.release();
         }
+
+        int moveCount = board.getMoveCount()-1;
+        for(int k = moveCount; k >= 0; k--){
+            try {
+                Thread.sleep(0);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            board.goToMove(k);
+        }
+        board.goToMove(500);
+        board.goToMove(0);
+        board.goToMove(60);
+        board.goToMove(50);
+        board.goToMove(80);
     }
 
     private void performMove(String moveData) {
