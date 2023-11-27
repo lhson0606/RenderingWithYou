@@ -13,7 +13,7 @@ import java.util.concurrent.Semaphore;
 public class EntityManger {
 
     private final Vector<GameEntity> entities = new Vector<>();
-    private final Semaphore mutex = new Semaphore(1);
+    private final Semaphore mutex = new Semaphore(1, true);
     private final Vector<GameEntity> removeList = new Vector<>();
     private DyRenderer renderer;
 
@@ -94,6 +94,8 @@ public class EntityManger {
     public void removeEntity(GameEntity entity){
         try {
             mutex.acquire();
+            if(!entities.contains(entity))
+                throw new RuntimeException("Entity not found");
             entities.remove(entity);
             removeList.add(entity);
         } catch (InterruptedException e) {

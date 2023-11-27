@@ -1,17 +1,13 @@
 package com.dy.app.gameplay.board;
 
 import android.content.Context;
-import android.graphics.Shader;
 import android.util.Log;
 
-import com.airbnb.lottie.L;
-import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.common.maths.Vec3;
-import com.dy.app.core.GameCore;
 import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.move.ChessMove;
-import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.gameplay.piece.King;
 import com.dy.app.gameplay.piece.Pawn;
 import com.dy.app.gameplay.piece.Piece;
@@ -38,7 +34,11 @@ public class Board implements GameEntity {
     private PieceManager pieceManager;
     private Tile prevSrcTile = null;
     private Tile prevDesTile = null;
-    private final ReentrantLock mutex = new ReentrantLock();
+    private final ReentrantLock mutex = new ReentrantLock(true);
+    public static int NO_CHECK = 0;
+    public static int IS_CHECK = 1;
+    public static int IS_CHECKMATE = 2;
+    private int moveCount = 0;
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
         this.context = context;
@@ -124,6 +124,14 @@ public class Board implements GameEntity {
         }
     }
 
+    public Vector<Piece> getPieceByNotation(boolean isWhite, String pieceNotation, Tile des){
+        if(isWhite){
+            return getWhitePiecesByNotation(pieceNotation, des);
+        }else{
+            return getBlackPiecesByNotation(pieceNotation, des);
+        }
+    }
+
     public Vector<Piece> getWhitePiecesByNotation(String pieceNotation, Tile des){
         Vector<Piece> pieces = pieceManager.getWhitePieces();
 
@@ -171,14 +179,29 @@ public class Board implements GameEntity {
             return result;
         } else if(pieceNotation.length() == 2){
             final String pieceName = pieceNotation.substring(0, 1);
-            final char file = pieceNotation.charAt(1);
-            final int x = 7 - (file - 'a');
-            for(Piece piece : pieces){
-                if(piece.getNotation().equals(pieceName) && piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
-                    result.add(piece);
+            final char c = pieceNotation.charAt(1);
+
+            if(isFile(c)){
+                final int x = 7 - (c - 'a');
+                for(Piece piece : pieces){
+                    if(piece.getNotation().equals(pieceName) && piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
+                        result.add(piece);
+                    }
                 }
+
+                return result;
+            }else if(isRank(c)){
+                final int y = c - '1';
+                for(Piece piece : pieces){
+                    if(piece.getNotation().equals(pieceName) && piece.getTile().pos.y == y && piece.getPossibleMoves().contains(des)){
+                        result.add(piece);
+                    }
+                }
+
+                return result;
+            }else{
+                throw new RuntimeException("Unknown character");
             }
-            return result;
         } else if(pieceNotation.length() == 3){
             final String pieceName = pieceNotation.substring(0, 1);
             final char file = pieceNotation.charAt(1);
@@ -194,6 +217,14 @@ public class Board implements GameEntity {
         }
 
         return result;
+    }
+
+    private boolean isFile(char c){
+        return c >= 'a' && c <= 'h';
+    }
+
+    private boolean isRank(char c){
+        return c >= '1' && c <= '8';
     }
 
     public Vector<Piece> getBlackPiecesByNotation(String pieceNotation, Tile des){
@@ -231,14 +262,29 @@ public class Board implements GameEntity {
             return result;
         } else if(pieceNotation.length() == 2){
             final String pieceName = pieceNotation.substring(0, 1);
-            final char file = pieceNotation.charAt(1);
-            final int x = 7 - (file - 'a');
-            for(Piece piece : pieces){
-                if(piece.getNotation().equals(pieceName) && piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
-                    result.add(piece);
+            final char c = pieceNotation.charAt(1);
+
+            if(isFile(c)){
+                final int x = 7 - (c - 'a');
+                for(Piece piece : pieces){
+                    if(piece.getNotation().equals(pieceName) && piece.getTile().pos.x == x && piece.getPossibleMoves().contains(des)){
+                        result.add(piece);
+                    }
                 }
+
+                return result;
+            }else if(isRank(c)){
+                final int y = c - '1';
+                for(Piece piece : pieces){
+                    if(piece.getNotation().equals(pieceName) && piece.getTile().pos.y == y && piece.getPossibleMoves().contains(des)){
+                        result.add(piece);
+                    }
+                }
+
+                return result;
+            }else{
+                throw new RuntimeException("Unknown character");
             }
-            return result;
         } else if(pieceNotation.length() == 3){
             final String pieceName = pieceNotation.substring(0, 1);
             final char file = pieceNotation.charAt(1);
@@ -254,6 +300,36 @@ public class Board implements GameEntity {
         }
 
         return result;
+    }
+
+    public void pseudoMoveByNotation(String moveNotation, boolean isWhite) throws Exception {
+        try {
+            mutex.lock();
+            ChessMove move = new ChessMove(isWhite, moveNotation, this);
+            Tile srcTile = move.getSrcTile();
+            Piece piece = srcTile.getPiece();
+            Tile desTile = move.getDesTile();
+
+            if(!piece.getPossibleMoves().contains(desTile)){
+                throw new RuntimeException("Invalid move");
+            }
+
+            piece.pseudoMove(desTile.pos);
+            pseudoCheckForPromotionMove(move);
+            pseudoUpdateBoardState();
+        }finally {
+            mutex.unlock();
+        }
+    }
+
+    private void pseudoUpdateBoardState() {
+        for(Piece piece : pieceManager.getActivePieces()){
+            piece.updatePossibleMoves();
+        }
+
+        for(Piece piece : pieceManager.getActivePieces()){
+            piece.updatePieceState();
+        }
     }
 
     public void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
@@ -278,6 +354,7 @@ public class Board implements GameEntity {
             piece.move(desTile.pos);
             checkForPromotionMove(move);
             updateBoardState();
+            moveCount++;
 
             srcTile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
             desTile.getObj().changeState(Obj3D.State.SOURCE);
@@ -285,6 +362,18 @@ public class Board implements GameEntity {
             prevDesTile = desTile;
         }finally {
             mutex.unlock();
+        }
+    }
+
+    public void pseudoCheckForPromotionMove(ChessMove move){
+        if(move.isPromotionMove()){
+            Piece piece = move.getDesTile().getPiece();
+            Pawn pawn = (Pawn) piece;
+            try {
+                pawn.pseudoPromote(move.getPromotingPieceNotation());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -347,16 +436,16 @@ public class Board implements GameEntity {
     }
 
     public void updateBoardState(){
-        for(Piece piece : pieceManager.getAllPieces()){
+        for(Piece piece : pieceManager.getActivePieces()){
             piece.updatePossibleMoves();
         }
 
-        for(Piece piece : pieceManager.getAllPieces()){
+        for(Piece piece : pieceManager.getActivePieces()){
             piece.updatePieceState();
         }
 
         for(Piece piece : pieceManager.getAllPieces()){
-            piece.resetPieceState();
+            piece.addStateToHistory();
         }
     }
 
@@ -399,5 +488,70 @@ public class Board implements GameEntity {
 
     public AssetManger getAssetManger() {
         return assetManger;
+    }
+
+    public int testForCheck(boolean isWhite){
+        if(isWhite){
+            return testForWhiteCheck();
+        }else{
+            return testForBlackCheck();
+        }
+    }
+
+    private int testForWhiteCheck() {
+        return 0;
+    }
+
+    private int testForBlackCheck() {
+        return 0;
+    }
+
+    public void pseudoRemove(Piece piece) {
+        pieceManager.ghostRemove(piece);
+    }
+
+    public void pseudoAdd(Piece piece) {
+        pieceManager.ghostAdd(piece);
+    }
+
+    public void goToMove(int moveNumber){
+        try{
+            mutex.lock();
+            if(moveNumber < 0 || moveNumber > moveCount){
+                throw new RuntimeException("Invalid move number");
+            }
+
+            if(moveNumber == moveCount) return;
+
+            //first, we need to set containing piece of all tiles to null
+            for(int i = 0; i < DyConst.row_count; i++){
+                for(int j = 0; j < DyConst.col_count; j++){
+                    tiles[i][j].setPiece(null);
+                }
+            }
+
+            //perform move to the desired state
+            for(Piece piece : pieceManager.getAllPieces()){
+                piece.goToMove(moveNumber);
+            }
+
+            for(Piece piece : pieceManager.getActivePieces()){
+                piece.updatePossibleMoves();
+            }
+
+            //update the current count
+            moveCount = moveNumber;
+        }finally {
+            mutex.unlock();
+        }
+    }
+
+    public int getMoveCount(){
+        try {
+            mutex.lock();
+            return moveCount;
+        }finally {
+            mutex.unlock();
+        }
     }
 }

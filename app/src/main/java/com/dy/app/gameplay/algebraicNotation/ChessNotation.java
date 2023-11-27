@@ -1,7 +1,6 @@
-package com.dy.app.gameplay.notation;
+package com.dy.app.gameplay.algebraicNotation;
 
 import com.dy.app.common.maths.Vec2i;
-import com.dy.app.gameplay.piece.King;
 
 public class ChessNotation {
     public static final String KING = "K";

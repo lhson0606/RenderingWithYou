@@ -6,14 +6,19 @@ import com.dy.app.common.maths.Vec3;
 import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
+import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.model.Obj3D;
+import com.dy.app.manager.AssetManger;
 import com.dy.app.manager.EntityManger;
 import com.dy.app.manager.PieceManager;
 import com.dy.app.utils.DyConst;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Piece implements GameEntity {
@@ -30,6 +35,9 @@ public class Piece implements GameEntity {
     public void pickUp() {
         isPicking = true;
     }
+    public PieceState currentState = new PieceState();
+
+    protected final Map<Integer, PieceState> history = new HashMap<Integer, PieceState>();
 
     public void putDown(){
         isPicking = false;
@@ -50,9 +58,6 @@ public class Piece implements GameEntity {
     }
 
     public void updatePieceState(){
-    }
-
-    public void resetPieceState() {
     }
 
     public void showPossibleMoves(){
@@ -129,6 +134,13 @@ public class Piece implements GameEntity {
         this.possibleMoves = new Vector<Tile>();
         this.pieceColor = pieceColor;
         this.board = board;
+        this.currentState.pos = tile.pos;
+        //save the initial state
+        addStateToHistory();
+    }
+
+    public void addStateToHistory(){
+        this.history.put(this.history.size(), currentState.clone());
     }
 
     public boolean isOnPlayerSide(){
@@ -137,6 +149,24 @@ public class Piece implements GameEntity {
 
     public Tile getTile(){
         return tile;
+    }
+
+    private PieceState rollbackState = null;
+
+    public void pseudoMove(Vec2i pos){
+        rollbackState = currentState.clone();
+        tile.setPiece(null);
+        tile = board.getTile(pos);
+        if(tile.getPiece() != null){
+            //we only need to perform pseudo capture if there is a piece to capture
+            pseudoCapture(tile.getPiece());
+        }
+        tile.setPiece(this);
+    }
+
+    public void pseudoCapture(Piece piece) {
+        board.pseudoRemove(piece);
+        piece.currentState.isCaptured = true;
     }
 
     public Tile move(Vec2i pos){
@@ -152,13 +182,79 @@ public class Piece implements GameEntity {
             capture(tile.getPiece());
         }
         tile.setPiece(this);
+        //update state pos
+        currentState.pos = tile.pos;
 
         startMoveAnimation(oldTile, newTile);
         return tile;
     }
 
+    public void goToMove(int moveNumber) {
+        PieceState stateToGo = history.get(moveNumber);
+        if(!stateToGo.isCaptured && !currentState.isCaptured){
+            //we need to reset the piece position
+            Tile dstTile = board.getTile(stateToGo.pos);
+            Tile srcTile = board.getTile(currentState.pos);
+            final Semaphore sem = new Semaphore(0);
+            startMoveAnimation(srcTile, dstTile,()->{
+                sem.release();
+            });
+            try {
+                sem.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            //if it's promoted need to promote it
+            if(stateToGo.isPromoted && !currentState.isPromoted){
+                try {
+                    ((Pawn)this).promote(stateToGo.promotingNotation);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else if(!stateToGo.isPromoted && currentState.isPromoted){
+                //we need to demote the piece
+                demote();
+            }
+        }else if(stateToGo.isCaptured && !currentState.isCaptured){
+            //we need to remove the piece from the board
+            board.removePiece(this);
+        }else if(!stateToGo.isCaptured){
+            //we need to add the piece to the board
+            board.addPiece(this);
+        }
+
+
+
+        //update the current state
+        currentState = stateToGo;
+    }
+
+    private void demote() {
+        Piece piece = null;
+        Skin skin = null;
+
+        if(isOnPlayerSide()){
+            skin = board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER);
+        }else{
+            skin = board.getAssetManger().getSkin(AssetManger.SkinType.RIVAL);
+        }
+
+        //create a new pawn
+        try {
+            piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),skin ,DyConst.pawn, tile.pos, pieceColor);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        //remove the current piece
+        board.removePiece(this);
+        //add the new piece
+        board.addPiece(piece);
+    }
+
     protected void capture(Piece piece){
         board.removePiece(piece);
+        piece.currentState.isCaptured = true;
     }
 
     private void doAnimation(float dt){
@@ -187,13 +283,28 @@ public class Piece implements GameEntity {
         fCurrentAnimationTime = 0f;
         dstTile = null;
         srcTile = null;
+        if(onAnimationFinished != null){
+            onAnimationFinished.onAnimationFinished();
+        }
+        onAnimationFinished = null;
     }
 
-    protected void startMoveAnimation(Tile srcTile, Tile dstTile){
+    private OnAnimationFinished onAnimationFinished = null;
+
+    private void startMoveAnimation(Tile srcTile, Tile dstTile){
+        startMoveAnimation(srcTile, dstTile, null);
+    }
+
+    protected void startMoveAnimation(Tile srcTile, Tile dstTile, OnAnimationFinished onAnimationFinished){
         //set do animation to true
         isDoingAnimation = true;
         this.srcTile = srcTile;
         this.dstTile = dstTile;
+        this.onAnimationFinished = onAnimationFinished;
+    }
+
+    private interface OnAnimationFinished{
+        void onAnimationFinished();
     }
 
     public Vector<Tile> getPossibleMoves(){
@@ -206,5 +317,32 @@ public class Piece implements GameEntity {
 
     public String getNotation(){
         return "";
+    }
+
+    public class PieceState implements Cloneable{
+        public Vec2i pos;
+        public boolean hasMoved;
+        public boolean justAdvancedTwoTiles;
+        public boolean isCaptured;
+        public boolean isPromoted;
+        public String promotingNotation;
+        public PieceState(){
+            pos = null;
+            hasMoved = false;
+            justAdvancedTwoTiles = false;
+            isCaptured = false;
+            isPromoted = false;
+        }
+
+        @Override
+        public PieceState clone() {
+            PieceState clone = new PieceState();
+            clone.pos = pos;
+            clone.hasMoved = hasMoved;
+            clone.justAdvancedTwoTiles = justAdvancedTwoTiles;
+            clone.isCaptured = isCaptured;
+            clone.isPromoted = isPromoted;
+            return clone;
+        }
     }
 }

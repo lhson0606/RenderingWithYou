@@ -43,11 +43,16 @@ public class ScriptsRunner extends Thread{
         }
 
         BlackRunner blackRunner = new BlackRunner(moves, board, whiteSem, blackSem);
-        //blackRunner.start();
+        blackRunner.start();
         WhiteRunner whiteRunner = new WhiteRunner(moves, board, whiteSem, blackSem);
-        //whiteRunner.start();
+        whiteRunner.start();
 
         Log.d(TAG, " run: stopped");
+    }
+
+    private String preProcess(String data){
+        //delete all '\r' characters
+        return data.replaceAll("\r", "");
     }
 
     private void parsePGN() throws IOException {
@@ -70,6 +75,7 @@ public class ScriptsRunner extends Thread{
         };
 
         data = builder.toString();
+        data = preProcess(data);
 
         String[] splitResult = data.split("\n\n");
 
@@ -81,6 +87,9 @@ public class ScriptsRunner extends Thread{
         String movesStr = splitResult[1];
 
         parseMeta(metaStr);
+
+        //convert ".\s*" to ". "
+        movesStr = movesStr.replaceAll("\\.\\s*", ". ");
         parseMoves(movesStr);
     }
 

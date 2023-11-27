@@ -1,20 +1,14 @@
 package com.dy.app.gameplay.piece;
 
-import android.util.Log;
-
-import com.anychart.charts.Pie;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
-import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.graphic.model.Obj3D;
 
 import java.util.Vector;
 
 public class King extends Piece{
-    boolean hasMoved = false;
-    boolean inCheckMate = false;
-    boolean inStaleMate = false;
 
     public King(Tile tile, Obj3D obj, boolean onPlayerSide, PieceColor pieceColor, Board board){
         super(tile, obj, onPlayerSide, pieceColor, board);
@@ -22,12 +16,41 @@ public class King extends Piece{
 
     @Override
     public Tile move(Vec2i pos) {
-        if(!hasMoved){
+        if(!currentState.hasMoved){
             if(isCastlingMove(pos)){
                 return performCastle(pos);
             }
         }
-        hasMoved = true;
+        currentState.hasMoved = true;
+        return super.move(pos);
+    }
+
+    @Override
+    public void pseudoMove(Vec2i pos) {
+        if(!currentState.hasMoved){
+            if(isCastlingMove(pos)){
+                pseudoCastle(pos);
+            }
+        }
+        currentState.hasMoved = true;
+        super.pseudoMove(pos);
+    }
+
+    private void pseudoCastle(Vec2i pos) {
+        //first moved the rook then the king
+        //check if the move is long castling or short castling
+        Tile rookTile = board.getTile(getCastlingRookPos(pos));
+        Rook rook = (Rook) rookTile.getPiece();
+        rook.pseudoMove(getRookPosAfterCastling(pos));
+        super.pseudoMove(pos);
+    }
+
+    public Tile performCastle(Vec2i pos) {
+        //first moved the rook then the king
+        //check if the move is long castling or short castling
+        Tile rookTile = board.getTile(getCastlingRookPos(pos));
+        Rook rook = (Rook) rookTile.getPiece();
+        rook.move(getRookPosAfterCastling(pos));
         return super.move(pos);
     }
 
@@ -64,7 +87,7 @@ public class King extends Piece{
             }
         }
 
-        if(!hasMoved){
+        if(!currentState.hasMoved){
             possibleMoves.addAll(getPossibleCastlingSquare());
         }
     }
@@ -103,7 +126,7 @@ public class King extends Piece{
             throw new RuntimeException("Invalid castling move");
         }
         //+ king has not moved
-        if(hasMoved) return false;
+        if(currentState.hasMoved) return false;
         //+ rook has not moved
         Vec2i rookPos = getCastlingRookPos(dstPos);
         Piece currentPiece = board.getTile(getCastlingRookPos(dstPos)).getPiece();
@@ -124,15 +147,6 @@ public class King extends Piece{
 
     private boolean isInCheck(){
         return board.getPieceDifferentColorControlledTile(this.isWhite()).contains(tile);
-    }
-
-    public Tile performCastle(Vec2i pos) {
-        //first moved the rook then the king
-        //check if the move is long castling or short castling
-        Tile rookTile = board.getTile(getCastlingRookPos(pos));
-        Rook rook = (Rook) rookTile.getPiece();
-        rook.move(getRookPosAfterCastling(pos));
-        return super.move(pos);
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.dy.app.gameplay.move;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
-import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.gameplay.piece.King;
 import com.dy.app.gameplay.piece.Piece;
 

@@ -1,12 +1,10 @@
 package com.dy.app.gameplay.piece;
 
-import android.util.Log;
-
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
-import com.dy.app.gameplay.notation.ChessNotation;
-import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.algebraicNotation.ChessNotation;
+import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.manager.AssetManger;
 import com.dy.app.utils.DyConst;
@@ -15,8 +13,6 @@ import java.io.IOException;
 import java.util.Vector;
 
 public class Pawn extends Piece{
-    private boolean hasMoved = false;
-    private boolean justAdvancedTwoTiles = false;
 
     public Pawn(Tile tile, Obj3D obj, boolean onPlayerSide, PieceColor pieceColor, Board board){
         super(tile, obj, onPlayerSide, pieceColor, board);
@@ -24,32 +20,38 @@ public class Pawn extends Piece{
 
     @Override
     public Tile move(Vec2i pos){
+
         if(Math.abs(pos.y - tile.pos.y) == 2) {
-            justAdvancedTwoTiles = true;
+            currentState.justAdvancedTwoTiles = true;
         }
 
-        hasMoved = true;
+        currentState.hasMoved = true;
 
         if(isAnEnPassantMove(pos)){
             captureEnPassant(pos);
         }
 
-        //perform move
-        tile.setPiece(null);
-        Tile newTile = board.getTile(pos);
-        Tile oldTile = tile;
+        return super.move(pos);
+    }
 
-        tile.setPiece(null);
-        tile = newTile;
-        //check if there is a piece to capture
-        if(tile.getPiece() != null){
-            capture(tile.getPiece());
+    @Override
+    public void pseudoMove(Vec2i pos) {
+        if(Math.abs(pos.y - tile.pos.y) == 2) {
+            currentState.justAdvancedTwoTiles = true;
         }
 
-        tile.setPiece(this);
+        currentState.hasMoved = true;
 
-        startMoveAnimation(oldTile, newTile);
-        return tile;
+        if(isAnEnPassantMove(pos)){
+            pseudoEnPassant(pos);
+        }
+        super.pseudoMove(pos);
+    }
+
+    private void pseudoEnPassant(Vec2i pos) {
+        //get captured piece
+        Vec2i capturedPos = new Vec2i(pos.x, this.tile.pos.y);
+        pseudoCapture(board.getTile(capturedPos).getPiece());
     }
 
     private void captureEnPassant(Vec2i pos) {
@@ -71,6 +73,7 @@ public class Pawn extends Piece{
 
     @Override
     public void updatePieceState() {
+        currentState.justAdvancedTwoTiles = false;
         super.updatePieceState();
     }
 
@@ -85,11 +88,6 @@ public class Pawn extends Piece{
 
        //add any possible existing en passant moves
        possibleMoves.addAll(getPossibleEnPassantMoves());
-    }
-
-    @Override
-    public void resetPieceState() {
-        justAdvancedTwoTiles = false;
     }
 
     public Vector<Tile> getPossibleEnPassantMoves(){
@@ -201,7 +199,7 @@ public class Pawn extends Piece{
         tile = board.getTile(new Vec2i(pos.x, pos.y - 1));
         if(!tile.hasPiece()){
             possibleMoves.add(tile);
-            if(!hasMoved){
+            if(!currentState.hasMoved){
                 tile = board.getTile(new Vec2i(pos.x, pos.y - 2));
                 if(!tile.hasPiece()){
                     possibleMoves.add(tile);
@@ -239,7 +237,7 @@ public class Pawn extends Piece{
         tile = board.getTile(new Vec2i(pos.x, pos.y + 1));
         if(!tile.hasPiece()){
             possibleMoves.add(tile);
-            if(!hasMoved){
+            if(!currentState.hasMoved){
                 tile = board.getTile(new Vec2i(pos.x, pos.y + 2));
                 if(!tile.hasPiece()){
                     possibleMoves.add(tile);
@@ -263,25 +261,68 @@ public class Pawn extends Piece{
         }
     }
 
-    public void promote(String piecePromotionNotation) throws IOException {
+    public void pseudoPromote(String piecePromotionNotation) throws IOException {
         Piece piece = null;
+
         switch (piecePromotionNotation){
             case ChessNotation.QUEEN:
-                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER),DyConst.queen, tile.pos, pieceColor);
+                piece = new Queen(tile, obj, isOnPlayerSide(), pieceColor, board);
+                tile.setPiece(piece);
                 break;
             case ChessNotation.ROOK:
-                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER),DyConst.rook, tile.pos, pieceColor);
+                piece = new Rook(tile, obj, isOnPlayerSide(), pieceColor, board);
+                tile.setPiece(piece);
                 break;
             case ChessNotation.BISHOP:
-                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER),DyConst.bishop, tile.pos, pieceColor);
+                piece = new Bishop(tile, obj, isOnPlayerSide(), pieceColor, board);
+                tile.setPiece(piece);
                 break;
             case ChessNotation.KNIGHT:
-                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER),DyConst.knight, tile.pos, pieceColor);
+                piece = new Knight(tile, obj, isOnPlayerSide(), pieceColor, board);
+                tile.setPiece(piece);
                 break;
             default:
                 throw new RuntimeException("Invalid piece promotion notation");
         }
 
+        board.pseudoRemove(this);
+        board.pseudoAdd(piece);
+    }
+
+    public void promote(String piecePromotionNotation) throws IOException {
+        Piece piece = null;
+        Skin skin = null;
+
+        if(isOnPlayerSide()){
+            skin = board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER);
+        }else{
+            skin = board.getAssetManger().getSkin(AssetManger.SkinType.RIVAL);
+        }
+
+        switch (piecePromotionNotation){
+            case ChessNotation.QUEEN:
+                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),skin ,DyConst.queen, tile.pos, pieceColor);
+                currentState.promotingNotation = ChessNotation.QUEEN;
+                break;
+            case ChessNotation.ROOK:
+                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),skin ,DyConst.rook, tile.pos, pieceColor);
+                currentState.promotingNotation = ChessNotation.ROOK;
+                break;
+            case ChessNotation.BISHOP:
+                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),skin ,DyConst.bishop, tile.pos, pieceColor);
+                currentState.promotingNotation = ChessNotation.BISHOP;
+                break;
+            case ChessNotation.KNIGHT:
+                piece = board.getPieceManager().loadSinglePiece(board, isOnPlayerSide(),skin ,DyConst.knight, tile.pos, pieceColor);
+                currentState.promotingNotation = ChessNotation.KNIGHT;
+                break;
+            default:
+                throw new RuntimeException("Invalid piece promotion notation");
+        }
+
+        //set the state of the piece
+        currentState.isPromoted = true;
+        piece.currentState = currentState;
         board.removePiece(this);
         board.addPiece(piece);
     }
@@ -292,6 +333,6 @@ public class Pawn extends Piece{
     }
 
     public boolean justAdvancedTwoTiles(){
-        return justAdvancedTwoTiles;
+        return currentState.justAdvancedTwoTiles;
     }
 }

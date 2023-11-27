@@ -3,13 +3,12 @@ package com.dy.app.gameplay.piece;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
-import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.graphic.model.Obj3D;
 
 import java.util.Vector;
 
 public class Rook extends Piece{
-    private boolean hasMoved = false;
 
     public Rook(Tile tile, Obj3D obj, boolean onPlayerSide, PieceColor pieceColor, Board board){
         super(tile, obj, onPlayerSide, pieceColor, board);
@@ -71,8 +70,14 @@ public class Rook extends Piece{
 
     @Override
     public Tile move(Vec2i pos) {
-        hasMoved = true;
+        currentState.hasMoved = true;
         return super.move(pos);
+    }
+
+    @Override
+    public void pseudoMove(Vec2i pos) {
+        currentState.hasMoved = true;
+        super.pseudoMove(pos);
     }
 
     @Override
@@ -81,7 +86,7 @@ public class Rook extends Piece{
     }
 
     public boolean hasMoved() {
-        return hasMoved;
+        return currentState.hasMoved;
     }
 
     @Override

@@ -1,23 +1,15 @@
 package com.dy.app.gameplay.board;
 
-import android.graphics.Bitmap;
-
-import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.common.maths.Vec3;
-import com.dy.app.core.GameCore;
-import com.dy.app.gameplay.notation.ChessNotation;
+import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.Material;
 import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.model.Texture;
-import com.dy.app.graphic.shader.ShaderHelper;
-import com.dy.app.graphic.shader.TileShader;
 import com.dy.app.manager.AssetManger;
 import com.dy.app.utils.DyConst;
-
-import java.io.IOException;
 
 public class Tile {
     public Vec2i pos;

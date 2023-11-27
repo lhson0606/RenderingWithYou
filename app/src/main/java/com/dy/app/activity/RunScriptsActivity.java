@@ -34,9 +34,17 @@ public class RunScriptsActivity extends FragmentHubActivity{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         mainHandler = new Handler(getMainLooper());
         initCore();
-        runScript("scripts/carlsen_kasparov_2004.pgn");
+        //runScript("scripts/carlsen_kasparov_2004.pgn");
         //carlsen_nakamura_2009.pgn
-        //runScript("scripts/carlsen_nakamura_2009.pgn");
+        runScript("scripts/carlsen_nakamura_2009.pgn");
+        //nepomniachtchi_ding_liren_2023.pgn
+        //runScript("scripts/nepomniachtchi_ding_liren_2023.pgn");
+        //ding_liren_nepomniachtchi_2023.pgn
+        //runScript("scripts/ding_liren_nepomniachtchi_2023.pgn");
+        //ding_liren_nepomniachtchi_2023_90_moves.pgn
+        //runScript("scripts/ding_liren_nepomniachtchi_2023_90_moves.pgn");
+        //nikolic_arsovic_1989.pgn
+        //runScript("scripts/nikolic_arsovic_1989.pgn");
     }
 
     private void runScript(String src) {

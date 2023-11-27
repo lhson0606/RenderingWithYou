@@ -62,9 +62,14 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         entityManger.drawEntities();
     }
 
-    public void addAndInitEntityGL(GameEntity entity){
+    public void addAndInitEntityGL(GameEntity entity, OnEntityAdded onEntityAdded){
         gameSurface.queueEvent(() -> {
             entityManger.addAndInitSingleEntity(entity);
+            onEntityAdded.onEntityAdded();
         });
+    }
+
+    public interface OnEntityAdded{
+        void onEntityAdded();
     }
 }
