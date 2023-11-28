@@ -21,6 +21,8 @@ public class GameLoop extends Thread{
     public void run(){
         isRunning = true;
 
+        //surfaceView.getRenderer().waitForGLInit();
+
         while(isRunning){
             draw();
             update();

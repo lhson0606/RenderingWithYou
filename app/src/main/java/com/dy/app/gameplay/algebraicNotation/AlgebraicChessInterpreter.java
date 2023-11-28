@@ -51,8 +51,10 @@ public class AlgebraicChessInterpreter {
         final String captureNotation = isCaptureMove(srcTile, dstTile) ? CAPTURE_NOTATION : "";
         final String dstNotation = getDstNotation(dstTile);
         final String promotionNotation = isPromotionMove(srcTile, dstTile) ? PROMOTION_NOTATION + "?" : "";
+        //#todo check notation
+        final String checkNotation = "";
 
-        return null;
+        return srcNotation + captureNotation + dstNotation + promotionNotation + checkNotation;
     }
 
     private static boolean isPromotionMove(Tile srcTile, Tile dstTile){
@@ -98,7 +100,7 @@ public class AlgebraicChessInterpreter {
 
             String fileNotation = getFileNotation(srcTile.pos.x);
             //try to resolve ambiguity by adding the file notation
-            queryResult = board.getPieceByNotation(piece.isWhite(), pieceNotation, dstTile);
+            queryResult = board.getPieceByNotation(piece.isWhite(), pieceNotation + fileNotation, dstTile);
 
             if(queryResult.size() == 1) {
                 //no ambiguity, return the piece notation
@@ -107,11 +109,11 @@ public class AlgebraicChessInterpreter {
 
             String rankNotation = getRankNotation(srcTile.pos.y);
             //try to resolve ambiguity by adding the rank notation
-            queryResult = board.getPieceByNotation(piece.isWhite(), pieceNotation, dstTile);
+            queryResult = board.getPieceByNotation(piece.isWhite(), pieceNotation + rankNotation, dstTile);
 
             if(queryResult.size() == 1) {
                 //no ambiguity, return the piece notation
-                return pieceNotation + fileNotation + rankNotation;
+                return pieceNotation + rankNotation;
             }
 
             //last resort, add the rank notation

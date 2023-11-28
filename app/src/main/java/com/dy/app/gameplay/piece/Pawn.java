@@ -326,7 +326,11 @@ public class Pawn extends Piece{
         }
 
         //set the state of the piece
-        currentState.isPromoted = true;
+        if(inheritState){
+            currentState.isPromoted = true;
+        }
+
+        piece.history.putAll(history);
         board.replacePiece(this, piece, inheritState);
     }
 

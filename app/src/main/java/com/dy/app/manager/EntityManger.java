@@ -1,6 +1,8 @@
 package com.dy.app.manager;
 
 
+import android.util.Log;
+
 import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.render.DyRenderer;
@@ -14,7 +16,6 @@ public class EntityManger {
 
     private final Vector<GameEntity> entities = new Vector<>();
     private final Semaphore mutex = new Semaphore(1, true);
-    private final Vector<GameEntity> removeList = new Vector<>();
     private DyRenderer renderer;
 
     public void cleanUp(){
@@ -23,11 +24,7 @@ public class EntityManger {
             for(GameEntity e: entities){
                 e.destroy();
             }
-            for(GameEntity e: removeList){
-                e.destroy();
-            }
             entities.clear();
-            removeList.clear();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }finally {
@@ -38,15 +35,18 @@ public class EntityManger {
     public GameEntity newEntity(GameEntity entity){
         try {
             mutex.acquire();
-            if(entities.contains(entity))
-                return entity;
+            if(entities.contains(entity)){
+                throw new RuntimeException("Entity already exists");
+            }
             entities.add(entity);
-            return entity;
+            Log.d("GameEntity", "newEntity: " + entity);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
             mutex.release();
         }
+
+        return entity;
     }
 
     public EntityManger(){
@@ -81,9 +81,11 @@ public class EntityManger {
     public void drawEntities(){
         try {
             mutex.acquire();
+
             for(GameEntity e: entities){
                 e.draw();
             }
+
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
@@ -97,7 +99,6 @@ public class EntityManger {
             if(!entities.contains(entity))
                 throw new RuntimeException("Entity not found");
             entities.remove(entity);
-            removeList.add(entity);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
@@ -135,5 +136,21 @@ public class EntityManger {
 
     public DyRenderer getRenderer(){
         return renderer;
+    }
+
+    public void addAllEntities(Vector<Piece> allPieces) {
+        try {
+            mutex.acquire();
+            for(Piece p: allPieces){
+                if(entities.contains(p)){
+                    throw new RuntimeException("Entity already exists");
+                }
+                entities.add(p);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            mutex.release();
+        }
     }
 }

@@ -15,6 +15,8 @@ import com.dy.app.core.MainCallback;
 import com.dy.app.core.thread.GameLoop;
 import com.dy.app.graphic.display.GameFragment;
 
+import java.util.concurrent.Semaphore;
+
 public class GameActivity extends FragmentHubActivity
 implements MainCallback {
     private ProgressDialog progressDialog;
@@ -68,17 +70,16 @@ implements MainCallback {
             case SET_LOADING_BACKGROUND:
                 findViewById(R.id.loadingBackground).setBackground((BitmapDrawable) o2);
                 break;
-            case SET_GAME_SURFACE:
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
-                ft.replace(R.id.fl_game_surface, gameFragment);
-                ft.commit();
-                break;
             case SET_GAME_BACKGROUND:
                 gameFragment.onMsgFromMain(TAG, t, o1, o2);
                 break;
             case START_GAME:
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                //wait for GL thread to finish
+                gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
+                ft.replace(R.id.fl_game_surface, gameFragment);
+                ft.commit();
                 gameLoop = new GameLoop(gameFragment.getSurfaceView(), gameCore.getEntityManger());
                 gameLoop.start();
                 break;

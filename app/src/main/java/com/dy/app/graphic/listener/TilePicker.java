@@ -7,6 +7,7 @@ import android.view.View;
 
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.common.maths.Vec4;
+import com.dy.app.gameplay.algebraicNotation.AlgebraicChessInterpreter;
 import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
@@ -78,18 +79,24 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                     }else if(!tile.hasPiece()){
                         //perform move
                         lastPiece.putDown();
-                        lastPiece.move(tile.pos);
-                        //#todo for debugging
-                        board.updateBoardState();
-                        cancelPicking();
+                        String moveNotation = AlgebraicChessInterpreter.convertToAlgebraicNotation(board, lastPiece.getTile(), tile);
+                        try {
+                            board.moveByNotation(moveNotation, lastPiece.isOnPlayerSide());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        lastPiece = null;
                         return false;
                     }else{
                         //perform attack
                         lastPiece.putDown();
-                        lastPiece.move(tile.pos);
-                        //#todo for debugging
-                        board.updateBoardState();
-                        cancelPicking();
+                        String moveNotation = AlgebraicChessInterpreter.convertToAlgebraicNotation(board, lastPiece.getTile(), tile);
+                        try {
+                            board.moveByNotation(moveNotation, lastPiece.isOnPlayerSide());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        lastPiece = null;
                         return false;
                     }
 

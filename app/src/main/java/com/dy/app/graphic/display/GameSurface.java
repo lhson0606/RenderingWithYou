@@ -23,13 +23,12 @@ import com.dy.app.utils.DyConst;
 import java.util.concurrent.Semaphore;
 
 public class GameSurface extends android.opengl.GLSurfaceView{
-    private final Semaphore semSurfaceCreated = new Semaphore(0);
 
     public GameSurface(Context context, EntityManger entityManger, Board board) {
         super(context);
         mContext = context;
         setEGLContextClientVersion(3);
-        mRenderer = new DyRenderer(this, semSurfaceCreated, entityManger, board);
+        mRenderer = new DyRenderer(this, entityManger, board);
         setRenderer(mRenderer);
         mScaleListener = new ScaleListener(Camera.getInstance());
         mScaleDetector = new ScaleGestureDetector(context, mScaleListener);
@@ -80,10 +79,6 @@ public class GameSurface extends android.opengl.GLSurfaceView{
     }
     public void setGestureDetector(GestureDetector gestureDetector){
         mGestureDetector = gestureDetector;
-    }
-
-    public void waitForSurfaceToCreate() throws InterruptedException {
-        semSurfaceCreated.acquire();
     }
 
 }

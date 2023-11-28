@@ -17,6 +17,7 @@ import com.dy.app.graphic.display.GameFragment;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Semaphore;
 
 public class RunScriptsActivity extends FragmentHubActivity{
     private ProgressDialog progressDialog;
@@ -34,17 +35,6 @@ public class RunScriptsActivity extends FragmentHubActivity{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         mainHandler = new Handler(getMainLooper());
         initCore();
-        //runScript("scripts/carlsen_kasparov_2004.pgn");
-        //carlsen_nakamura_2009.pgn
-        //runScript("scripts/carlsen_nakamura_2009.pgn");
-        //nepomniachtchi_ding_liren_2023.pgn
-        //runScript("scripts/nepomniachtchi_ding_liren_2023.pgn");
-        //ding_liren_nepomniachtchi_2023.pgn
-        //runScript("scripts/ding_liren_nepomniachtchi_2023.pgn");
-        //ding_liren_nepomniachtchi_2023_90_moves.pgn
-        //runScript("scripts/ding_liren_nepomniachtchi_2023_90_moves.pgn");
-        //nikolic_arsovic_1989.pgn
-        runScript("scripts/nikolic_arsovic_1989.pgn");
     }
 
     private void runScript(String src) {
@@ -94,19 +84,35 @@ public class RunScriptsActivity extends FragmentHubActivity{
             case SET_LOADING_BACKGROUND:
                 findViewById(R.id.loadingBackground).setBackground((BitmapDrawable) o2);
                 break;
-            case SET_GAME_SURFACE:
-                FragmentManager fm = getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
-                ft.replace(R.id.fl_game_surface, gameFragment);
-                ft.commit();
-                break;
             case SET_GAME_BACKGROUND:
                 gameFragment.onMsgFromMain(TAG, t, o1, o2);
                 break;
             case START_GAME:
+                FragmentManager fm = getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+                //Semaphore semaphore = new Semaphore(0);
+                gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
+                ft.replace(R.id.fl_game_surface, gameFragment);
+                ft.commit();
                 gameLoop = new GameLoop(gameFragment.getSurfaceView(), gameCore.getEntityManger());
-                gameLoop.start();
+                Thread worker = new Thread(()->{
+                    gameFragment.getSurfaceView().getRenderer().waitForGLInit();
+                    //runScript("scripts/carlsen_kasparov_2004.pgn");
+                    //carlsen_nakamura_2009.pgn
+                    runScript("scripts/carlsen_nakamura_2009.pgn");
+                    //nepomniachtchi_ding_liren_2023.pgn
+                    //runScript("scripts/nepomniachtchi_ding_liren_2023.pgn");
+                    //ding_liren_nepomniachtchi_2023.pgn
+                    //runScript("scripts/ding_liren_nepomniachtchi_2023.pgn");
+                    //ding_liren_nepomniachtchi_2023_90_moves.pgn
+                    //runScript("scripts/ding_liren_nepomniachtchi_2023_90_moves.pgn");
+                    //nikolic_arsovic_1989.pgn
+                    //runScript("scripts/nikolic_arsovic_1989.pgn");
+                    gameLoop.start();
+                });
+
+                worker.start();
+
                 break;
         }
     }

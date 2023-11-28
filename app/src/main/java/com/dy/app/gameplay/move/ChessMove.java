@@ -72,13 +72,13 @@ public class ChessMove {
             }
         }
 
-        for(int i = 0; i<3 ;i++){
+        for(int i = 0; i<4; i++){
             String notation = null;
             String desNotation = null;
 
-            notation = moveNotation.substring(0, i);
-            //dest notation is the next 2 chars
             try{
+                notation = moveNotation.substring(0, i);
+                //dest notation is the next 2 chars
                 desNotation = moveNotation.substring(i, i+2);
             }catch (StringIndexOutOfBoundsException e) {
                 continue;

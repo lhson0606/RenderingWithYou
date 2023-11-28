@@ -14,6 +14,7 @@ import com.dy.app.graphic.shader.Obj3DShader;
 import com.dy.app.graphic.shader.TileShader;
 
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 public class Obj3D implements Cloneable{
 
@@ -29,7 +30,6 @@ public class Obj3D implements Cloneable{
     private Texture tex;;
     private Material material;
     private Vec4 highlightColor;
-
     private final Map<State, Vec4> highlightColors;
 
 /*    public Obj3D(Obj3D o) {
@@ -93,6 +93,8 @@ public class Obj3D implements Cloneable{
         shader.start();
         //load uniforms
         shader.loadUniforms();
+
+        while(VAO == null);
 
         VAO.bind();
         GLES30.glEnableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
@@ -189,5 +191,9 @@ public class Obj3D implements Cloneable{
 
     public Map<State, Vec4> getHighlightColors() {
         return highlightColors;
+    }
+
+    public VAO getVAO() {
+        return VAO;
     }
 }

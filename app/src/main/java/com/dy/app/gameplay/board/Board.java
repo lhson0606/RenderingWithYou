@@ -22,6 +22,7 @@ import com.dy.app.manager.PieceManager;
 import com.dy.app.utils.DyConst;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -534,13 +535,14 @@ public class Board implements GameEntity {
         //pieceManager.pseduoReplace(src, dst);
     }
 
-    private void checkForUndoCapture(int moveNumber){
+    public void checkForUndoCapture(int moveNumber){
         for(Piece piece : pieceManager.getAllPieces()){
             piece.checkForUndoCapture(moveNumber);
         }
     }
 
     public void goToMove(int moveNumber){
+        Log.d("Board", String.format(Locale.ENGLISH, "run: %d", moveNumber));
         try{
             mutex.lock();
             if(moveNumber < 0 || moveNumber > moveCount){
@@ -549,22 +551,36 @@ public class Board implements GameEntity {
 
             if(moveNumber == moveCount) return;
 
+            Log.d("Board", "perform move to the desired state");
             //perform move to the desired state
             for(Piece piece : pieceManager.getAllPieces()){
+                if(!piece.isInitialized){
+                    throw new RuntimeException("Piece not initialized");
+                }
                 piece.goToMove(moveNumber);
             }
 
+            Log.d("Board", "check for undo capture");
             checkForUndoCapture(moveNumber);
 
-            for(Piece piece : pieceManager.getActivePieces()){
+            Log.d("Board", "setStateAtMoveNumber");
+            for(Piece piece : pieceManager.getAllPieces()){
+                if(!piece.isInitialized){
+                    throw new RuntimeException("Piece not initialized");
+                }
                 piece.setStateAtMoveNumber(moveNumber);
             }
 
-            for(Piece piece: pieceManager.getBlackPieces()){
+            Log.d("Board", "refreshDisplayPosition");
+            for(Piece piece: pieceManager.getAllPieces()){
+                if(!piece.isInitialized){
+                    throw new RuntimeException("Piece not initialized");
+                }
                 piece.refreshDisplayPosition();
             }
 
-            for(Piece piece : pieceManager.getActivePieces()){
+            Log.d("Board", "updatePossibleMoves");
+            for(Piece piece : pieceManager.getAllPieces()){
                 piece.updatePossibleMoves();
             }
 

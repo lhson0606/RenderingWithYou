@@ -19,17 +19,15 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     private GameSurface gameSurface;
     private TilePicker tilePicker;
     private boolean pickerIsSet = false;
-    private Semaphore semSurfaceCreated;
     private Board board;
     private EntityManger entityManger;
 
-    public DyRenderer(GameSurface gameSurface, Semaphore semSurfaceCreated, EntityManger entityManger, Board board) {
+    public DyRenderer(GameSurface gameSurface, EntityManger entityManger, Board board) {
         this.board = board;
         this.entityManger = entityManger;
         this.gameSurface = gameSurface;
         tilePicker = new TilePicker(0,0, board);
         gameSurface.setGestureDetector(new GestureDetector(gameSurface.getContext(), tilePicker));
-        this.semSurfaceCreated = semSurfaceCreated;
         entityManger.setRenderer(this);
     }
 
@@ -43,8 +41,10 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         gl.glFrontFace(GL10.GL_CCW);
     }
 
+
     private void init() {
         entityManger.initEntities();
+        sem.release();
     }
 
     @Override
@@ -71,5 +71,19 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
 
     public interface OnEntityAdded{
         void onEntityAdded();
+    }
+
+    Semaphore sem = new Semaphore(0);
+
+    public void waitForGLInit(){
+        try {
+            sem.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    interface OnGLInitiated{
+        void onGLInitiated();
     }
 }

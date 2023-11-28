@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import com.dy.app.core.FragmentCallback;
 import com.dy.app.core.GameCore;
 import com.dy.app.gameplay.board.Board;
+import com.dy.app.graphic.render.DyRenderer;
 import com.dy.app.manager.EntityManger;
 
 public class GameFragment extends Fragment implements FragmentCallback {

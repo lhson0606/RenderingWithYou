@@ -6,6 +6,7 @@ import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.utils.Utils;
 
 import java.util.Locale;
 import java.util.Vector;
@@ -30,6 +31,18 @@ public class WhiteRunner extends Thread{
         ScriptsRunner.Move currentMove = null;
         int i = 0;
 
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        for(Piece piece : board.getPieceManager().getAllPieces()){
+            if(!piece.isInitialized){
+                throw new RuntimeException("Piece not initialized");
+            }
+        }
+
         while(isRunning){
             try{
                 whiteSem.acquire();
@@ -51,20 +64,33 @@ public class WhiteRunner extends Thread{
             blackSem.release();
         }
 
-        int moveCount = board.getMoveCount()-1;
-        for(int k = moveCount; k >= 0; k--){
-            try {
-                Thread.sleep(0);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        int moveCount = board.getMoveCount();
+
+        for(Piece piece : board.getPieceManager().getAllPieces()){
+            if(!piece.isInitialized){
+                throw new RuntimeException("Piece not initialized");
             }
-            board.goToMove(k);
         }
-        board.goToMove(500);
+
         board.goToMove(0);
-        board.goToMove(60);
-        board.goToMove(50);
-        board.goToMove(80);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+//        for(int k = 0; k<moveCount; k++){
+//            board.goToMove(k);
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+        //board.goToMove(150);
+//        for(int k = moveCount; k >= 0; k--){
+//            board.goToMove(k);
+//        }
+        //board.goToMove(67*2+2);
     }
 
     private void performMove(String moveData) {

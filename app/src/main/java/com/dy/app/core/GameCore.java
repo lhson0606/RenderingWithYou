@@ -28,7 +28,6 @@ public class GameCore {
 
     public enum TaskType{
         SET_LOADING_BACKGROUND,
-        SET_GAME_SURFACE,
         SET_GAME_BACKGROUND,
         START_GAME,
     }
@@ -93,8 +92,6 @@ public class GameCore {
     }
 
     public void startGame(){
-        //set game background
-        gameActivity.onMsgToMain(TAG, -1, TaskType.SET_GAME_SURFACE, null);
         //setting game camera
         if(Player.getInstance().isWhitePiece()){
             Camera.getInstance().setPos(DyConst.default_white_cam_pos);

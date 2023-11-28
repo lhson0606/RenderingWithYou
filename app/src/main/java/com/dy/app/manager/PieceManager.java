@@ -1,6 +1,7 @@
 package com.dy.app.manager;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.anychart.charts.Pie;
 import com.dy.app.common.maths.Vec2i;
@@ -38,7 +39,7 @@ public class PieceManager {
     private King blackKing;
     private King whiteKing;
     private final Vector<Piece> allPieces = new Vector<>();
-    private final ReentrantLock mutex = new ReentrantLock(true);
+    private final Semaphore mutex = new Semaphore(1, true);
 
     public PieceManager(Context context, EntityManger entityManger, Board board, ObjManager objManager, AssetManger assetManger, GameSetting gameSetting){
         this.entityManger = entityManger;
@@ -67,9 +68,7 @@ public class PieceManager {
             player_pieces = loadBlackPieces(true, playerSkin);
         }
 
-        for(Piece piece : allPieces){
-            entityManger.newEntity(piece);
-        }
+        entityManger.addAllEntities(allPieces);
 
     }
 
@@ -216,7 +215,7 @@ public class PieceManager {
 
     public Vector<Piece> getBlackPieces(){
         try{
-            mutex.lock();
+            mutex.acquire();
             Vector<Piece> blackPieces = new Vector<>();
 
             for(Piece piece : allPieces){
@@ -226,14 +225,16 @@ public class PieceManager {
             }
 
             return blackPieces;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
-            mutex.unlock();
+            mutex.release();
         }
     }
 
     public Vector<Piece> getWhitePieces(){
         try{
-            mutex.lock();
+            mutex.acquire();
             Vector<Piece> whitePieces = new Vector<>();
 
             for(Piece piece : allPieces){
@@ -243,8 +244,10 @@ public class PieceManager {
             }
 
             return whitePieces;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
-            mutex.unlock();
+            mutex.release();
         }
     }
 
@@ -257,20 +260,27 @@ public class PieceManager {
     }
 
     public Vector<Piece> getActivePieces() {
-        Vector<Piece> activePieces = new Vector<>();
+        try{
+            mutex.acquire();
+            Vector<Piece> activePieces = new Vector<>();
 
-        for(Piece piece : allPieces){
-            if(!piece.currentState.isCaptured){
-                activePieces.add(piece);
+            for(Piece piece : allPieces){
+                if(!piece.currentState.isCaptured){
+                    activePieces.add(piece);
+                }
             }
-        }
 
-        return activePieces;
+            return activePieces;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            mutex.release();
+        }
     }
 
     public void replacePiece(Piece srcPiece, Piece dstPiece){
         try{
-            mutex.lock();
+            mutex.acquire();
             if(srcPiece == null) throw new RuntimeException("Src is null");
             if(dstPiece == null) throw new RuntimeException("Dst is null");
             if(srcPiece == blackKing || srcPiece == whiteKing) throw new RuntimeException("Cannot remove king");
@@ -289,33 +299,44 @@ public class PieceManager {
                 semaphore.acquire();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
-            }finally {
-                semaphore.release();
             }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
-            mutex.unlock();
+            mutex.release();
         }
     }
 
     public void capturePiece(Piece piece){
         try{
-            mutex.lock();
+            mutex.acquire();
             if(piece == null) throw new RuntimeException("Piece is null");
             if(piece == blackKing || piece == whiteKing) throw new RuntimeException("Cannot remove king");
             piece.currentState.isCaptured = true;
             entityManger.removeEntity(piece);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
-            mutex.unlock();
+            mutex.release();
         }
     }
 
     public Vector<Piece> getAllPieces() {
-        return allPieces;
+        try{
+            mutex.acquire();
+            Vector<Piece> res = new Vector<>();
+            res.addAll(allPieces);
+            return res;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            mutex.release();
+        }
     }
 
     public void ghostReplace(Piece src, Piece dst){
         try{
-            mutex.lock();
+            mutex.acquire();
             if(src == null) throw new RuntimeException("Src is null");
             if(dst == null) throw new RuntimeException("Dst is null");
             if(src == blackKing || src == whiteKing) throw new RuntimeException("Cannot remove king");
@@ -323,15 +344,17 @@ public class PieceManager {
             if(allPieces.contains(dst)) throw new RuntimeException("Dst already exists");
             allPieces.remove(src);
             allPieces.add(dst);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
-            mutex.unlock();
+            mutex.release();
         }
     }
 
     public void pseudoReplace(Piece src, Piece dst) {
         //we just need to replace in all pieces, no need to replace in entity manager
         try{
-            mutex.lock();
+            mutex.acquire();
             if(src == null) throw new RuntimeException("Src is null");
             if(dst == null) throw new RuntimeException("Dst is null");
             if(src == blackKing || src == whiteKing) throw new RuntimeException("Cannot remove king");
@@ -339,21 +362,54 @@ public class PieceManager {
             if(allPieces.contains(dst)) throw new RuntimeException("Dst already exists");
             allPieces.remove(src);
             allPieces.add(dst);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
-            mutex.unlock();
+            mutex.release();
         }
     }
 
     public void undoCapture(Piece piece) {
         try{
-            mutex.lock();
+            mutex.acquire();
+            Log.d("PieceManager", "undoCapture: " + piece);
             if(piece == null) throw new RuntimeException("Piece is null");
             if(piece == blackKing || piece == whiteKing) throw new RuntimeException("Cannot remove king");
             piece.currentState.isCaptured = false;
             //no need to call init gl, we just need to add to entity manager
             entityManger.newEntity(piece);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         } finally {
-            mutex.unlock();
+            mutex.release();
         }
     }
+
+//    public void goToMove(int moveNumber, Board board){
+//        try{
+//            mutex.acquire();
+//            //perform move to the desired state
+//            for(Piece piece : allPieces){
+//                piece.goToMove(moveNumber);
+//            }
+//
+//            board.checkForUndoCapture(moveNumber);
+//
+//            for(Piece piece : allPieces){
+//                piece.setStateAtMoveNumber(moveNumber);
+//            }
+//
+//            for(Piece piece: allPieces){
+//                piece.refreshDisplayPosition();
+//            }
+//
+//            for(Piece piece : allPieces){
+//                piece.updatePossibleMoves();
+//            }
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            mutex.release();
+//        }
+//    }
 }

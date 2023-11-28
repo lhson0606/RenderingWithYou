@@ -92,9 +92,12 @@ public class Piece implements GameEntity {
         return pieceColor == PieceColor.WHITE;
     }
 
+    public boolean isInitialized = false;
+
     @Override
     public void init() {
         obj.init();
+        isInitialized = true;
     }
 
     @Override
@@ -145,6 +148,7 @@ public class Piece implements GameEntity {
     }
 
     public void addStateToHistory(){
+        currentState.moveNumber = history.size();
         this.history.put(this.history.size(), currentState.clone());
     }
 
@@ -204,18 +208,34 @@ public class Piece implements GameEntity {
     }
 
     public void checkForUndoCapture(int moveNumber){
-        PieceState  stateToGo = history.get(moveNumber);
+        PieceState stateToGo = history.get(moveNumber);
+        assert stateToGo != null;
         if(!stateToGo.isCaptured && currentState.isCaptured){
             board.undoCapture(this);
         }
+        //we need to capture the piece from the board
+        if(stateToGo.isPromoted && !currentState.isPromoted){
 
+            try {
+                ((Pawn)this).promote(stateToGo.promotingNotation, false);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        }else if(!stateToGo.isPromoted && currentState.isPromoted){
+            demote();
+        }
     }
 
     public void goToMove(int moveNumber) {
         PieceState stateToGo = history.get(moveNumber);
 
-        if(stateToGo.equals(currentState)){
-            return;
+//        if(stateToGo.equals(currentState)){
+//            return;
+//        }
+
+        if(stateToGo == null){
+            throw new RuntimeException("stateToGo is null");
         }
 
         if(!stateToGo.isCaptured && !currentState.isCaptured){
@@ -226,33 +246,20 @@ public class Piece implements GameEntity {
             srcTile.setPiece(null);
             //dstTile.setPiece(this);
             //this.tile = dstTile;
-
+            startMoveAnimation(srcTile, dstTile,null);
             //if it's promoted need to promote it
             if(stateToGo.isPromoted && !currentState.isPromoted){
+
                 try {
-                    final Semaphore sem = new Semaphore(0);
-                    startMoveAnimation(srcTile, dstTile,()->{
-                        sem.release();
-                    });
-                    try {
-                        sem.acquire();
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    //delay the promotion, wait for animation to finish
                     ((Pawn)this).promote(stateToGo.promotingNotation, false);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
             }else if(!stateToGo.isPromoted && currentState.isPromoted){
-                //we need to demote the piece
-                startMoveAnimation(srcTile, dstTile,null);
                 demote();
-            }else{
-                startMoveAnimation(srcTile, dstTile,null);
             }
         }else if(stateToGo.isCaptured && !currentState.isCaptured){
-            //we need to capture the piece from the board
             board.capturePiece(this);
         }
 //        else if(!stateToGo.isCaptured){
@@ -278,6 +285,7 @@ public class Piece implements GameEntity {
             throw new RuntimeException(e);
         }
 
+        piece.history.putAll(this.history);
         board.replacePiece(this, piece, false);
     }
 
@@ -348,6 +356,7 @@ public class Piece implements GameEntity {
     }
 
     public class PieceState implements Cloneable{
+        public int moveNumber;
         public Vec2i pos;
         public boolean hasMoved;
         public boolean justAdvancedTwoTiles;
@@ -356,6 +365,7 @@ public class Piece implements GameEntity {
         public String promotingNotation;
         public boolean movedInThisTurn;
         public PieceState(){
+            moveNumber = -1;
             pos = null;
             hasMoved = false;
             justAdvancedTwoTiles = false;
@@ -374,6 +384,7 @@ public class Piece implements GameEntity {
             clone.isPromoted = isPromoted;
             clone.promotingNotation = promotingNotation;
             clone.movedInThisTurn = movedInThisTurn;
+            clone.moveNumber = moveNumber;
             return clone;
         }
 
