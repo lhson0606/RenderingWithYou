@@ -13,7 +13,9 @@ import com.dy.app.R;
 import com.dy.app.core.GameCore;
 import com.dy.app.core.MainCallback;
 import com.dy.app.core.thread.GameLoop;
+import com.dy.app.core.thread.MultiDeviceInGameHandler;
 import com.dy.app.graphic.display.GameFragment;
+import com.dy.app.manager.ConnectionManager;
 
 import java.util.concurrent.Semaphore;
 
@@ -24,6 +26,7 @@ implements MainCallback {
     private GameFragment gameFragment;
     private GameLoop gameLoop;
     private GameCore gameCore;
+    private MultiDeviceInGameHandler multiDeviceInGameHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +97,8 @@ implements MainCallback {
                 Thread worker = new Thread(()->{
                     gameFragment.getSurfaceView().getRenderer().waitForGLInit();
                     gameLoop.start();
+                    multiDeviceInGameHandler = new MultiDeviceInGameHandler(this, gameCore.getBoard(), ConnectionManager.getInstance(), gameFragment.getSurfaceView().getRenderer().getTilePicker());
+                    multiDeviceInGameHandler.start();
                 });
                 worker.start();
                 break;

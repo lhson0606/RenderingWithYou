@@ -30,6 +30,7 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
     public static Tile lastTile = null;
     private static Piece lastPiece = null;
     private boolean firstTouch = true;
+    private TilePickerListener listener = null;
 
     private void cancelPicking(){
         lastPiece.putDown();
@@ -81,10 +82,11 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                         lastPiece.putDown();
                         String moveNotation = AlgebraicChessInterpreter.convertToAlgebraicNotation(board, lastPiece.getTile(), tile);
                         try {
-                            board.moveByNotation(moveNotation, lastPiece.isOnPlayerSide());
+                            board.moveByNotation(moveNotation, Player.getInstance().isWhitePiece());
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
+                        if(listener != null) listener.onMoveDetected(moveNotation);
                         lastPiece = null;
                         return false;
                     }else{
@@ -92,10 +94,11 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                         lastPiece.putDown();
                         String moveNotation = AlgebraicChessInterpreter.convertToAlgebraicNotation(board, lastPiece.getTile(), tile);
                         try {
-                            board.moveByNotation(moveNotation, lastPiece.isOnPlayerSide());
+                            board.moveByNotation(moveNotation, Player.getInstance().isWhitePiece());
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
+                        if(listener != null) listener.onMoveDetected(moveNotation);
                         lastPiece = null;
                         return false;
                     }
@@ -184,5 +187,13 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
     public void setScreenSize(float width, float height){
         this.width = width;
         this.height = height;
+    }
+
+    public interface TilePickerListener{
+        void onMoveDetected(String moveNotation);
+    }
+
+    public void setListener(TilePickerListener listener) {
+        this.listener = listener;
     }
 }

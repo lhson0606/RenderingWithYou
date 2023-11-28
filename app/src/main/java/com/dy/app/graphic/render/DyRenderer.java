@@ -86,4 +86,8 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     interface OnGLInitiated{
         void onGLInitiated();
     }
+
+    public TilePicker getTilePicker() {
+        return tilePicker;
+    }
 }

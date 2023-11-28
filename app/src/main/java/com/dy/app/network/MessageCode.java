@@ -8,4 +8,7 @@ public class MessageCode {
     public static final int REQUEST_START_GAME_COUNTDOWN_CODE = 4;
     public static final int REQUEST_STOP_GAME_COUNTDOWN_CODE = 5;
     public static final int START_GAME_CODE = 6;
+    public static final int PIECE_COLOR_CHANGE_REQUEST_CODE = 7;
+    public static final int ON_PIECE_COLOR_CHANGED_CODE = 8;
+    public static final int ON_PIECE_MOVE_REQUEST = 9;
 }

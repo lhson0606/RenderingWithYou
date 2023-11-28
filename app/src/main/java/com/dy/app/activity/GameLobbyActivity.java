@@ -31,6 +31,7 @@ import com.dy.app.utils.MessageFactory;
 import com.dy.app.utils.Utils;
 
 import java.util.Vector;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -76,8 +77,46 @@ implements View.OnClickListener {
     }
 
     private void startMatch() {
-        Intent intent = new Intent(this, GameActivity.class);
-        startActivity(intent);
+        //Before start game activity, if we are host, we have to random piece color and send it to peer
+        if(Player.getInstance().isHost()){
+            selectPieceColorAndInformClient();
+            Thread onClientPieceColorChange = new Thread(()->{
+                try {
+                    semPieceColorChange.acquire();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //start game activity
+                Intent intent = new Intent(this, GameActivity.class);
+                startActivity(intent);
+            });
+
+            onClientPieceColorChange.start();
+        }else{
+            //else we have to wait for host to send us piece color
+            Thread onHostPieceColorInform = new Thread(()->{
+                try {
+                    semPieceColorChange.acquire();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //start game activity
+                Intent intent = new Intent(this, GameActivity.class);
+                startActivity(intent);
+            });
+
+            onHostPieceColorInform.start();
+        }
+    }
+
+    private void selectPieceColorAndInformClient(){
+        Boolean isWhite = Math.random() < 0.5;
+        Player.getInstance().setWhitePiece(isWhite);
+        Rival.getInstance().setWhitePiece(!isWhite);
+        //inform client
+        byte[] data = Utils.serialize(!isWhite);
+        Message msg = MessageFactory.getInstance().createDataMessage(data, MessageCode.PIECE_COLOR_CHANGE_REQUEST_CODE);
+        ConnectionManager.getInstance().postMessage(msg);
     }
 
     private void exqListener() {
@@ -152,22 +191,37 @@ implements View.OnClickListener {
                 }
                 break;
             case MessageCode.REQUEST_START_GAME_COUNTDOWN_CODE:
-                    //check if both players are ready
-                    if(Player.getInstance().isReady() && Rival.getInstance().isReady()){
-                        startCountDown();
-                    }else if(countDownStarted){
-                        //if count down has started, stop it
-                        countDownStarted = false;
-                    }
-                    break;
-            case MessageCode.REQUEST_STOP_GAME_COUNTDOWN_CODE:
+                //check if both players are ready
+                if(Player.getInstance().isReady() && Rival.getInstance().isReady()){
+                    startCountDown();
+                }else if(countDownStarted){
                     //if count down has started, stop it
                     countDownStarted = false;
-                    break;
+                }
+                break;
+            case MessageCode.REQUEST_STOP_GAME_COUNTDOWN_CODE:
+                //if count down has started, stop it
+                countDownStarted = false;
+                break;
             case MessageCode.START_GAME_CODE:
-                    //start game
-                    startMatch();
-                    break;
+                //start game
+                startMatch();
+                break;
+            case MessageCode.PIECE_COLOR_CHANGE_REQUEST_CODE:
+                //host has sent us piece color
+                //get piece color
+                Boolean isWhite = (Boolean) Utils.deserialize(data);
+                Player.getInstance().setWhitePiece(isWhite);
+                Rival.getInstance().setWhitePiece(!isWhite);
+                //inform host that we have received piece color, and release the semaphore
+                Message onPieceColorChangedMsg = MessageFactory.getInstance().createDataMessage(null, MessageCode.ON_PIECE_COLOR_CHANGED_CODE);
+                ConnectionManager.getInstance().postMessage(onPieceColorChangedMsg);
+                semPieceColorChange.release();
+                break;
+            case MessageCode.ON_PIECE_COLOR_CHANGED_CODE:
+                //client has received his piece color, release the semaphore
+                semPieceColorChange.release();
+                break;
         }
     }
 
@@ -179,7 +233,7 @@ implements View.OnClickListener {
     }
 
     private class CountDownThread extends Thread{
-        int countDownValue = 10;
+        int countDownValue = 3;
         @Override
         public void run() {
             while (countDownValue > 0){
@@ -376,6 +430,7 @@ implements View.OnClickListener {
             super.onBackPressed();
     }
 
+    private final Semaphore semPieceColorChange = new Semaphore(0);
     private UIManager uiManager;
     private FragmentManager fm;
     private Button btnQuit, btnReady;
