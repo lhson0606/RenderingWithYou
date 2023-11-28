@@ -78,18 +78,29 @@ public class WhiteRunner extends Thread{
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-//        for(int k = 0; k<moveCount; k++){
-//            board.goToMove(k);
+
+//        board.goToMove(95);
+//        board.goToMove(96);
+        for(int x = 0; x<100; x++){
+            for(int k = 0; k<moveCount; k++){
+                board.goToMove(k);
 //            try {
-//                Thread.sleep(1000);
+//                //Thread.sleep(500);
 //            } catch (InterruptedException e) {
 //                throw new RuntimeException(e);
 //            }
-//        }
-        //board.goToMove(150);
-//        for(int k = moveCount; k >= 0; k--){
-//            board.goToMove(k);
-//        }
+            }
+
+            for(int k = moveCount; k >= 0; k--){
+                board.goToMove(k);
+//            try {
+//                //Thread.sleep(500);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
+            }
+        }
+
         //board.goToMove(67*2+2);
     }
 

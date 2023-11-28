@@ -563,6 +563,13 @@ public class Board implements GameEntity {
             Log.d("Board", "check for undo capture");
             checkForUndoCapture(moveNumber);
 
+            //refresh piece position
+            for(int i = 0; i<8; i++){
+                for(int j = 0; j<8; j++){
+                    tiles[i][j].setPiece(null);
+                }
+            }
+
             Log.d("Board", "setStateAtMoveNumber");
             for(Piece piece : pieceManager.getAllPieces()){
                 if(!piece.isInitialized){

@@ -103,8 +103,6 @@ public class Piece implements GameEntity {
     @Override
     public void update(float dt) {
         if(!isDoingAnimation){
-            //updatePossibleMoves();
-
             if(isPicking) {
                 showPossibleMoves();
             }
@@ -213,11 +211,13 @@ public class Piece implements GameEntity {
         if(!stateToGo.isCaptured && currentState.isCaptured){
             board.undoCapture(this);
         }
-        //we need to capture the piece from the board
+
         if(stateToGo.isPromoted && !currentState.isPromoted){
 
             try {
                 ((Pawn)this).promote(stateToGo.promotingNotation, false);
+            } catch (ClassCastException e) {
+                throw new RuntimeException(e);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -238,6 +238,8 @@ public class Piece implements GameEntity {
             throw new RuntimeException("stateToGo is null");
         }
 
+        tile.setPiece(null);
+
         if(!stateToGo.isCaptured && !currentState.isCaptured){
             //we need to reset the piece position
             Tile dstTile = board.getTile(stateToGo.pos);
@@ -247,18 +249,7 @@ public class Piece implements GameEntity {
             //dstTile.setPiece(this);
             //this.tile = dstTile;
             startMoveAnimation(srcTile, dstTile,null);
-            //if it's promoted need to promote it
-            if(stateToGo.isPromoted && !currentState.isPromoted){
 
-                try {
-                    ((Pawn)this).promote(stateToGo.promotingNotation, false);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }else if(!stateToGo.isPromoted && currentState.isPromoted){
-                demote();
-            }
         }else if(stateToGo.isCaptured && !currentState.isCaptured){
             board.capturePiece(this);
         }

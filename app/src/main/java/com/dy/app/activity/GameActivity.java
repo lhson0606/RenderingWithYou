@@ -33,7 +33,17 @@ implements MainCallback {
         setContentView(R.layout.game_activity);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         mainHandler = new Handler(getMainLooper());
+        init();
+        attachListener();
         initCore();
+    }
+
+    private void init(){
+
+    }
+
+    private void attachListener(){
+
     }
 
     @Override
@@ -76,12 +86,16 @@ implements MainCallback {
             case START_GAME:
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
-                //wait for GL thread to finish
+                //Semaphore semaphore = new Semaphore(0);
                 gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
                 ft.replace(R.id.fl_game_surface, gameFragment);
                 ft.commit();
                 gameLoop = new GameLoop(gameFragment.getSurfaceView(), gameCore.getEntityManger());
-                gameLoop.start();
+                Thread worker = new Thread(()->{
+                    gameFragment.getSurfaceView().getRenderer().waitForGLInit();
+                    gameLoop.start();
+                });
+                worker.start();
                 break;
         }
     }
