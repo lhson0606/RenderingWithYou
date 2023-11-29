@@ -3,7 +3,10 @@ package com.dy.app.core.thread;
 import android.util.Log;
 
 import com.dy.app.activity.GameActivity;
+import com.dy.app.gameplay.algebraicNotation.AlgebraicChessInterpreter;
 import com.dy.app.gameplay.board.Board;
+import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.ConnectionManager;
@@ -27,6 +30,8 @@ public class MultiDeviceInGameHandler extends Thread
     private final Vector<Message> messages = new Vector<>();
     public static final String TAG = "MultiDeviceInGameHandler";
     private TilePicker tilePicker;
+    private final Player player = Player.getInstance();
+    private Long startTime = null;
 
     public MultiDeviceInGameHandler(GameActivity gameActivity, Board board, ConnectionManager connectionManager, TilePicker tilePicker){
         this.board = board;
@@ -35,14 +40,49 @@ public class MultiDeviceInGameHandler extends Thread
         connectionManager.startReceiving(this);
         this.tilePicker = tilePicker;
         tilePicker.setListener(this);
+        startTime = System.currentTimeMillis();
+
+        if(player.isWhitePiece()){
+            player.setInTurn(true);
+        }else{
+            player.setInTurn(false);
+        }
     }
 
     @Override
-    public void onMoveDetected(String moveNotation) {
+    public void onMoveDetected(Tile src, Tile dest) {
         //#todo
+        String moveNotation = AlgebraicChessInterpreter.convertToAlgebraicNotation(board, src, dest);
         Log.d(TAG, "onMoveDetected: moveNotation: " + moveNotation);
+        if(checkForSpecialMove(moveNotation)){
+            return;
+        }
+        player.setInTurn(false);
+        try {
+            board.moveByNotation(moveNotation, player.isWhitePiece());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         //send move to other device
         sendMove(moveNotation);
+    }
+
+    private boolean checkForSpecialMove(String moveNotation) {
+        //promotion move
+        if(moveNotation.contains("=")){
+            //call main thread to show promotion dialog, note that we are on the ui thread
+            gameActivity.showPromotionDialog((pieceName) -> {
+                try {
+                    board.moveByNotation(moveNotation.replace("?", pieceName), player.isWhitePiece());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                sendMove(moveNotation.replace("?", pieceName));
+                player.setInTurn(false);
+            });
+            return true;
+        }
+        return false;
     }
 
     private void handleMessage(Message msg) {
@@ -50,6 +90,23 @@ public class MultiDeviceInGameHandler extends Thread
         final int code = msg.getCode();
         final byte[] data = msg.getData();
 
+        switch (code){
+            case MessageCode.ON_PIECE_MOVE_REQUEST:
+                handleMoveRequest(data);
+                break;
+            case MessageCode.PLAYER_CHAT_MESSAGE_CODE:
+                handlePlayerChatMessage(data);
+                break;
+            default:
+                throw new RuntimeException("Unknown message code: " + code);
+        }
+    }
+
+    private void handlePlayerChatMessage(byte[] data) {
+        gameActivity.addPeerMessage(new String(data));
+    }
+
+    private void handleMoveRequest(byte[] data) {
         String moveNotation = new String(data);
         Log.d(TAG, "handleMessage: moveNotation: " + moveNotation);
         try {
@@ -57,6 +114,7 @@ public class MultiDeviceInGameHandler extends Thread
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        player.setInTurn(true);
     }
 
     private void sendMove(String moveNotation){

@@ -102,4 +102,9 @@ public class Rival {
     public void setBackgroundSkinIndex(long backgroundSkinIndex) {
         this.backgroundSkinIndex = backgroundSkinIndex;
     }
+
+    public long getElo() {
+        //#todo
+        return 0l;
+    }
 }

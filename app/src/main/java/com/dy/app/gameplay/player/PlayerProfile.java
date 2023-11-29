@@ -13,6 +13,7 @@ public class PlayerProfile{
     public static final String KEY_PHOTO_URL = "photoUrl";
     public static final String KEY_UID = "uID";
     public static final String KEY_IS_ANONYMOUS = "isAnonymous";
+    public static final String KEY_ELO = "elo";
 
     public PlayerProfile(){
         data = new HashMap<>();
@@ -22,6 +23,7 @@ public class PlayerProfile{
         data.put(KEY_PHOTO_URL, "");
         data.put(KEY_UID, "");
         data.put(KEY_IS_ANONYMOUS, false);
+        data.put(KEY_ELO, 0L);
     }
 
     public Object get(String key){

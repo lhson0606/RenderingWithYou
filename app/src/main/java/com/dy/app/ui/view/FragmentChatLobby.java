@@ -1,5 +1,6 @@
 package com.dy.app.ui.view;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -102,7 +103,7 @@ public class FragmentChatLobby extends Fragment
     }
 
     private void addMessage(String chatText){
-        androidx.emoji.widget.EmojiTextView tv = LayoutInflater.from(getContext()).inflate(R.layout.emoji_text_view, llChat, false).findViewById(R.id.emojiView);
+        androidx.emoji.widget.EmojiTextView tv = LayoutInflater.from(main).inflate(R.layout.emoji_text_view, llChat, false).findViewById(R.id.emojiView);
         tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
         tv.setText(etMsg.getText().toString());
         llChat.addView(tv);
@@ -114,7 +115,7 @@ public class FragmentChatLobby extends Fragment
     }
 
     private void addMessageFromPeer(String chatText){
-        androidx.emoji.widget.EmojiTextView tv = LayoutInflater.from(getContext()).inflate(R.layout.emoji_text_view, llChat, false).findViewById(R.id.emojiView);
+        androidx.emoji.widget.EmojiTextView tv = LayoutInflater.from(main).inflate(R.layout.emoji_text_view, llChat, false).findViewById(R.id.emojiView);
         tv.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
         final String text = "["+Rival.getInstance().getName() +"] " +chatText;
         tv.setText(text);

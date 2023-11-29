@@ -60,9 +60,9 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                                 //do nothing :)
                                 return false;
                             }else if(!piece.isOnPlayerSide()){
-                                //#todo for testing
-                                piece.pickUp();
-                                lastPiece = piece;
+//                                //#todo for testing
+//                                piece.pickUp();
+//                                lastPiece = piece;
                                 return false;
 
                             }else{/*is player piece*/
@@ -80,25 +80,13 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                     }else if(!tile.hasPiece()){
                         //perform move
                         lastPiece.putDown();
-                        String moveNotation = AlgebraicChessInterpreter.convertToAlgebraicNotation(board, lastPiece.getTile(), tile);
-                        try {
-                            board.moveByNotation(moveNotation, Player.getInstance().isWhitePiece());
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                        if(listener != null) listener.onMoveDetected(moveNotation);
+                        if(listener != null) listener.onMoveDetected(lastPiece.getTile(), tile);
                         lastPiece = null;
                         return false;
                     }else{
                         //perform attack
                         lastPiece.putDown();
-                        String moveNotation = AlgebraicChessInterpreter.convertToAlgebraicNotation(board, lastPiece.getTile(), tile);
-                        try {
-                            board.moveByNotation(moveNotation, Player.getInstance().isWhitePiece());
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                        if(listener != null) listener.onMoveDetected(moveNotation);
+                        if(listener != null) listener.onMoveDetected(lastPiece.getTile(), tile);
                         lastPiece = null;
                         return false;
                     }
@@ -190,7 +178,7 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
     }
 
     public interface TilePickerListener{
-        void onMoveDetected(String moveNotation);
+        void onMoveDetected(Tile src, Tile dst);
     }
 
     public void setListener(TilePickerListener listener) {

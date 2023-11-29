@@ -65,7 +65,7 @@ public class ChessMove {
                     case ChessNotation.KNIGHT:
                         break;
                     default:
-                        throw new Exception("Invalid move");
+                        throw new Exception("Invalid promotion move");
                 }
             }else{
                 throw new Exception("Invalid move");
@@ -96,7 +96,7 @@ public class ChessMove {
             }
         }
 
-        throw new Exception("Invalid move");
+        throw new Exception("Invalid white move: " + moveNotation);
     }
 
     private Piece getBlackPieceNotation() throws Exception{
@@ -123,10 +123,10 @@ public class ChessMove {
                     case ChessNotation.KNIGHT:
                         break;
                     default:
-                        throw new Exception("Invalid move");
+                        throw new Exception("Invalid move " + moveNotation + " " + promotingPieceNotation);
                 }
             }else{
-                throw new Exception("Invalid move");
+                throw new Exception("Invalid move: " + moveNotation);
             }
         }
 
@@ -154,7 +154,7 @@ public class ChessMove {
             }
         }
 
-        throw new Exception("Invalid move");
+        throw new Exception("Invalid black move " + moveNotation);
     }
 
     private void interpretWhiteMove() throws Exception{

@@ -16,7 +16,7 @@
         android:textColor="@color/black"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:text="You won!"/>
+        android:text="Title"/>
 
     <LinearLayout
         android:id="@+id/trophyDifferenceContainer"

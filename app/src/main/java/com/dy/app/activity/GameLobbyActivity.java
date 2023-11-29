@@ -51,10 +51,10 @@ implements View.OnClickListener {
     private void attachFragment() {
         FragmentTransaction ft = fm.beginTransaction();
 
-        ft.replace(R.id.flChatWindow,fragmentChatLobby, FragmentChatLobby.TAG);
+        ft.replace(R.id.flChatWindow,fragmentChatLobby);
         ft.show(fragmentChatLobby);
         //#todo
-        ft.replace(R.id.flSkinSelection, fragmentSetting, FragmentSkinSelection.TAG);
+        ft.replace(R.id.flSkinSelection, fragmentSetting);
         ft.show(fragmentSetting);
 
         ft.commit();
@@ -62,8 +62,8 @@ implements View.OnClickListener {
 
     private void init(){
         uiManager = UIManager.getInstance();
-        fragmentChatLobby = (FragmentChatLobby) UIManager.getInstance().getUI(UIManager.UIType.CHAT);
-        fragmentSetting = (FragmentSetting) UIManager.getInstance().getUI(UIManager.UIType.CONFIG);
+        fragmentChatLobby = FragmentChatLobby.newInstance();
+        fragmentSetting = FragmentSetting.newInstance();
         btnQuit = (Button)findViewById(R.id.btnQuit);
         btnQuit.setOnClickListener(this);
         btnReady = (Button)findViewById(R.id.btnReady);
@@ -360,6 +360,7 @@ implements View.OnClickListener {
 
     @Override
     protected void onDestroy() {
+        //detach fragment
         super.onDestroy();
     }
 
