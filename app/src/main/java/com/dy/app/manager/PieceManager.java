@@ -385,6 +385,30 @@ public class PieceManager {
         }
     }
 
+    public void pseudoCapture(Piece piece) {
+        try{
+            mutex.acquire();
+            if(piece == null) throw new RuntimeException("Piece is null");
+            if(piece == blackKing || piece == whiteKing) throw new RuntimeException("Cannot remove king");
+            piece.currentState.isCaptured = true;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            mutex.release();
+        }
+    }
+
+    public void rollbackPseudoCapture(Piece pseudoCapturedPiece) {
+        try{
+            mutex.acquire();
+            pseudoCapturedPiece.currentState.isCaptured = false;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            mutex.release();
+        }
+    }
+
 //    public void goToMove(int moveNumber, Board board){
 //        try{
 //            mutex.acquire();

@@ -36,26 +36,6 @@ public class Pawn extends Piece{
         return super.move(pos);
     }
 
-    @Override
-    public void pseudoMove(Vec2i pos) {
-        if(Math.abs(pos.y - tile.pos.y) == 2) {
-            currentState.justAdvancedTwoTiles = true;
-        }
-
-        currentState.hasMoved = true;
-
-        if(isAnEnPassantMove(pos)){
-            pseudoEnPassant(pos);
-        }
-        super.pseudoMove(pos);
-    }
-
-    private void pseudoEnPassant(Vec2i pos) {
-        //get captured piece
-        Vec2i capturedPos = new Vec2i(pos.x, this.tile.pos.y);
-        pseudoCapture(board.getTile(capturedPos).getPiece());
-    }
-
     private void captureEnPassant(Vec2i pos) {
         //get captured piece
         Vec2i capturedPos = new Vec2i(pos.x, this.tile.pos.y);

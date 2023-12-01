@@ -25,26 +25,6 @@ public class King extends Piece{
         return super.move(pos);
     }
 
-    @Override
-    public void pseudoMove(Vec2i pos) {
-        if(!currentState.hasMoved){
-            if(isCastlingMove(pos)){
-                pseudoCastle(pos);
-            }
-        }
-        currentState.hasMoved = true;
-        super.pseudoMove(pos);
-    }
-
-    private void pseudoCastle(Vec2i pos) {
-        //first moved the rook then the king
-        //check if the move is long castling or short castling
-        Tile rookTile = board.getTile(getCastlingRookPos(pos));
-        Rook rook = (Rook) rookTile.getPiece();
-        rook.pseudoMove(getRookPosAfterCastling(pos));
-        super.pseudoMove(pos);
-    }
-
     public Tile performCastle(Vec2i pos) {
         //first moved the rook then the king
         //check if the move is long castling or short castling

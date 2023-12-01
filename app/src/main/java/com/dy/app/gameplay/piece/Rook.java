@@ -75,12 +75,6 @@ public class Rook extends Piece{
     }
 
     @Override
-    public void pseudoMove(Vec2i pos) {
-        currentState.hasMoved = true;
-        super.pseudoMove(pos);
-    }
-
-    @Override
     public String getNotation(){
         return ChessNotation.ROOK;
     }

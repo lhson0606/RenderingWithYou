@@ -63,21 +63,37 @@ public class MultiDeviceInGameHandler extends Thread
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        //we need to add whether it's a check or checkmate
+        int testResult = board.testForCheck(Rival.getInstance().isWhitePiece());
+        if(testResult == Board.IS_CHECK){
+            moveNotation += "+";
+        }else if(testResult == Board.IS_CHECKMATE){
+            moveNotation += "#";
+        }
         //send move to other device
         sendMove(moveNotation);
     }
 
     private boolean checkForSpecialMove(String moveNotation) {
+        final String promotionMoveNotation = moveNotation;
         //promotion move
         if(moveNotation.contains("=")){
             //call main thread to show promotion dialog, note that we are on the ui thread
             gameActivity.showPromotionDialog((pieceName) -> {
+                String tempMoveNotation = promotionMoveNotation.replace("?", pieceName);
                 try {
-                    board.moveByNotation(moveNotation.replace("?", pieceName), player.isWhitePiece());
+                    board.moveByNotation(tempMoveNotation, player.isWhitePiece());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                sendMove(moveNotation.replace("?", pieceName));
+                int testResult = board.testForCheck(Rival.getInstance().isWhitePiece());
+                if(testResult == Board.IS_CHECK){
+                    tempMoveNotation += "+";
+                }else if(testResult == Board.IS_CHECKMATE){
+                    tempMoveNotation += "#";
+                }
+                //send move to other device
+                sendMove(tempMoveNotation);
                 player.setInTurn(false);
             });
             return true;

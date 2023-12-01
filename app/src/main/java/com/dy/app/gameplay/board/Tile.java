@@ -1,5 +1,7 @@
 package com.dy.app.gameplay.board;
 
+import androidx.annotation.NonNull;
+
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.gameplay.algebraicNotation.ChessNotation;
@@ -93,5 +95,19 @@ public class Tile {
 
     public String getNotation(){
         return ChessNotation.BoardPositions[pos.x][pos.y];
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        if(piece!=null){
+            String pieceNotation = piece.getNotation();
+            if(pieceNotation.equals(ChessNotation.PAWN)){
+                pieceNotation = "p";
+            }
+            return "|" + (piece.isWhite() ? pieceNotation.toUpperCase() : pieceNotation.toLowerCase()) + "|" ;
+        }
+
+        return "| |";
     }
 }

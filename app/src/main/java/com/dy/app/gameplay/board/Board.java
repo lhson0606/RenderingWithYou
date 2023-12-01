@@ -3,6 +3,8 @@ package com.dy.app.gameplay.board;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.core.GameEntity;
@@ -40,6 +42,7 @@ public class Board implements GameEntity {
     public static int IS_CHECK = 1;
     public static int IS_CHECKMATE = 2;
     private int moveCount = 1;
+    private final StringBuilder moveHistoryBuilder = new StringBuilder();
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
         this.context = context;
@@ -316,7 +319,6 @@ public class Board implements GameEntity {
             }
 
             piece.pseudoMove(desTile.pos);
-            pseudoCheckForPromotionMove(move);
             pseudoUpdateBoardState();
         }finally {
             mutex.unlock();
@@ -367,20 +369,19 @@ public class Board implements GameEntity {
             desTile.getObj().changeState(Obj3D.State.SOURCE);
             prevSrcTile = srcTile;
             prevDesTile = desTile;
+
+            //save to board history
+            if(isWhite) {
+                moveHistoryBuilder.append(moveCount / 2).append(". ").append(moveNotation).append(" ");
+            }else{
+                moveHistoryBuilder.append(moveNotation).append(" ");
+            }
+
+            Log.d("Board", toString());
+            Log.d("Board", "moveCount: " + moveCount);
+            Log.d("Board", "moveHistory: " + moveHistoryBuilder.toString());
         }finally {
             mutex.unlock();
-        }
-    }
-
-    public void pseudoCheckForPromotionMove(ChessMove move){
-        if(move.isPromotionMove()){
-            Piece piece = move.getDesTile().getPiece();
-            Pawn pawn = (Pawn) piece;
-            try {
-                pawn.pseudoPromote(move.getPromotingPieceNotation());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
@@ -511,29 +512,127 @@ public class Board implements GameEntity {
         return assetManger;
     }
 
+    /**
+     * @param isWhite the king color to be checked
+     * @return 0 if no check, 1 if check, 2 if checkmate
+     */
     public int testForCheck(boolean isWhite){
-        if(isWhite){
-            return testForWhiteCheck();
-        }else{
-            return testForBlackCheck();
+        Log.d("Board", "testForCheck");
+        Vector<Tile> controlledTiles = isWhite ? getBlackControlledTile() : getWhiteControlledTile();
+        King king = isWhite ? pieceManager.getWhiteKing() : pieceManager.getBlackKing();
+
+        if(!controlledTiles.contains(king.getTile())){
+            Log.d("Board", "no check");
+            return NO_CHECK;
         }
+
+        Log.d("Board", "check");
+        boolean isCheckmate = true;
+        Vector<Piece> pieces = isWhite ? pieceManager.getWhitePieces() : pieceManager.getBlackPieces();
+        //we need to try every possible moves of the ally pieces
+        for(Piece piece : pieces){
+            Vector<Tile> currentPossibleMove = new Vector<>(piece.getPossibleMoves());
+            for(Tile tile : currentPossibleMove){
+                //try pseudo move
+                piece.pseudoMove(tile.pos);
+                //update the board state for the pseudo move
+                pseudoUpdateBoardState();
+                //check if the king is still in check
+                Vector<Tile> newControlledTiles = isWhite ? getBlackControlledTile() : getWhiteControlledTile();
+                //there's a move that can get the king out of check
+                if(!newControlledTiles.contains(king.getTile())){
+                    isCheckmate = false;
+                    Log.d("Board", toString());
+                    piece.rollbackPseudoMove();
+                    pseudoUpdateBoardState();
+                    break;
+                }
+                piece.rollbackPseudoMove();
+                pseudoUpdateBoardState();
+            }
+
+            //no need to continue if we detect there's move to parry the check
+            if(!isCheckmate){
+                break;
+            }
+        }
+
+        Log.d("Board", "isCheckmate: " + isCheckmate);
+        return isCheckmate ? IS_CHECKMATE : IS_CHECK;
     }
 
     private int testForWhiteCheck() {
-        return 0;
+        Vector<Tile> blackControlledTiles = getBlackControlledTile();
+        King whiteKing = pieceManager.getWhiteKing();
+
+        if(!blackControlledTiles.contains(whiteKing.getTile())){
+            return NO_CHECK;
+        }
+
+        boolean isCheckmate = true;
+        //we need to try every possible moves of the white pieces
+        for(Piece piece : pieceManager.getWhitePieces()){
+            for(Tile tile : piece.getPossibleMoves()){
+                //try pseudo move
+                piece.pseudoMove(tile.pos);
+                //update the board state for the pseudo move
+                pseudoUpdateBoardState();
+                //check if the king is still in check
+                Vector<Tile> newBlackControlledTiles = getBlackControlledTile();
+                //there's a move that can get the king out of check
+                if(!newBlackControlledTiles.contains(whiteKing.getTile())){
+                    isCheckmate = false;
+                    //rollback the pseudo move and break
+                    piece.rollbackPseudoMove();
+                    break;
+                }
+            }
+        }
+
+        //restore the board state
+        for(Piece piece : pieceManager.getActivePieces()){
+            piece.updatePossibleMoves();
+        }
+
+        return isCheckmate ? IS_CHECKMATE : IS_CHECK;
     }
 
     private int testForBlackCheck() {
-        return 0;
+        Vector<Tile> whiteControlledTiles = getWhiteControlledTile();
+        King blackKing = pieceManager.getBlackKing();
+
+        if(!whiteControlledTiles.contains(blackKing.getTile())){
+            return NO_CHECK;
+        }
+
+        boolean isCheckmate = true;
+        //we need to try every possible moves of the white pieces
+        for(Piece piece : pieceManager.getBlackPieces()){
+            for(Tile tile : piece.getPossibleMoves()){
+                //try pseudo move
+                piece.pseudoMove(tile.pos);
+                //update the board state for the pseudo move
+                pseudoUpdateBoardState();
+                //check if the king is still in check
+                Vector<Tile> newWhiteControlledTiles = getWhiteControlledTile();
+                //there's a move that can get the king out of check
+                if(!newWhiteControlledTiles.contains(blackKing.getTile())){
+                    isCheckmate = false;
+                    //rollback the pseudo move and break
+                    piece.rollbackPseudoMove();
+                    break;
+                }
+            }
+        }
+
+        //restore the board state
+        for(Piece piece : pieceManager.getActivePieces()){
+            piece.updatePossibleMoves();
+        }
+
+        return isCheckmate ? IS_CHECKMATE : IS_CHECK;
     }
 
-    public void pseudoCapture(Piece piece) {
-        pieceManager.capturePiece(piece);
-    }
-
-    public void pseudoReplace(Piece src, Piece dst) {
-        //pieceManager.pseduoReplace(src, dst);
-    }
 
     public void checkForUndoCapture(int moveNumber){
         for(Piece piece : pieceManager.getAllPieces()){
@@ -609,5 +708,18 @@ public class Board implements GameEntity {
 
     public void undoCapture(Piece piece) {
         pieceManager.undoCapture(piece);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < DyConst.row_count; i++){
+            for(int j = 0; j < DyConst.col_count; j++){
+                builder.append(tiles[j][i].toString());
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
     }
 }

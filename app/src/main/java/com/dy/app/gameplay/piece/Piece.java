@@ -1,9 +1,12 @@
 package com.dy.app.gameplay.piece;
 
+import android.util.Log;
+
 import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.core.GameEntity;
+import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.graphic.Skin;
@@ -159,21 +162,61 @@ public class Piece implements GameEntity {
     }
 
     private PieceState rollbackState = null;
+    private Piece pseudoCapturedPiece = null;
 
+    /**
+     * This method is used to perform a pseudo move to check if it's a checkmate or not
+     * it will not pseudo promote the pawn, because it's only be used when the king is in check so castling is not possible in pseudo move
+     * after check the state of the game, we need to rollback the pseudo move by calling rollbackPseudoMove() of this piece
+     * else the state of the board will be corrupted
+     * @param pos
+     */
     public void pseudoMove(Vec2i pos){
+        Tile dstTile = board.getTile(pos);
+
+        if(!possibleMoves.contains(dstTile)){
+            throw new RuntimeException("Pseudo move is not possible");
+        }
+
+        if(dstTile.getPiece() != null){
+            //we only need to perform pseudo capture if there is a piece to capture
+            if(dstTile.getPiece().getNotation().equals(ChessNotation.KING)){
+                return;//if we are capturing the king, we don't need to do anything
+            }
+
+            pseudoCapture(dstTile.getPiece());
+        }
+
         rollbackState = currentState.clone();
         tile.setPiece(null);
         tile = board.getTile(pos);
-        if(tile.getPiece() != null){
-            //we only need to perform pseudo capture if there is a piece to capture
-            pseudoCapture(tile.getPiece());
-        }
         tile.setPiece(this);
     }
 
     public void pseudoCapture(Piece piece) {
-        //board.pseudoRemove(piece);
-        piece.currentState.isCaptured = true;
+        pseudoCapturedPiece = piece;
+        pseudoCapturedPiece.rollbackState = pseudoCapturedPiece.currentState.clone();
+        board.getPieceManager().pseudoCapture(pseudoCapturedPiece);
+    }
+
+    public void rollbackPseudoMove(){
+        if(rollbackState == null){
+            return;//nothing to rollback
+        }
+        tile.setPiece(null);
+        tile = board.getTile(rollbackState.pos);
+        tile.setPiece(this);
+        currentState = rollbackState;
+        rollbackState = null;
+        if(pseudoCapturedPiece != null){
+            Log.d("Piece", "rollback captured piece: " + pseudoCapturedPiece.getNotation());
+            board.getPieceManager().rollbackPseudoCapture(pseudoCapturedPiece);
+            pseudoCapturedPiece.currentState = pseudoCapturedPiece.rollbackState;
+            //set the piece back to the tile
+            pseudoCapturedPiece.getTile().setPiece(pseudoCapturedPiece);
+            //prepare for the next pseudo move
+            pseudoCapturedPiece = null;
+        }
     }
 
     public Tile move(Vec2i pos){
