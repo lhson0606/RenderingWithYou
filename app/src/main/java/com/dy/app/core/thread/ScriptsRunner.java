@@ -12,6 +12,7 @@ import com.dy.app.gameplay.piece.Piece;
 
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ScriptsRunner extends Thread{
@@ -20,11 +21,11 @@ public class ScriptsRunner extends Thread{
     private Board board;
     private PGNFile pgnFile;
     boolean isRunning = false;
-    final Object lock = new Object();
     RunScriptsActivity activity;
     private boolean isPaused = false;
     private int currentMove = 0;
     private final ReentrantLock moveLock = new ReentrantLock();
+    private final Condition resumeCondition = moveLock.newCondition();
 
     public ScriptsRunner(RunScriptsActivity activity, PGNFile pgnFile, Board board){
         this.activity = activity;
@@ -35,6 +36,7 @@ public class ScriptsRunner extends Thread{
     @Override
     public void run() {
         isRunning = true;
+
         try {
             loadAllMove();
         } catch (Exception e) {
@@ -42,90 +44,73 @@ public class ScriptsRunner extends Thread{
         }
         Vector<PGNFile.Move> moves = pgnFile.getMoves();
 
-        //jumpToMove(0);
-//        jumpToMove(1);
-//        Log.d(TAG, board.toString());
-//        jumpToMove(2);
-//        Log.d(TAG, board.toString());
-//        jumpToMove(3);
-//        Log.d(TAG, board.toString());
-//        jumpToMove(149);
-//        Log.d(TAG, board.toString());
-        //jumpToMove(22);
-        //jumpToMove(4);
-        //Log.d(TAG, board.toString());
         jumpToMove(0);
-        jumpToMove(4);
-        jumpToMove(0);
-//        jumpToMove(4);
-//        jumpToMove(4);
-//        jumpToMove(0);
-//
+
         while(isRunning){
             while(currentMove < moves.size()*2) {
-                Log.d("Debug concurrent", "worker is waiting for mutex");
-                moveLock.lock();
-                Log.d("Debug concurrent", "Mutex acquired!");
-                Log.d("Debug concurrent", "<");
-                currentMove++;
-                activity.updateProgress(currentMove);
-                boolean isWhite = currentMove%2 == 1;
-                PGNFile.Move move =isWhite? moves.get((currentMove-1)/2) : moves.get(currentMove/2 - 1);
-                ChessMove chessMove = null;
-                String moveNotation = isWhite? move.white : move.black;
-                Log.d("Debug concurrent", "move " + currentMove + " " + moveNotation);
-                try {
-                    chessMove = new ChessMove(isWhite, moveNotation, board);
-                } catch (Exception e) {
-                    Log.d(TAG, "at move " + currentMove + " " + moveNotation);
-                    Log.d(TAG, board.toString());
-                    throw new RuntimeException(e);
+                try{
+                    Log.d("Debug concurrent", "worker is waiting for mutex");
+                    moveLock.lock();
+                    Log.d("Debug concurrent", "Mutex acquired!");
+                    Log.d("Debug concurrent", "<");
+                    currentMove++;
+                    activity.updateProgress(currentMove);
+                    boolean isWhite = currentMove%2 == 1;
+                    PGNFile.Move move =isWhite? moves.get((currentMove-1)/2) : moves.get(currentMove/2 - 1);
+                    ChessMove chessMove = null;
+                    String moveNotation = isWhite? move.white : move.black;
+                    Log.d("Debug concurrent", "move " + currentMove + " " + moveNotation);
+                    try {
+                        chessMove = new ChessMove(isWhite, moveNotation, board);
+                    } catch (Exception e) {
+                        Log.d(TAG, "at move " + currentMove + " " + moveNotation);
+                        Log.d(TAG, board.toString());
+                        throw new RuntimeException(e);
+                    }
+                    Piece piece = chessMove.getSrcTile().getPiece();
+                    try {
+                        board.moveByNotation(moveNotation, isWhite);
+                        Log.d("Debug concurrent", "Worker: on board state update: ");
+                        Log.d("Debug concurrent", board.toString());
+                    } catch (Exception e) {
+                        Log.d(TAG, "at move " + currentMove + " " + moveNotation);
+                        Log.d(TAG, board.toString());
+                        throw new RuntimeException(e);
+                    }
+                    Log.d("Debug concurrent", ">");
+
+                    if(isPaused){
+                        try {
+                            resumeCondition.await();
+                        } catch (InterruptedException e) {
+                            //no need to handle
+                        }
+                    }
+
+                }finally {
+                    if(isPaused){
+                        Log.d(TAG, "Worker: paused and released mutex");
+                    }
+                    moveLock.unlock();
                 }
-                Piece piece = chessMove.getSrcTile().getPiece();
-                piece.pickUp();
-//                moveLock.unlock();
-//
-//                try {
-//                    Thread.sleep(200);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-//
-//                moveLock.lock();
-//                if(isJustJumped){
-//                    piece.putDown();
-//                    isJustJumped = false;
-//                    moveLock.unlock();
-//                    continue;
-//                }
-                try {
-                    board.moveByNotation(moveNotation, isWhite);
-                    Log.d("Debug concurrent", "Worker: on board state update: ");
-                    Log.d("Debug concurrent", board.toString());
-                } catch (Exception e) {
-                    Log.d(TAG, "at move " + currentMove + " " + moveNotation);
-                    Log.d(TAG, board.toString());
-                    throw new RuntimeException(e);
-                }
-                Log.d("Debug concurrent", ">");
-                moveLock.unlock();
 
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+                    //no need to handle
                 }
             }
 
-            throw new RuntimeException("End of script");
-
-//            synchronized (lock){
-//                try {
-//                    lock.wait();
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
+            try{
+                moveLock.lock();
+                Log.d(TAG, "run: waiting for resume");
+                activity.changePlayButtonToContinue();
+                resumeCondition.await();
+            } catch (InterruptedException e) {
+                //no need to handle
+            } finally {
+                moveLock.unlock();
+            }
         }
 
         Log.d(TAG, " run: stopped");
@@ -135,13 +120,12 @@ public class ScriptsRunner extends Thread{
         try {
             moveLock.lock();
             isPaused = false;
-            if(currentMove == pgnFile.getMoves().size()){
-                currentMove = 0;
-                board.goToMove(0);
+            //if it's the end of the game, jump to the beginning for replay
+            if(currentMove == pgnFile.getMoves().size()*2){
+                jumpToMove(0);
             }
-            synchronized (lock){
-                lock.notify();
-            }
+
+            resumeCondition.signal();
         }finally {
             moveLock.unlock();
         }
@@ -206,7 +190,54 @@ public class ScriptsRunner extends Thread{
             currentMove = move;
             Log.d(TAG, board.toString());
             Log.d("Debug concurrent", "]");
+            activity.updateProgress(currentMove);
         }finally {
+            moveLock.unlock();
+        }
+    }
+
+    public void prevMove(){
+        try {
+            moveLock.lock();
+            if(currentMove == 0){
+                jumpToMove(pgnFile.getMoves().size()*2-1);
+                return;
+            }
+            jumpToMove(currentMove-1);
+        }finally {
+            moveLock.unlock();
+        }
+    }
+
+    public void nextMove(){
+        try {
+            moveLock.lock();
+            if(currentMove == pgnFile.getMoves().size()*2-1){
+                jumpToMove(0);
+                return;
+            }
+            jumpToMove(currentMove+1);
+        }finally {
+            moveLock.unlock();
+        }
+    }
+
+    public boolean isPaused(){
+        try{
+            moveLock.lock();
+            return isPaused;
+        }finally {
+            moveLock.unlock();
+        }
+    }
+
+    public void close(){
+        try{
+            moveLock.lock();
+            isRunning = false;
+            resumeCondition.signal();
+        }
+        finally {
             moveLock.unlock();
         }
     }

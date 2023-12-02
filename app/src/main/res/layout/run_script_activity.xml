@@ -170,22 +170,32 @@
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/sbProgress"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="10dp">
 
-            <ImageButton
+            <ImageView
+                android:id="@+id/btnPrev"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_play_previous"/>
+                android:src="@drawable/ic_play_previous"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"/>
 
-            <ImageButton
+            <ImageView
+                android:id="@+id/btnPlay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_pause_playing"/>
+                android:src="@drawable/ic_pause_playing"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"/>
 
-            <ImageButton
+            <ImageView
+                android:id="@+id/btnNext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_play_next"/>
+                android:src="@drawable/ic_play_next"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"/>
 
         </LinearLayout>
 
@@ -202,7 +212,8 @@
             android:max="0"
             android:progress="0"
             android:progressTint="#183259"
-            android:thumb="@drawable/blue_circle_seek_bar_thumb"/>
+            android:thumb="@drawable/blue_circle_seek_bar_thumb"
+            android:layout_marginBottom="10dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -235,7 +246,7 @@
             app:layout_constraintHeight_percent="0.8"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_percent="0.5" />
+            app:layout_constraintWidth_percent="0.5"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

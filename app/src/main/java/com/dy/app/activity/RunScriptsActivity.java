@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -38,6 +39,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     PGNFile pgnFile = null;
     private SeekBar sbProgress;
     private ScriptsRunner runner = null;
+    private ImageView btnPlay, btnPrev, btnNext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,10 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
             ((TextView)findViewById(R.id.tvBlackPlayerElo)).setText(pgnFile.getBlackPlayerElo());
             ((TextView)findViewById(R.id.tvWhitePlayerElo)).setText(pgnFile.getWhitePlayerElo());
             sbProgress.setMax(pgnFile.getMoves().size()*2);
+            sbProgress.setProgress(0);
+            btnPlay.setEnabled(true);
+            btnPrev.setEnabled(true);
+            btnNext.setEnabled(true);
         });
     }
 
@@ -72,11 +78,21 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     private void init(){
         btnClose = findViewById(R.id.btnClose);
         sbProgress = findViewById(R.id.sbProgress);
+        btnPlay = findViewById(R.id.btnPlay);
+        btnPrev = findViewById(R.id.btnPrev);
+        btnNext = findViewById(R.id.btnNext);
+        //disable the buttons for now, until we load the script, we will enable them in updateDisplay()
+        btnPlay.setEnabled(false);
+        btnPrev.setEnabled(false);
+        btnNext.setEnabled(false);
     }
 
     private void attachListener(){
         btnClose.setOnClickListener(this);
         sbProgress.setOnSeekBarChangeListener(this);
+        btnPlay.setOnClickListener(this);
+        btnPrev.setOnClickListener(this);
+        btnNext.setOnClickListener(this);
     }
 
     private void runScript(String src) {
@@ -197,15 +213,8 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     }
 
     private void quit(){
+        runner.close();
         finish();
-    }
-
-    @Override
-    public void onClick(View v) {
-        if(v == btnClose){
-            btnClose.playAnimation();
-            showQuitDialog();
-        }
     }
 
     @Override
@@ -226,5 +235,37 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     public void onStopTrackingTouch(SeekBar seekBar) {
         //runner.resumePlaying();
         Log.d("Debug concurrent", "stop touching progress bar>");
+    }
+
+    public void changePlayButtonToPause(){
+        runOnUiThread(()->{
+            btnPlay.setImageResource(R.drawable.ic_pause_playing);
+        });
+    }
+
+    public void changePlayButtonToContinue(){
+        runOnUiThread(()->{
+            btnPlay.setImageResource(R.drawable.ic_continue_playing);
+        });
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v == btnClose){
+            btnClose.playAnimation();
+            showQuitDialog();
+        }else if(v == btnPlay){
+            if(runner.isPaused()){
+                runner.resumePlaying();
+                btnPlay.setImageResource(R.drawable.ic_pause_playing);
+            }else{
+                runner.pausePlaying();
+                btnPlay.setImageResource(R.drawable.ic_continue_playing);
+            }
+        }else if(v == btnPrev){
+            runner.prevMove();
+        }else if(v == btnNext){
+            runner.nextMove();
+        }
     }
 }
