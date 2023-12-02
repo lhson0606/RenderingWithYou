@@ -51,10 +51,8 @@ public class AlgebraicChessInterpreter {
         final String captureNotation = isCaptureMove(srcTile, dstTile) ? CAPTURE_NOTATION : "";
         final String dstNotation = getDstNotation(dstTile);
         final String promotionNotation = isPromotionMove(srcTile, dstTile) ? PROMOTION_NOTATION + "?" : "";
-        //#todo check notation
-        final String checkNotation = "";
 
-        return srcNotation + captureNotation + dstNotation + promotionNotation + checkNotation;
+        return srcNotation + captureNotation + dstNotation + promotionNotation;
     }
 
     private static boolean isPromotionMove(Tile srcTile, Tile dstTile){

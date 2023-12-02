@@ -82,12 +82,14 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                         lastPiece.putDown();
                         if(listener != null) listener.onMoveDetected(lastPiece.getTile(), tile);
                         lastPiece = null;
+                        firstTouch = true;
                         return false;
                     }else{
                         //perform attack
                         lastPiece.putDown();
                         if(listener != null) listener.onMoveDetected(lastPiece.getTile(), tile);
                         lastPiece = null;
+                        firstTouch = true;
                         return false;
                     }
 
@@ -98,8 +100,6 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
                 firstTouch = true;
                 break;
         }
-
-
 
         return false;
     }

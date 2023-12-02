@@ -144,13 +144,11 @@ public class Piece implements GameEntity {
         this.pieceColor = pieceColor;
         this.board = board;
         this.currentState.pos = tile.pos;
-        //save the initial state
-        addStateToHistory();
     }
 
     public void addStateToHistory(){
-        currentState.moveNumber = history.size();
-        this.history.put(this.history.size(), currentState.clone());
+        currentState.moveNumber = board.getMoveCount();
+        this.history.put(currentState.moveNumber, currentState.clone());
     }
 
     public boolean isOnPlayerSide(){
@@ -243,7 +241,7 @@ public class Piece implements GameEntity {
 
     public void setStateAtMoveNumber(int moveNumber){
         PieceState stateToGo = history.get(moveNumber);
-        currentState = stateToGo;
+        currentState = stateToGo.clone();
         this.tile = board.getTile(stateToGo.pos);
         this.tile.setPiece(this);
     }

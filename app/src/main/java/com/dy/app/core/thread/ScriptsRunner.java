@@ -1,152 +1,213 @@
 package com.dy.app.core.thread;
 
 import android.util.Log;
+import android.widget.RelativeLayout;
 
-import com.dy.app.common.maths.Vec2i;
+import com.dy.app.activity.RunScriptsActivity;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.move.ChessMove;
+import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.piece.Piece;
-import com.dy.app.graphic.model.Obj3D;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ScriptsRunner extends Thread{
-    InputStream is;
 
     public static final String TAG = "ScriptsRunner";
-    private InputStreamReader reader;
     private Board board;
-    private final Semaphore whiteSem = new Semaphore(1);
-    private final Semaphore blackSem = new Semaphore(0);
+    private PGNFile pgnFile;
+    boolean isRunning = false;
+    final Object lock = new Object();
+    RunScriptsActivity activity;
+    private boolean isPaused = false;
+    private int currentMove = 0;
+    private final ReentrantLock moveLock = new ReentrantLock();
 
-    public ScriptsRunner(InputStream is, Board board){
-        this.is = is;
-        reader = new InputStreamReader(is);
-        moves = new Vector<>();
-        meta = new HashMap<>();
+    public ScriptsRunner(RunScriptsActivity activity, PGNFile pgnFile, Board board){
+        this.activity = activity;
+        this.pgnFile = pgnFile;
         this.board = board;
     }
 
     @Override
     public void run() {
+        isRunning = true;
         try {
-            parsePGN();
-        } catch (IOException e) {
+            loadAllMove();
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        Vector<PGNFile.Move> moves = pgnFile.getMoves();
 
-        BlackRunner blackRunner = new BlackRunner(moves, board, whiteSem, blackSem);
-        //blackRunner.start();
-        WhiteRunner whiteRunner = new WhiteRunner(moves, board, whiteSem, blackSem);
-        //whiteRunner.start();
+        //jumpToMove(0);
+//        jumpToMove(1);
+//        Log.d(TAG, board.toString());
+//        jumpToMove(2);
+//        Log.d(TAG, board.toString());
+//        jumpToMove(3);
+//        Log.d(TAG, board.toString());
+//        jumpToMove(149);
+//        Log.d(TAG, board.toString());
+        //jumpToMove(22);
+        //jumpToMove(4);
+        //Log.d(TAG, board.toString());
+        jumpToMove(0);
+        jumpToMove(4);
+        jumpToMove(0);
+//        jumpToMove(4);
+//        jumpToMove(4);
+//        jumpToMove(0);
+//
+        while(isRunning){
+            while(currentMove < moves.size()*2) {
+                Log.d("Debug concurrent", "worker is waiting for mutex");
+                moveLock.lock();
+                Log.d("Debug concurrent", "Mutex acquired!");
+                Log.d("Debug concurrent", "<");
+                currentMove++;
+                activity.updateProgress(currentMove);
+                boolean isWhite = currentMove%2 == 1;
+                PGNFile.Move move =isWhite? moves.get((currentMove-1)/2) : moves.get(currentMove/2 - 1);
+                ChessMove chessMove = null;
+                String moveNotation = isWhite? move.white : move.black;
+                Log.d("Debug concurrent", "move " + currentMove + " " + moveNotation);
+                try {
+                    chessMove = new ChessMove(isWhite, moveNotation, board);
+                } catch (Exception e) {
+                    Log.d(TAG, "at move " + currentMove + " " + moveNotation);
+                    Log.d(TAG, board.toString());
+                    throw new RuntimeException(e);
+                }
+                Piece piece = chessMove.getSrcTile().getPiece();
+                piece.pickUp();
+//                moveLock.unlock();
+//
+//                try {
+//                    Thread.sleep(200);
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
+//
+//                moveLock.lock();
+//                if(isJustJumped){
+//                    piece.putDown();
+//                    isJustJumped = false;
+//                    moveLock.unlock();
+//                    continue;
+//                }
+                try {
+                    board.moveByNotation(moveNotation, isWhite);
+                    Log.d("Debug concurrent", "Worker: on board state update: ");
+                    Log.d("Debug concurrent", board.toString());
+                } catch (Exception e) {
+                    Log.d(TAG, "at move " + currentMove + " " + moveNotation);
+                    Log.d(TAG, board.toString());
+                    throw new RuntimeException(e);
+                }
+                Log.d("Debug concurrent", ">");
+                moveLock.unlock();
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            throw new RuntimeException("End of script");
+
+//            synchronized (lock){
+//                try {
+//                    lock.wait();
+//                } catch (InterruptedException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+        }
 
         Log.d(TAG, " run: stopped");
     }
 
-    private String preProcess(String data){
-        //delete all '\r' characters
-        return data.replaceAll("\r", "");
-    }
-
-    private void parsePGN() throws IOException {
-        StringBuilder builder = new StringBuilder();
-        String curLine = null;
-        final int BUFFER_SIZE = 1024;
-        char[] buffer = new char[BUFFER_SIZE];
-        int count = -1;
-
-        while(reader.ready()){
-            try {
-                count = reader.read(buffer, 0, BUFFER_SIZE);
-                if(count == -1) break;
-                curLine = new String(buffer, 0, count);
-                Log.d(TAG, curLine);
-                builder.append(curLine);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    public void resumePlaying(){
+        try {
+            moveLock.lock();
+            isPaused = false;
+            if(currentMove == pgnFile.getMoves().size()){
+                currentMove = 0;
+                board.goToMove(0);
             }
-        };
-
-        data = builder.toString();
-        data = preProcess(data);
-
-        String[] splitResult = data.split("\n\n");
-
-        if(splitResult.length != 2) {
-            throw new RuntimeException("Invalid PGN file");
-        }
-
-        String metaStr = splitResult[0];
-        String movesStr = splitResult[1];
-
-        parseMeta(metaStr);
-
-        //convert ".\s*" to ". "
-        movesStr = movesStr.replaceAll("\\.\\s*", ". ");
-        parseMoves(movesStr);
-    }
-
-    private void parseMeta(String metaStr) {
-        String[] metaLines = metaStr.split("\n");
-        for(String line : metaLines){
-            line = line.trim();
-
-            try{
-                line = line.substring(1, line.length()-1);
-                String[] splitResult = line.split("\\s+\"");
-                if(splitResult.length != 2) throw new RuntimeException("Invalid PGN file");
-                meta.put(splitResult[0].trim(), splitResult[1].trim().substring(0, splitResult[1].length()-1));
-            }catch (StringIndexOutOfBoundsException e){
-                throw new RuntimeException("Invalid PGN file");
+            synchronized (lock){
+                lock.notify();
             }
+        }finally {
+            moveLock.unlock();
         }
     }
 
-    private void parseMoves(String movesStr) {
-        String[] splitResults = movesStr.split("\\s+");
-        Move move = null;
+    public void pausePlaying(){
+        moveLock.lock();
+        isPaused = true;
+        moveLock.unlock();
+    }
 
-        for(int i = 0; i < splitResults.length; i++){
-            String curStr = splitResults[i];
-            curStr = curStr.trim();
-            //check for correct index
-            if(i%3 == 0) {
-                int index = -1;
-
-                try{
-                    index = Integer.parseInt(curStr.substring(0, curStr.length()-1));
-                }catch (NumberFormatException e){
-                    if(curStr.equals("1-0") || curStr.equals("0-1") || curStr.equals("1/2-1/2")){
-                        break;
-                    }
-
-                    throw new RuntimeException("Invalid PGN file");
-                }
-
-                if(index != i/3 + 1) throw new RuntimeException("Index error");
-            }else if(i%3 == 1){
-                move = new Move();
-                move.white = curStr;
-            }else{
-                move.black = curStr;
-                moves.add(move);
-            }
+    private void loadAllMove() throws Exception {
+        Vector<PGNFile.Move> moves = pgnFile.getMoves();
+        for(PGNFile.Move move : moves){
+            loadSingleMove(move.white, true);
+            loadSingleMove(move.black, false);
         }
     }
 
-    public class Move{
-        public String white;
-        public String black;
+    private void loadSingleMove(String moveData, boolean isWhite) throws Exception {
+        board.moveByNotation(moveData, isWhite);
     }
 
-    private final Vector<Move> moves;
-    private final Map<String, String> meta;
-    private String data;
+    private void performMove(String moveData, boolean isWhite) {
+        ChessMove move = null;
+        try {
+            move = new ChessMove(isWhite, moveData, board);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        Tile srcTile = move.getSrcTile();
+        Piece piece = srcTile.getPiece();
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        piece.pickUp();
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        piece.putDown();
+        //piece.move(desTile.pos);
+        try {
+            board.moveByNotation(moveData, isWhite);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void jumpToMove(int move){
+        try {
+            moveLock.lock();
+            Log.d("Debug concurrent", "[");
+            board.goToMove(move);
+            Log.d("Debug concurrent", "User: on board state reset: ");
+            Log.d("Debug concurrent", board.toString());
+            Log.d(TAG, "received jump to move " + move);
+            Log.d(TAG, "jumpToMove: from "+ currentMove + " to " + move);
+            currentMove = move;
+            Log.d(TAG, board.toString());
+            Log.d("Debug concurrent", "]");
+        }finally {
+            moveLock.unlock();
+        }
+    }
 }

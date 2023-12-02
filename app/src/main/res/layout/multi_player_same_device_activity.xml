@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:screenOrientation="landscape"
+    tools:context=".activity.GameActivity"
+    android:background="#ffffff"
+    android:id="@+id/loadingBackground">
+
+    <FrameLayout
+        android:id="@+id/fl_game_surface"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tvBlackPlayerElo"
+                android:layout_width="109dp"
+                android:layout_height="17dp"
+                app:layout_constraintTop_toBottomOf="@+id/tvBlackPlayerName"
+                app:layout_constraintEnd_toStartOf="@id/tvLeftTimeRemain"
+                android:background="@drawable/bg_left_player_elo_display"
+                android:layout_marginEnd="-20dp"
+                android:layout_marginTop="-2dp"
+                android:paddingStart="30dp"
+                android:paddingEnd="20dp"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:fontFamily="@font/bangers"
+                android:textSize="11sp"
+                android:text="elo"/>
+
+            <TextView
+                android:id="@+id/tvWhitePlayerElo"
+                android:layout_width="109dp"
+                android:layout_height="17dp"
+                app:layout_constraintTop_toBottomOf="@+id/tvWhitePlayerName"
+                app:layout_constraintStart_toEndOf="@id/tvRightTimeRemain"
+                android:background="@drawable/bg_right_player_elo_display"
+                android:layout_marginStart="-20dp"
+                android:layout_marginTop="-2dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="30dp"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:fontFamily="@font/bangers"
+                android:textSize="11sp"
+                android:text="elo"/>
+
+            <TextView
+                android:id="@+id/tvBlackPlayerName"
+                android:layout_width="165dp"
+                android:layout_height="26dp"
+                android:layout_marginEnd="-12dp"
+                android:background="@drawable/bg_black_player_name_display"
+                android:fontFamily="@font/bangers"
+                android:paddingEnd="20dp"
+                android:text="Player - 1"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toStartOf="@+id/tvLeftTimeRemain"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvWhitePlayerName"
+                android:layout_width="165dp"
+                android:layout_height="26dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tvRightTimeRemain"
+                android:background="@drawable/bg_white_player_name_display"
+                android:layout_marginStart="-12dp"
+                android:fontFamily="@font/bangers"
+                android:textSize="15sp"
+                android:textColor="@color/white"
+                android:textAlignment="center"
+                android:paddingStart="20dp"
+                android:text="Player - 2"/>
+
+            <TextView
+                android:id="@+id/tvLeftTimeRemain"
+                android:layout_width="152dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_time_remain_left"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tvRightTimeRemain"
+                android:layout_marginStart="-2dp"
+                android:fontFamily="@font/bangers"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:text="-- : --"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/tvRightTimeRemain"
+                android:layout_width="152dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_time_remain_right"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/tvLeftTimeRemain"
+                android:layout_marginStart="-2dp"
+                android:fontFamily="@font/bangers"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:text="-- : --"
+                android:textAlignment="center"/>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/btnConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false"
+            app:lottie_fileName="animated_ui/btn_setting.json"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/btnSpeaker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/btnConfig"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false"
+            app:lottie_fileName="animated_ui/btn_speaker_enable.json"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/flCenterFragmentContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <FrameLayout
+            android:id="@+id/flStage"
+            android:layout_width="0sp"
+            android:layout_height="0sp"
+            app:layout_constraintWidth_percent="0.5"
+            app:layout_constraintHeight_percent="0.8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_gravity="center"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>

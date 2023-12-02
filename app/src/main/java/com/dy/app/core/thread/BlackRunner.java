@@ -5,6 +5,7 @@ import android.util.Log;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.move.ChessMove;
+import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.model.Obj3D;
 
@@ -12,14 +13,14 @@ import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
 public class BlackRunner extends Thread{
-    private Vector<ScriptsRunner.Move> moves;
+    private Vector<PGNFile.Move> moves;
     private boolean isRunning = true;
     private Board board;
     private Semaphore whiteSem;
     private Semaphore blackSem;
 
 
-    public BlackRunner(Vector<ScriptsRunner.Move> moves, Board board, Semaphore whiteSem, Semaphore blackSem){
+    public BlackRunner(Vector<PGNFile.Move> moves, Board board, Semaphore whiteSem, Semaphore blackSem){
         this.moves = moves;
         this.board = board;
         this.whiteSem = whiteSem;
@@ -28,7 +29,7 @@ public class BlackRunner extends Thread{
 
     @Override
     public void run() {
-        ScriptsRunner.Move currentMove = null;
+        PGNFile.Move currentMove = null;
         int i = 0;
 
         while(isRunning){

@@ -41,7 +41,7 @@ public class Board implements GameEntity {
     public static int NO_CHECK = 0;
     public static int IS_CHECK = 1;
     public static int IS_CHECKMATE = 2;
-    private int moveCount = 1;
+    private int moveCount = 0;
     private final StringBuilder moveHistoryBuilder = new StringBuilder();
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
@@ -363,7 +363,6 @@ public class Board implements GameEntity {
             piece.move(desTile.pos);
             checkForPromotionMove(move);
             updateBoardState();
-            moveCount++;
 
             srcTile.getObj().changeState(Obj3D.State.HIGHLIGHTED);
             desTile.getObj().changeState(Obj3D.State.SOURCE);
@@ -459,6 +458,8 @@ public class Board implements GameEntity {
         for(Piece piece : pieceManager.getActivePieces()){
             piece.updatePieceStateAfterWritingToHistory();
         }
+
+        moveCount++;
     }
 
     public King getKing(boolean isWhite){
@@ -644,11 +645,15 @@ public class Board implements GameEntity {
         Log.d("Board", String.format(Locale.ENGLISH, "run: %d", moveNumber));
         try{
             mutex.lock();
-            if(moveNumber < 0 || moveNumber > moveCount){
+            Log.d("Debug concurrent", "(");
+            if(moveNumber < 0){
                 throw new RuntimeException("Invalid move number");
             }
 
-            if(moveNumber == moveCount) return;
+            if(moveNumber == moveCount - 1) {
+                Log.d("Debug concurrent", "I won't go to the current state");
+                return;
+            }
 
             Log.d("Board", "perform move to the desired state");
             //perform move to the desired state
@@ -670,7 +675,7 @@ public class Board implements GameEntity {
             }
 
             Log.d("Board", "setStateAtMoveNumber");
-            for(Piece piece : pieceManager.getAllPieces()){
+            for(Piece piece : pieceManager.getActivePieces()){
                 if(!piece.isInitialized){
                     throw new RuntimeException("Piece not initialized");
                 }
@@ -678,7 +683,7 @@ public class Board implements GameEntity {
             }
 
             Log.d("Board", "refreshDisplayPosition");
-            for(Piece piece: pieceManager.getAllPieces()){
+            for(Piece piece: pieceManager.getActivePieces()){
                 if(!piece.isInitialized){
                     throw new RuntimeException("Piece not initialized");
                 }
@@ -686,12 +691,13 @@ public class Board implements GameEntity {
             }
 
             Log.d("Board", "updatePossibleMoves");
-            for(Piece piece : pieceManager.getAllPieces()){
+            for(Piece piece : pieceManager.getActivePieces()){
                 piece.updatePossibleMoves();
             }
 
+            Log.d("Debug concurrent", ")");
             //update the current count
-            //moveCount = moveNumber;
+            moveCount = moveNumber + 1;
         }finally {
             mutex.unlock();
         }

@@ -124,13 +124,13 @@ public class MultiDeviceInGameHandler extends Thread
 
     private void handleMoveRequest(byte[] data) {
         String moveNotation = new String(data);
+        player.setInTurn(true);
         Log.d(TAG, "handleMessage: moveNotation: " + moveNotation);
         try {
             board.moveByNotation(moveNotation, Rival.getInstance().isWhitePiece());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        player.setInTurn(true);
     }
 
     private void sendMove(String moveNotation){
