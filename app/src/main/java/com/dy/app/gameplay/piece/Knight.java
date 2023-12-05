@@ -40,6 +40,9 @@ public class Knight extends Piece{
             }
             possibleMoves.add(tile);
         }
+
+        //check for legal moves
+        removeIllegalMoves();
     }
 
     @Override

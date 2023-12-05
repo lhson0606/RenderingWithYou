@@ -1,14 +1,23 @@
 package com.dy.app.gameplay.pgn;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.gameplay.board.Board;
+import com.dy.app.utils.Utils;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -44,6 +53,28 @@ public class PGNFile {
         public String black;
     }
 
+    public PGNFile(String moveData){
+        //parse move data
+        try {
+            parseMoves(moveData);
+        } catch (PGNParseException e) {
+            throw new RuntimeException(e);
+        }
+
+        //put initial meta data
+        addEvent("?");
+        addSite("DyChess 1.0");
+        addDate("?");
+        addRound("?");
+        addResult("*");
+        addWhitePlayer("?");
+        addBlackPlayer("?");
+        addECO("?");
+        addWhiteElo("?");
+        addBlackElo("?");
+        addPlyCount("?");
+    }
+
     private static String preProcess(String data){
         //delete all '\r' characters
         return data.replaceAll("\r", "");
@@ -52,7 +83,7 @@ public class PGNFile {
     private PGNFile(){
     }
 
-    public static PGNFile parsePGN(Context context, String path, Board board) throws PGNParseException, IOException {
+    public static PGNFile parsePGN(Context context, String path) throws PGNParseException, IOException {
         StringBuilder builder = new StringBuilder();
         String curLine = null;
         final int BUFFER_SIZE = 1024;
@@ -95,6 +126,7 @@ public class PGNFile {
     }
 
     private void parseMoves(String movesStr) throws PGNParseException {
+        if(movesStr.length() == 0) return;
         String[] splitResults = movesStr.split("\\s+");
         Move move = null;
 
@@ -122,8 +154,11 @@ public class PGNFile {
             }else{
                 move.black = curStr;
                 moves.add(move);
+                move = null;
             }
         }
+
+        if(move != null) moves.add(move);
     }
 
     private void parseMeta(String metaStr) throws PGNParseException {
@@ -145,4 +180,96 @@ public class PGNFile {
     public String getTitle(){
         return meta.get("Event") + " " + meta.get("Date") + " " + meta.get("Round");
     }
+
+    public void addEvent(String event){
+        putMeta("Event", event);
+    }
+
+    public void addSite(String site){
+        putMeta("Site", site);
+    }
+
+    public void addDate(String date){
+        putMeta("Date", date);
+    }
+
+    public void addRound(String round){
+        putMeta("Round", round);
+    }
+
+    public void addResult(String round){
+        putMeta("Round", round);
+    }
+
+    public void addWhitePlayer(String whitePlayer){
+        putMeta("White", whitePlayer);
+    }
+
+    public void addBlackPlayer(String blackPlayer){
+        putMeta("Black", blackPlayer);
+    }
+
+    public void addECO(String eco){
+        putMeta("ECO", eco);
+    }
+
+    public void addWhiteElo(String whiteElo){
+        putMeta("WhiteElo", whiteElo);
+    }
+
+    public void addBlackElo(String blackElo){
+        putMeta("BlackElo", blackElo);
+    }
+
+    public void addPlyCount(String plyCount){
+        putMeta("PlyCount", plyCount);
+    }
+
+    private void putMeta(String key, String value){
+        meta.put(key, value);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        //meta data
+        for(Map.Entry<String, String> entry : meta.entrySet()){
+            builder.append("[" + entry.getKey() + " \"" + entry.getValue() + "\"]\n");
+        }
+
+        if(moves.size()==0){
+            throw new RuntimeException("No moves");
+        }
+
+        //moves
+        for(int i = 0; i < moves.size(); i++){
+            if(i%MOVE_PER_LINE == 0) builder.append("\n");
+
+            Move move = moves.get(i);
+            builder.append((i+1) + ". " + move.white + " " + move.black);
+        }
+
+        return builder.toString();
+    }
+
+    public interface IOnSavePGNListener{
+        void onSavePGN(String path);
+    }
+
+    public void savePGN(Context context, Uri uri, IOnSavePGNListener listener) throws IOException {
+        String data = toString();
+        ParcelFileDescriptor pfd = context.getContentResolver().
+                openFileDescriptor(uri, "w");
+        FileOutputStream fileOutputStream =
+                new FileOutputStream(pfd.getFileDescriptor());
+        fileOutputStream.write(data.getBytes());
+        // Let the document provider know you're done by closing the stream.
+        fileOutputStream.close();
+        pfd.close();
+        //get file from uri
+        listener.onSavePGN(uri.getPath());
+    }
+
+    public static int MOVE_PER_LINE = 6;
 }

@@ -36,6 +36,12 @@ public class Pawn extends Piece{
         return super.move(pos);
     }
 
+    @Override
+    public void pseudoMove(Vec2i pos) {
+        super.pseudoMove(pos);
+        currentState.hasMoved = true;
+    }
+
     private void captureEnPassant(Vec2i pos) {
         //get captured piece
         Vec2i capturedPos = new Vec2i(pos.x, this.tile.pos.y);
@@ -70,6 +76,8 @@ public class Pawn extends Piece{
 
        //add any possible existing en passant moves
        possibleMoves.addAll(getPossibleEnPassantMoves());
+        //check for legal moves
+        removeIllegalMoves();
     }
 
     public Vector<Tile> getPossibleEnPassantMoves(){
@@ -278,10 +286,10 @@ public class Pawn extends Piece{
         Piece piece = null;
         Skin skin = null;
 
-        if(isOnPlayerSide()){
-            skin = board.getAssetManger().getSkin(AssetManger.SkinType.PLAYER);
+        if(isWhite()){
+            skin = board.getAssetManger().getSkin(AssetManger.SkinType.WHITE_PIECE_SKIN);
         }else{
-            skin = board.getAssetManger().getSkin(AssetManger.SkinType.RIVAL);
+            skin = board.getAssetManger().getSkin(AssetManger.SkinType.BLACK_PIECE_SKIN);
         }
 
         switch (piecePromotionNotation){

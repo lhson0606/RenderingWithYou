@@ -1,5 +1,7 @@
 package com.dy.app.utils;
 
+import android.os.Environment;
+
 import com.dy.app.R;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.graphic.Material;
@@ -59,5 +61,9 @@ public class DyConst {
     public static final String tile_frag_glsl_path = "glsl/tile/frag.glsl";
     public static final String piece_model[] = {"king.obj", "queen.obj", "bishop.obj", "rook.obj", "knight.obj", "pawn.obj"};
     public static final String tile_model_path ="model/board/tile.obj";
+    public static final int REQUEST_CHOOSE_FILE_LOCATION = 1;
+    public static final int REQUEST_TAKE_SCREENSHOT_AND_SHARE = 2;
+    public static final int CHECK_FOR_PERMISSION_BEFORE_TAKE_SCREENSHOT_AND_SHARE = 3;
+    final static String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/DyChess/";
 
 }

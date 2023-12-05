@@ -19,6 +19,14 @@
             app:lottie_fileName="animated_ui/btn_item_find_room.json"
             android:layout_weight="1"/>
         <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/ltvTwoPlayersOnSameDevice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false"
+            app:lottie_fileName="animated_ui/btn_item_two_player_on_this_device.json"
+            android:layout_weight="1"/>
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/ltvRunScripts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

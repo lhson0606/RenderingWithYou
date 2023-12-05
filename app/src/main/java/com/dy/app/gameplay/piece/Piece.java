@@ -9,6 +9,7 @@ import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.model.Obj3D;
@@ -41,6 +42,9 @@ public class Piece implements GameEntity {
     public PieceState currentState = new PieceState();
 
     protected final Map<Integer, PieceState> history = new HashMap<Integer, PieceState>();
+    private Vector<PieceState> rollbackStates = new Vector<>();
+    private Vector<Piece> pseudoCapturedPieces = new Vector<>();
+    private Vector<Boolean> hasPseudoCapturedAPiece = new Vector<>();
 
     public void putDown(){
         isPicking = false;
@@ -50,6 +54,38 @@ public class Piece implements GameEntity {
     public enum PieceColor{
         BLACK,
         WHITE
+    }
+
+    public boolean isLegalMove(Tile tile){
+        if(!possibleMoves.contains(tile)){
+            throw new RuntimeException("Tile is not a possible move");
+        }else {
+            pseudoMove(tile.pos);
+            Vector<Tile> enemyControlledTiles = isWhite()? board.getBlackControlledTile() : board.getWhiteControlledTile();
+            King king = isWhite()? board.getPieceManager().getWhiteKing() : board.getPieceManager().getBlackKing();
+            Tile afterPseudoMoveKingTile = king.getTile();
+            rollbackPseudoMove();
+
+            if(enemyControlledTiles.contains(afterPseudoMoveKingTile)){
+                return false;
+            }else{
+                return true;
+            }
+        }
+    }
+
+    protected void removeIllegalMoves(){
+        Vector<Tile> illegalMoves = new Vector<>();
+        Vector<Tile> currentPossibleMoves = new Vector<>();
+        currentPossibleMoves.addAll(possibleMoves);
+
+        for(Tile tile : currentPossibleMoves){
+            if(!isLegalMove(tile)){
+                illegalMoves.add(tile);
+            }
+        }
+
+        possibleMoves.removeAll(illegalMoves);
     }
 
     boolean isTheSameColor(Piece piece){
@@ -152,15 +188,17 @@ public class Piece implements GameEntity {
     }
 
     public boolean isOnPlayerSide(){
-        return onPlayerSide;
+        //return onPlayerSide;
+        if(Player.getInstance().isWhitePiece()){
+            return pieceColor == PieceColor.WHITE;
+        }else{
+            return pieceColor == PieceColor.BLACK;
+        }
     }
 
     public Tile getTile(){
         return tile;
     }
-
-    private PieceState rollbackState = null;
-    private Piece pseudoCapturedPiece = null;
 
     /**
      * This method is used to perform a pseudo move to check if it's a checkmate or not
@@ -177,43 +215,65 @@ public class Piece implements GameEntity {
         }
 
         if(dstTile.getPiece() != null){
-            //we only need to perform pseudo capture if there is a piece to capture
-            if(dstTile.getPiece().getNotation().equals(ChessNotation.KING)){
-                return;//if we are capturing the king, we don't need to do anything
-            }
-
             pseudoCapture(dstTile.getPiece());
+        }else{
+            hasPseudoCapturedAPiece.add(false);
         }
 
-        rollbackState = currentState.clone();
+        pushrollbackStates();
+        currentState.pos = pos;
         tile.setPiece(null);
         tile = board.getTile(pos);
         tile.setPiece(this);
     }
+    
+    private void pushrollbackStates(){
+        rollbackStates.add(currentState.clone());
+    }
+    
+    private PieceState poprollbackStates(){
+        if(rollbackStates.isEmpty()){
+            return null;
+        }
+        return rollbackStates.remove(rollbackStates.size() - 1).clone();
+    }
+
+    private void pushPseudoCapturedPiece(Piece piece){
+        pseudoCapturedPieces.add(piece);
+    }
+
+    private Piece popPseudoCapturedPiece(){
+        if(pseudoCapturedPieces.isEmpty()){
+            return null;
+        }
+        return pseudoCapturedPieces.remove(pseudoCapturedPieces.size() - 1);
+    }
 
     public void pseudoCapture(Piece piece) {
-        pseudoCapturedPiece = piece;
-        pseudoCapturedPiece.rollbackState = pseudoCapturedPiece.currentState.clone();
-        board.getPieceManager().pseudoCapture(pseudoCapturedPiece);
+        pushPseudoCapturedPiece(piece);
+        piece.pushrollbackStates();
+        board.getPieceManager().pseudoCapture(piece);
+        hasPseudoCapturedAPiece.add(true);
     }
 
     public void rollbackPseudoMove(){
-        if(rollbackState == null){
-            return;//nothing to rollback
+        PieceState rbState = poprollbackStates();
+        if(rbState == null){
+            throw new RuntimeException("rollback state is null");
         }
         tile.setPiece(null);
-        tile = board.getTile(rollbackState.pos);
+        tile = board.getTile(rbState.pos);
         tile.setPiece(this);
-        currentState = rollbackState;
-        rollbackState = null;
-        if(pseudoCapturedPiece != null){
+        currentState = rbState;
+        Boolean hasCapturedAPiece = hasPseudoCapturedAPiece.remove(hasPseudoCapturedAPiece.size() - 1);
+        if(hasCapturedAPiece){
+            Piece pseudoCapturedPiece = popPseudoCapturedPiece();
             Log.d("Piece", "rollback captured piece: " + pseudoCapturedPiece.getNotation());
             board.getPieceManager().rollbackPseudoCapture(pseudoCapturedPiece);
-            pseudoCapturedPiece.currentState = pseudoCapturedPiece.rollbackState;
+            PieceState pseudoCapturedPieceState = pseudoCapturedPiece.poprollbackStates();
+            pseudoCapturedPiece.currentState = pseudoCapturedPieceState;
             //set the piece back to the tile
             pseudoCapturedPiece.getTile().setPiece(pseudoCapturedPiece);
-            //prepare for the next pseudo move
-            pseudoCapturedPiece = null;
         }
     }
 

@@ -47,7 +47,7 @@ public class ScriptsRunner extends Thread{
         jumpToMove(0);
 
         while(isRunning){
-            while(currentMove < moves.size()*2) {
+            while(currentMove < moves.size()*2 && isRunning) {
                 try{
                     Log.d("Debug concurrent", "worker is waiting for mutex");
                     moveLock.lock();

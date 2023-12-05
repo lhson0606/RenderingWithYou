@@ -24,6 +24,8 @@ public class AssetManger {
         WHITE_TILE,
         BACKGROUND,
         TERRAIN_TEXTURE,
+        BLACK_PIECE_SKIN,
+        WHITE_PIECE_SKIN
     }
 
     public AssetManger(Context context){
@@ -38,7 +40,8 @@ public class AssetManger {
         String black_tile_skin_path = Player.getInstance().getBlackTileSkinPath();
         String white_tile_skin_path = Player.getInstance().getWhiteTileSkinPath();
         String terrain_texture_path = Player.getInstance().getTerrainTexPath();
-
+        String whitePieceSkinPath =  Player.getInstance().isWhitePiece()? player_piece_skin_path : rival_piece_skin_path;
+        String blackPieceSkinPath =  Player.getInstance().isWhitePiece()? rival_piece_skin_path : player_piece_skin_path;
         Skin player_skin = new Skin(
                 DyConst.default_material,
                 GLHelper.loadBitmap(context.getAssets().open(player_piece_skin_path))
@@ -73,12 +76,24 @@ public class AssetManger {
                 GLHelper.loadBitmap(context.getAssets().open(terrain_texture_path))
         );
 
+        Skin white_piece_skin = new Skin(
+                DyConst.default_material,
+                GLHelper.loadBitmap(context.getAssets().open(whitePieceSkinPath))
+        );
+
+        Skin black_piece_skin = new Skin(
+                DyConst.default_material,
+                GLHelper.loadBitmap(context.getAssets().open(blackPieceSkinPath))
+        );
+
         skins.put(SkinType.PLAYER, player_skin);
         skins.put(SkinType.RIVAL, rival_skin);
         skins.put(SkinType.BOARD, board_skin);
         skins.put(SkinType.BLACK_TILE, black_tile_skin);
         skins.put(SkinType.WHITE_TILE, white_tile_skin);
         skins.put(SkinType.TERRAIN_TEXTURE, terrain_texture);
+        skins.put(SkinType.BLACK_PIECE_SKIN, black_piece_skin);
+        skins.put(SkinType.WHITE_PIECE_SKIN, white_piece_skin);
 
     }
 

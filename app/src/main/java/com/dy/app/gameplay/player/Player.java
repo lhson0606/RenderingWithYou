@@ -29,6 +29,13 @@ public class Player {
         reset();
     }
 
+    public String getDisplayName() {
+        String name = (String) profile.get(PlayerProfile.KEY_USERNAME);
+        if(name == null || name == "")
+            name = (String) profile.get(PlayerProfile.KEY_EMAIL);
+        return name;
+    }
+
     public void reset(){
         inTurn = true;
         whitePiece = true;

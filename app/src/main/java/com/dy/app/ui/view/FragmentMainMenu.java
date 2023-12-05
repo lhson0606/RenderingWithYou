@@ -27,6 +27,7 @@ public class FragmentMainMenu extends Fragment
     public final static String TAG = "FragmentMainMenu";
     private FragmentHubActivity main;
     private LottieAnimationView ltvFindRoom;
+    private LottieAnimationView ltvTwoPlayersOnSameDevice;
     private LottieAnimationView ltvRunScripts;
     private LottieAnimationView ltvCredits;
     private LottieAnimationView ltvQuit;
@@ -46,10 +47,12 @@ public class FragmentMainMenu extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mainMenuView = inflater.inflate(R.layout.fragment_menu_items, container, false);
         ltvFindRoom = mainMenuView.findViewById(R.id.ltvFindRoom);
+        ltvTwoPlayersOnSameDevice = mainMenuView.findViewById(R.id.ltvTwoPlayersOnSameDevice);
         ltvCredits = mainMenuView.findViewById(R.id.ltvCredits);
         ltvQuit = mainMenuView.findViewById(R.id.ltvQuit);
         ltvRunScripts = mainMenuView.findViewById(R.id.ltvRunScripts);
         ltvFindRoom.setOnClickListener(this);
+        ltvTwoPlayersOnSameDevice.setOnClickListener(this);
         ltvCredits.setOnClickListener(this);
         ltvQuit.setOnClickListener(this);
         ltvRunScripts.setOnClickListener(this);
@@ -66,7 +69,11 @@ public class FragmentMainMenu extends Fragment
         if(v.getId() == R.id.ltvFindRoom) {
             ltvFindRoom.playAnimation();
             main.onMsgToMain(TAG, 0, null, null);
-        }else if (v.getId() == R.id.ltvRunScripts) {
+        }else if(v.getId() == R.id.ltvTwoPlayersOnSameDevice) {
+            ltvTwoPlayersOnSameDevice.playAnimation();
+            main.onMsgToMain(TAG, 4, null, null);
+        }
+        else if (v.getId() == R.id.ltvRunScripts) {
             ltvRunScripts.playAnimation();
             main.onMsgToMain(TAG, 3, null, null);
         }

@@ -408,7 +408,16 @@ public class MainActivity extends FragmentHubActivity
                 startScriptsGame();
                 break;
             }
+            case 4:{
+                startTwoPlayerSameDeviceGame();
+            }
         }
+    }
+
+    private void startTwoPlayerSameDeviceGame() {
+        Intent intent = new Intent(this, MultiPlayerOnSameDeviceActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
     }
 
     private void startScriptsGame(){

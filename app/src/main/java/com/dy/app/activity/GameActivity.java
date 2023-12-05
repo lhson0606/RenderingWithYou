@@ -95,7 +95,7 @@ implements MainCallback, View.OnClickListener {
 
     @Override
     protected void onDestroy() {
-        //remove all fragment
+        gameLoop.shutDown();
         super.onDestroy();
     }
 

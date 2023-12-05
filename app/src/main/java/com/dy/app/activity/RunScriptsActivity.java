@@ -103,7 +103,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
             throw new RuntimeException(e);
         }
         try {
-            pgnFile = PGNFile.parsePGN(this, src, gameCore.getBoard());
+            pgnFile = PGNFile.parsePGN(this, src);
         } catch (PGNParseException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -116,6 +116,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     @Override
     protected void onDestroy() {
+        gameLoop.shutDown();
         super.onDestroy();
     }
 

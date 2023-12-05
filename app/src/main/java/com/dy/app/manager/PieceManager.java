@@ -265,6 +265,9 @@ public class PieceManager {
             Vector<Piece> activePieces = new Vector<>();
 
             for(Piece piece : allPieces){
+                if(piece == null){
+                    throw new RuntimeException("Piece is null");
+                }
                 if(!piece.currentState.isCaptured){
                     activePieces.add(piece);
                 }
@@ -374,7 +377,6 @@ public class PieceManager {
             mutex.acquire();
             Log.d("PieceManager", "undoCapture: " + piece);
             if(piece == null) throw new RuntimeException("Piece is null");
-            if(piece == blackKing || piece == whiteKing) throw new RuntimeException("Cannot remove king");
             piece.currentState.isCaptured = false;
             //no need to call init gl, we just need to add to entity manager
             entityManger.newEntity(piece);
@@ -389,7 +391,6 @@ public class PieceManager {
         try{
             mutex.acquire();
             if(piece == null) throw new RuntimeException("Piece is null");
-            if(piece == blackKing || piece == whiteKing) throw new RuntimeException("Cannot remove king");
             piece.currentState.isCaptured = true;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

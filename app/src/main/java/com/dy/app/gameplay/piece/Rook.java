@@ -18,6 +18,8 @@ public class Rook extends Piece{
     public void updatePossibleMoves(){
         super.updatePossibleMoves();
         updatePossibleMovesStraight();
+        //check for legal moves
+        removeIllegalMoves();
     }
 
     private void updatePossibleMovesStraight() {

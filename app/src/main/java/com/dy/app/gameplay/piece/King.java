@@ -49,27 +49,27 @@ public class King extends Piece{
         super.updatePossibleMoves();
         Vec2i pos = tile.pos;
 
-        Vector<Tile> enemyControlledTiles = board.getPieceDifferentColorControlledTile(isWhite());
-
         for(int i = -1; i < 2; i++){
             for(int j = -1; j < 2; j++){
                 if(pos.x + i < 0 || pos.x + i > 7 || pos.y + j < 0 || pos.y + j > 7) continue;
                 Tile tile = board.getTile(new Vec2i(pos.x + i, pos.y + j));
+
                 if(tile.hasPiece()){
                     if(!tile.getPiece().isTheSameColor(this))
                         possibleMoves.add(tile);
                     continue;
                 }
 
-                if(!enemyControlledTiles.contains(tile)){
-                    possibleMoves.add(tile);
-                }
+                possibleMoves.add(tile);
             }
         }
 
         if(!currentState.hasMoved){
             possibleMoves.addAll(getPossibleCastlingSquare());
         }
+
+        //check for legal moves
+        removeIllegalMoves();
     }
 
     private Vector<Tile> getPossibleCastlingSquare(){
