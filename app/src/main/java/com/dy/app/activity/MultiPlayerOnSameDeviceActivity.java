@@ -3,6 +3,7 @@ package com.dy.app.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.net.Uri;
@@ -25,7 +26,9 @@ import com.dy.app.core.thread.GameLoop;
 import com.dy.app.core.thread.MultiPlayerSameDeviceHandler;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerGameHistory;
 import com.dy.app.gameplay.player.Rival;
+import com.dy.app.gameplay.screenshot.ITakeScreenshot;
 import com.dy.app.graphic.display.GameFragment;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.ui.dialog.LoadingDialog;
@@ -40,7 +43,7 @@ import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
 public class MultiPlayerOnSameDeviceActivity extends FragmentHubActivity
-implements View.OnClickListener {
+implements View.OnClickListener, ITakeScreenshot {
     public static final String TAG = "MultiPlayerOnSameDeviceActivity";
 
     @Override
@@ -68,6 +71,7 @@ implements View.OnClickListener {
         Rival.getInstance().setWhitePiece(false);
 
         loadingDialog = new LoadingDialog();
+        currentSavedFileUri = null;
     }
 
     private void attachFragment() {
@@ -218,40 +222,64 @@ implements View.OnClickListener {
         });
     }
 
-    public void onGameResult(boolean isWhite) {
-        final MultiPlayerSameDeviceGameResultDialog dialog = new MultiPlayerSameDeviceGameResultDialog(isWhite, new MultiPlayerSameDeviceGameResultDialog.IGameResultDialogListener() {
-            @Override
-            public void onBtnSavePGNClick(MultiPlayerSameDeviceGameResultDialog dialog) {
-                Utils.askForFileLocation(MultiPlayerOnSameDeviceActivity.this, "gameplay.pgn", "", "*/*", DyConst.REQUEST_CHOOSE_FILE_LOCATION);
+    private final MultiPlayerSameDeviceGameResultDialog dialog = new MultiPlayerSameDeviceGameResultDialog(new MultiPlayerSameDeviceGameResultDialog.IGameResultDialogListener() {
+        @Override
+        public void onBtnSavePGNClick(MultiPlayerSameDeviceGameResultDialog dialog) {
+            Utils.askForFileLocation(MultiPlayerOnSameDeviceActivity.this, "gameplay.pgn", "", "*/*", DyConst.REQUEST_CHOOSE_FILE_LOCATION);
+        }
+
+        @Override
+        public void onBtnReplayClick(MultiPlayerSameDeviceGameResultDialog dialog) {
+            replay();
+        }
+
+        @Override
+        public void onBtnRematchClick(MultiPlayerSameDeviceGameResultDialog dialog) {
+            dialog.dismiss();
+            gameLoop.shutDown();
+            currentSavedFileUri = null;
+            initCore();
+        }
+
+        @Override
+        public void onBtnExitClick(MultiPlayerSameDeviceGameResultDialog dialog) {
+            finish();
+        }
+
+        @Override
+        public void onBtnShareAsImageClick(MultiPlayerSameDeviceGameResultDialog dialog) {
+            Utils.shareScreenShot(MultiPlayerOnSameDeviceActivity.this, MultiPlayerOnSameDeviceActivity.this, "gameplay.png");
+        }
+
+        @Override
+        public void onBtnShareAsPGNClick(MultiPlayerSameDeviceGameResultDialog dialog) {
+            if(currentSavedFileUri == null) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MultiPlayerOnSameDeviceActivity.this);
+                builder.setTitle("Error");
+                builder.setMessage("Please save the PGN file first");
+                builder.setPositiveButton("OK", (d, which) -> {
+                    d.dismiss();
+                    Utils.askForFileLocation(MultiPlayerOnSameDeviceActivity.this, "gameplay.pgn", "", "*/*", DyConst.REQUEST_SAVE_FILE_BEFORE_SHARE);
+                });
+                builder.setNegativeButton("Cancel", (d, which) -> {
+                    d.dismiss();
+                });
+                builder.show();
+            }else{
+                Utils.shareFile(MultiPlayerOnSameDeviceActivity.this, currentSavedFileUri, "text/plain");
             }
+        }
+    });
 
-            @Override
-            public void onBtnRematchClick(MultiPlayerSameDeviceGameResultDialog dialog) {
-                dialog.dismiss();
-                gameLoop.shutDown();
-                initCore();
-            }
-
-            @Override
-            public void onBtnExitClick(MultiPlayerSameDeviceGameResultDialog dialog) {
-                finish();
-            }
-
-            @Override
-            public void onBtnShareAsImageClick(MultiPlayerSameDeviceGameResultDialog dialog) {
-                Utils.verifyReadStoragePermission(MultiPlayerOnSameDeviceActivity.this, DyConst.REQUEST_TAKE_SCREENSHOT_AND_SHARE);
-                Utils.verifyWriteStoragePermission(MultiPlayerOnSameDeviceActivity.this, DyConst.REQUEST_TAKE_SCREENSHOT_AND_SHARE);
-                Utils.verifyPermission(MultiPlayerOnSameDeviceActivity.this, "android.permission.RE", DyConst.REQUEST_TAKE_SCREENSHOT_AND_SHARE);
-                Utils.takeCurrentScreenShotAndShare(MultiPlayerOnSameDeviceActivity.this);
-            }
-
-            @Override
-            public void onBtnShareAsPGNClick(MultiPlayerSameDeviceGameResultDialog dialog) {
-
-            }
-        });
-
+    public void onGameResult(int gameResult) {
+        this.gameResult = gameResult;
+        saveGameResultToPlayerHistory();
+        dialog.setGameResult(gameResult);
         dialog.show(getSupportFragmentManager(), "MultiPlayerSameDeviceGameResultDialog");
+    }
+
+    private void saveGameResultToPlayerHistory(){
+        Player.getInstance().history.newGame(PlayerGameHistory.KEY_P_V_P, getPGNFile());
     }
 
     private void showLoadingDialog(boolean cancelable){
@@ -269,10 +297,23 @@ implements View.OnClickListener {
         loadingDialog.dismiss();
     }
 
+    private PGNFile getPGNFile(){
+        PGNFile file = gameCore.getBoard().getPGNFile();
+        file.addResult(gameResult);
+        file.addEvent("Multiplayer on same device");
+        file.addSite("Local");
+        return file;
+    }
+
+    private void replay(){
+        PGNFile file = getPGNFile();
+        Intent intent = new Intent(this, ReplayActivity.class);
+        intent.putExtra("pgn", file);
+        startActivity(intent);
+    }
+
     private void savePGN(Uri uri){
-        PGNFile file = new PGNFile(gameCore.getBoard().getMoveHistory());
-        //put meta
-        file.addWhitePlayer(Player.getInstance().isWhitePiece()? Player.getInstance().getDisplayName() : Rival.getInstance().getName());
+        PGNFile file = getPGNFile();
         showLoadingDialog(false);
         Thread worker = new Thread(()->{
             try {
@@ -283,6 +324,37 @@ implements View.OnClickListener {
                             hideLoadingDialog();
                             Toast.makeText(MultiPlayerOnSameDeviceActivity.this, "Saved", Toast.LENGTH_SHORT).show();
                         });
+                        currentSavedFileUri = uri;
+                    }
+                });
+            } catch (IOException e) {
+                hideLoadingDialog();
+                showError(e.getMessage());
+            }
+        });
+        worker.start();
+    }
+
+    private void savePGNAndShare(Uri uri) {
+        PGNFile file = new PGNFile(gameCore.getBoard().getMoveHistory());
+        //put meta
+        file.addWhitePlayer(Player.getInstance().isWhitePiece()? Player.getInstance().getDisplayName() : Rival.getInstance().getName());
+        file.addBlackPlayer(Player.getInstance().isWhitePiece()? Rival.getInstance().getName() : Player.getInstance().getDisplayName());
+        file.addResult(gameResult);
+        file.addDate(Utils.getCurrentDate());
+        file.addEvent("Multiplayer on same device");
+        file.addSite("Local");
+        showLoadingDialog(false);
+        Thread worker = new Thread(()->{
+            try {
+                file.savePGN(this, uri, new PGNFile.IOnSavePGNListener() {
+                    @Override
+                    public void onSavePGN(String path) {
+                        runOnUiThread(() -> {
+                            hideLoadingDialog();
+                            Utils.shareFile(MultiPlayerOnSameDeviceActivity.this, uri, "text/plain");
+                        });
+                        currentSavedFileUri = uri;
                     }
                 });
             } catch (IOException e) {
@@ -318,14 +390,62 @@ implements View.OnClickListener {
                 uri = data.getData();
                 savePGN(uri);
             }
+        }else if(requestCode == DyConst.REQUEST_SAVE_FILE_BEFORE_SHARE && resultCode == Activity.RESULT_OK) {
+            Uri uri = null;
+            if (data != null) {
+                uri = data.getData();
+                savePGNAndShare(uri);
+            }
+        } else if(requestCode == DyConst.REQUEST_TAKE_SCREENSHOT_AND_SHARE && resultCode == Activity.RESULT_OK){
+            Uri uri = null;
+            if (data != null) {
+                uri = data.getData();
+                Utils.shareImageMedia(this, uri);
+            }
         }
-//        else if(requestCode == DyConst.REQUEST_TAKE_SCREENSHOT_AND_SHARE && resultCode == Activity.RESULT_OK){
-//            Uri uri = null;
-//            if (data != null) {
-//                uri = data.getData();
-//                Utils.shareImageMedia(this, uri);
-//            }
-//        }
+    }
+
+    @Override
+    public Bitmap getScreenshot() {
+        Bitmap uiBitmap = Utils.getScreenShot(this.getWindow().getDecorView().getRootView());
+        Bitmap gameBitmap = null;
+        try {
+            gameBitmap = gameFragment.getSurfaceView().getRenderer().getScreenShot();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        Bitmap resultBitmap = null;
+
+        if(dialog.getView()!=null){
+            resultBitmap = Utils.getScreenShot(dialog.getView());
+        }
+
+        Bitmap bitmapParts[] = new Bitmap[3];
+        bitmapParts[0] = gameBitmap;
+        bitmapParts[1] = uiBitmap;
+        bitmapParts[2] = resultBitmap;
+        //exclude null bitmap
+        int count = 0;
+        for(Bitmap bitmap : bitmapParts){
+            if(bitmap != null){
+                count++;
+            }
+        }
+        Bitmap[] finalBitmapParts = new Bitmap[count];
+        int index = 0;
+        for(Bitmap bitmap : bitmapParts){
+            if(bitmap != null){
+                finalBitmapParts[index++] = bitmap;
+            }
+        }
+
+        Bitmap result = Utils.mergeBitmapCenter(finalBitmapParts);
+        for(Bitmap bitmap : finalBitmapParts){
+            bitmap.recycle();
+        }
+
+        return result;
     }
 
     private Fragment currentFragment;
@@ -339,4 +459,6 @@ implements View.OnClickListener {
     private FragmentSetting fragmentSetting;
     private TextView tvWhiteTimeRemain, tvBlackTimeRemain;
     private LoadingDialog loadingDialog;
+    private Uri currentSavedFileUri = null;
+    private int gameResult = -1;
 }

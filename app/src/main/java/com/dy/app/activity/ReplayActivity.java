@@ -2,6 +2,7 @@ package com.dy.app.activity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,21 +23,23 @@ import com.dy.app.core.thread.GameLoop;
 import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNParseException;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.display.GameFragment;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Semaphore;
 
-public class RunScriptsActivity extends FragmentHubActivity
-implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.IScriptRunnerCallback {
+public class ReplayActivity extends FragmentHubActivity
+        implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.IScriptRunnerCallback {
     private ProgressDialog progressDialog;
     private Handler mainHandler;
     private GameFragment gameFragment;
     private GameLoop gameLoop;
     private GameCore gameCore;
     private LottieAnimationView btnClose;
-    PGNFile pgnFile = null;
+    private PGNFile pgnFile = null;
     private SeekBar sbProgress;
     private ScriptsRunner runner = null;
     private ImageView btnPlay, btnPrev, btnNext;
@@ -49,6 +52,10 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         setContentView(R.layout.run_script_activity);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         mainHandler = new Handler(getMainLooper());
+        Intent callerIntent = getIntent();
+        pgnFile = (PGNFile) callerIntent.getSerializableExtra("pgn");
+        Player.getInstance().setWhitePiece(true);
+        Rival.getInstance().setWhitePiece(false);
         initCore();
         init();
         attachListener();
@@ -95,20 +102,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         btnNext.setOnClickListener(this);
     }
 
-    private void runScript(String src) {
-        InputStream is = null;
-        try {
-            is = getAssets().open(src);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            pgnFile = PGNFile.parsePGN(this, src);
-        } catch (PGNParseException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    private void runScript(PGNFile pgnFile) {
         updateDisplay(pgnFile);
         runner = new ScriptsRunner(this, pgnFile, gameCore.getBoard());
         runner.start();
@@ -162,17 +156,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
                 gameLoop = new GameLoop(gameFragment.getSurfaceView(), gameCore.getEntityManger());
                 Thread worker = new Thread(()->{
                     gameFragment.getSurfaceView().getRenderer().waitForGLInit();
-                    //runScript("scripts/carlsen_kasparov_2004.pgn");
-                    //carlsen_nakamura_2009.pgn
-                    //runScript("scripts/carlsen_nakamura_2009.pgn");
-                    //nepomniachtchi_ding_liren_2023.pgn
-                    //runScript("scripts/nepomniachtchi_ding_liren_2023.pgn");
-                    //ding_liren_nepomniachtchi_2023.pgn
-                    //runScript("scripts/ding_liren_nepomniachtchi_2023.pgn");
-                    //ding_liren_nepomniachtchi_2023_90_moves.pgn
-                    //runScript("scripts/ding_liren_nepomniachtchi_2023_90_moves.pgn");
-                    //nikolic_arsovic_1989.pgn
-                    runScript("scripts/nikolic_arsovic_1989.pgn");
+                    runScript(pgnFile);
                     gameLoop.start();
                 });
 

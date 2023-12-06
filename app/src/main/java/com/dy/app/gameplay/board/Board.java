@@ -10,9 +10,12 @@ import com.dy.app.common.maths.Vec3;
 import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.algebraicNotation.ChessNotation;
+import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.piece.King;
 import com.dy.app.gameplay.piece.Pawn;
 import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.shader.ShaderHelper;
@@ -22,6 +25,7 @@ import com.dy.app.manager.EntityManger;
 import com.dy.app.manager.ObjManager;
 import com.dy.app.manager.PieceManager;
 import com.dy.app.utils.DyConst;
+import com.dy.app.utils.Utils;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -342,6 +346,7 @@ public class Board implements GameEntity {
     }
 
     public void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
+        if(moveNotation.equals("")) return;
         try {
             mutex.lock();
             if(prevSrcTile != null){
@@ -769,5 +774,14 @@ public class Board implements GameEntity {
 
     public String getMoveHistory(){
         return moveHistoryBuilder.toString();
+    }
+
+    public PGNFile getPGNFile(){
+        PGNFile file = new PGNFile(moveHistoryBuilder.toString());
+        //put meta
+        file.addWhitePlayer(Player.getInstance().isWhitePiece()? Player.getInstance().getDisplayName() : Rival.getInstance().getName());
+        file.addBlackPlayer(Player.getInstance().isWhitePiece()? Rival.getInstance().getName() : Player.getInstance().getDisplayName());
+        file.addDate(Utils.getCurrentDate());
+        return file;
     }
 }

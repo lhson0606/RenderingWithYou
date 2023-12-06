@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"  tools:remove="maxSdkVersion"/>
     <uses-feature android:name="android.hardware.wifi.direct" android:required="true" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
 
     <application
         android:name=".EmojiApplication"
@@ -23,7 +24,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RenderingWithYou"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        android:requestLegacyExternalStorage="true">
 
         <activity
             android:name=".activity.MainActivity"
@@ -48,6 +50,13 @@
         </activity>
 
         <activity android:name=".activity.MultiPlayerOnSameDeviceActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name=".activity.ReplayActivity"
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true">
@@ -98,6 +107,7 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+        <!-- see  https://stackoverflow.com/questions/38200282/android-os-fileuriexposedexception-file-storage-emulated-0-test-txt-exposed/38858040#38858040-->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

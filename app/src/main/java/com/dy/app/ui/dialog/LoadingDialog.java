@@ -13,12 +13,14 @@ import androidx.fragment.app.DialogFragment;
 import com.dy.app.R;
 
 public class LoadingDialog extends DialogFragment {
+    public LoadingDialog() {
+        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.TransparentDialog);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Set the dialog style to the transparent style
-        setStyle(DialogFragment.STYLE_NO_FRAME, R.style.TransparentDialog);
     }
 
     @Nullable

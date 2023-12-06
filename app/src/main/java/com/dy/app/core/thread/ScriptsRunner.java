@@ -21,13 +21,19 @@ public class ScriptsRunner extends Thread{
     private Board board;
     private PGNFile pgnFile;
     boolean isRunning = false;
-    RunScriptsActivity activity;
+    IScriptRunnerCallback activity;
     private boolean isPaused = false;
     private int currentMove = 0;
     private final ReentrantLock moveLock = new ReentrantLock();
     private final Condition resumeCondition = moveLock.newCondition();
 
-    public ScriptsRunner(RunScriptsActivity activity, PGNFile pgnFile, Board board){
+    public interface IScriptRunnerCallback{
+        void updateProgress(int progress);
+
+        void changePlayButtonToContinue();
+    }
+
+    public ScriptsRunner(IScriptRunnerCallback activity, PGNFile pgnFile, Board board){
         this.activity = activity;
         this.pgnFile = pgnFile;
         this.board = board;
@@ -146,6 +152,7 @@ public class ScriptsRunner extends Thread{
     }
 
     private void loadSingleMove(String moveData, boolean isWhite) throws Exception {
+        if(moveData.equals("")) return;
         board.moveByNotation(moveData, isWhite);
     }
 

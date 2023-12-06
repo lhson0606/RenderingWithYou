@@ -1,5 +1,7 @@
 package com.dy.app.graphic.render;
 
+import android.graphics.Bitmap;
+import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.view.GestureDetector;
 
@@ -9,7 +11,11 @@ import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.display.GameSurface;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.EntityManger;
+import com.dy.app.utils.GLHelper;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 import java.util.concurrent.Semaphore;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -21,6 +27,9 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     private boolean pickerIsSet = false;
     private Board board;
     private EntityManger entityManger;
+    private Bitmap screenShot = null;
+    private Semaphore screenShotSem = new Semaphore(0);
+    private boolean isScreenShotRequested = false;
 
     public DyRenderer(GameSurface gameSurface, EntityManger entityManger, Board board) {
         this.board = board;
@@ -60,6 +69,34 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     public void onDrawFrame(GL10 gl) {
         GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
         entityManger.drawEntities();
+
+        //after all entities are drawn, check if screenshot is requested
+        if(isScreenShotRequested){
+            screenShot = takeScreenShot();
+            screenShotSem.release();
+        }
+    }
+
+    private Bitmap takeScreenShot(){
+        Bitmap bmp = Bitmap.createBitmap(gameSurface.getWidth(), gameSurface.getHeight(), Bitmap.Config.ARGB_8888);
+        int[] viewPort = new int[4];
+        GLES30.glGetIntegerv(GLES30.GL_VIEWPORT, viewPort, 0);
+        int width = gameSurface.getWidth();
+        int height = gameSurface.getHeight();
+        IntBuffer intBuffer = IntBuffer.allocate(width * height);
+        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, intBuffer);
+        int[] pixelArray = intBuffer.array();
+
+        // Convert the pixel data to the Bitmap, we need to flip the data, or it will be upside down
+        for (int i = 0; i < height / 2; i++) {
+            for (int j = 0; j < width; j++) {
+                int temp = pixelArray[i * width + j];
+                pixelArray[i * width + j] = pixelArray[(height - 1 - i) * width + j];
+                pixelArray[(height - 1 - i) * width + j] = temp;
+            }
+        }
+        bmp.copyPixelsFromBuffer(IntBuffer.wrap(pixelArray));
+        return bmp;
     }
 
     public void addAndInitEntityGL(GameEntity entity, OnEntityAdded onEntityAdded){
@@ -89,5 +126,13 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
 
     public TilePicker getTilePicker() {
         return tilePicker;
+    }
+
+    //only one thread can request screenshot at a time
+    public synchronized Bitmap getScreenShot() throws InterruptedException {
+        isScreenShotRequested = true;
+        screenShotSem.acquire();
+        isScreenShotRequested = false;
+        return screenShot;
     }
 }

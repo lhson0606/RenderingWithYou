@@ -92,7 +92,7 @@ public class Database {
 
     public void pushAllPlayerData(OnDBRequestListener listener){
         OnDBRequestListener allListener = new OnDBRequestListener() {
-            int count = 6;
+            int count = 7;
             boolean failed = false;
             @Override
             public void onDBRequestCompleted(int result, Object object) {
@@ -118,6 +118,7 @@ public class Database {
 
         updateUserProfileOnDB(allListener);
         updateUserInventoryOnDB(allListener);
+        updateUserHistoryOnDB(allListener);
         updateBattlePassOnDB(allListener);
         updateUserStatisticsOnDB(allListener);
         updateUserPurchaseOnDB(allListener);
@@ -138,6 +139,12 @@ public class Database {
         Player player = Player.getInstance();
         DocumentReference inventoryRef =  getUserDataColRef().document("inventory");
         updateDocRef(inventoryRef, player.inventory.getData(), listener);
+    }
+
+    public void updateUserHistoryOnDB(OnDBRequestListener listener) {
+        Player player = Player.getInstance();
+        DocumentReference historyRef =  getUserDataColRef().document("history");
+        updateDocRef(historyRef, player.history.getData(), listener);
     }
 
     public void updateBattlePassOnDB(OnDBRequestListener listener) {
@@ -167,7 +174,7 @@ public class Database {
 
     public void fetchAllPlayerData(OnDBRequestListener listener){
         OnDBRequestListener allListener = new OnDBRequestListener() {
-            int count = 6;
+            int count = 7;
             boolean failed = false;
             @Override
             public void onDBRequestCompleted(int result, Object object) {
@@ -189,6 +196,7 @@ public class Database {
 
         fetchPlayerProfile(allListener);
         fetchPlayerInventory(allListener);
+        fetchPlayerHistory(allListener);
         fetchBattlePass(allListener);
         fetchPlayerStatistics(allListener);
         fetchPlayerPurchase(allListener);
@@ -246,6 +254,20 @@ public class Database {
         getDocument(userInventoryDocRef, (res, o)->{
             if(res == RESULT_SUCCESS){
                 Player.getInstance().inventory.putAll((Map<String, Object>) o);
+            }
+            listener.onDBRequestCompleted(res, o);
+        });
+    }
+
+    public synchronized void fetchPlayerHistory(OnDBRequestListener listener){
+        selfCheckUserSignedIn();
+
+        DocumentReference userHistoryDocRef = db.collection("users").document(auth.getCurrentUser().getUid())
+                .collection("user_data").document("history");
+
+        getDocument(userHistoryDocRef, (res, o)->{
+            if(res == RESULT_SUCCESS){
+                Player.getInstance().history.putAll((Map<String, Object>) o);
             }
             listener.onDBRequestCompleted(res, o);
         });

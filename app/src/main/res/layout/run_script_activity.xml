@@ -92,7 +92,7 @@
 
             <TextView
                 android:id="@+id/tvEventTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="302dp"
                 android:layout_height="52dp"
                 android:textAlignment="gravity"
                 android:gravity="center"

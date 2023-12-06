@@ -48,6 +48,21 @@
                 app:lottie_fileName="animated_ui/btn_statistics.json"/>
 
             <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/btnHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/btnStatistics"
+                android:layout_marginStart="@dimen/default_margin"
+                android:layout_marginTop="@dimen/default_margin"
+                android:layout_marginEnd="@dimen/default_margin"
+                android:layout_marginBottom="@dimen/default_margin"
+
+                app:lottie_autoPlay="false"
+                app:lottie_loop="false"
+                app:lottie_fileName="animated_ui/btn_history.json"/>
+
+            <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/btnSpeaker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

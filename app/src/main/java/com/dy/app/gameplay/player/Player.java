@@ -4,11 +4,16 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import com.dy.app.R;
+import com.dy.app.gameplay.pgn.PGNFile;
+import com.dy.app.gameplay.pgn.PGNParseException;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.ImageLoader;
 import com.dy.app.utils.Utils;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 public class Player {
     private boolean inTurn = true;
@@ -19,6 +24,7 @@ public class Player {
     private int elo = 0;
     public PlayerProfile profile;
     public PlayerInventory inventory;
+    public PlayerGameHistory history;
     public BattlePass battlePass;
     public PlayerStatistics statistics;
     public PlayerPreferences preferences;
@@ -42,6 +48,7 @@ public class Player {
         hasLogin = false;
         profile = new PlayerProfile();
         inventory = new PlayerInventory();
+        history = new PlayerGameHistory();
         battlePass = new BattlePass();
         statistics = new PlayerStatistics();
         preferences = new PlayerPreferences();
@@ -153,5 +160,60 @@ public class Player {
 
     public void setReady(boolean ready) {
         isReady = ready;
+    }
+
+    public Vector<PGNFile> getAllHistory(){
+        List<String> pvpHistoryData = (List<String>) this.history.get(PlayerGameHistory.KEY_P_V_P);
+        List<String> pveHistoryData = (List<String>) this.history.get(PlayerGameHistory.KEY_P_V_E);
+
+        Vector<PGNFile> res = new Vector<>();
+
+        for(String pgn : pvpHistoryData){
+            try {
+                res.add(PGNFile.parsePGN(pgn));
+            } catch (PGNParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        for(String pgn : pveHistoryData){
+            try {
+                res.add(PGNFile.parsePGN(pgn));
+            } catch (PGNParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return res;
+    }
+
+    public Vector<PGNFile> getPvPHistory(){
+        List<String> pvpHistoryData = (List<String>) this.history.get(PlayerGameHistory.KEY_P_V_P);
+        Vector<PGNFile> res = new Vector<>();
+
+        for(String pgn : pvpHistoryData){
+            try {
+                res.add(PGNFile.parsePGN(pgn));
+            } catch (PGNParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return res;
+    }
+
+    public Vector<PGNFile> getPvEHistory(){
+        List<String> pveHistoryData = (List<String>) this.history.get(PlayerGameHistory.KEY_P_V_E);
+        Vector<PGNFile> res = new Vector<>();
+
+        for(String pgn : pveHistoryData){
+            try {
+                res.add(PGNFile.parsePGN(pgn));
+            } catch (PGNParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return res;
     }
 }

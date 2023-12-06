@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.gameplay.board.Board;
+import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;
 
 import java.io.File;
@@ -17,12 +18,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
-public class PGNFile {
+public class PGNFile implements Serializable {
     private final Vector<Move> moves = new Vector<>();
     private String data;
     private final Map<String, String> meta = new HashMap<>();
@@ -48,9 +50,9 @@ public class PGNFile {
         return moves;
     }
 
-    public class Move{
-        public String white;
-        public String black;
+    public class Move implements Serializable{
+        public String white = "";
+        public String black = "";
     }
 
     public PGNFile(String moveData){
@@ -64,9 +66,9 @@ public class PGNFile {
         //put initial meta data
         addEvent("?");
         addSite("DyChess 1.0");
-        addDate("?");
+        addDate("??.??.??");
         addRound("?");
-        addResult("*");
+        addResult(-1);
         addWhitePlayer("?");
         addBlackPlayer("?");
         addECO("?");
@@ -81,6 +83,26 @@ public class PGNFile {
     }
 
     private PGNFile(){
+    }
+
+    public static PGNFile parsePGN(String data) throws PGNParseException {
+        PGNFile pgnFile = new PGNFile();
+        pgnFile.data = preProcess(data);
+        String[] splitResult = pgnFile.data.split("\n\n");
+
+        if(splitResult.length != 2) {
+            throw new PGNParseException("Invalid PGN file");
+        }
+
+        String metaStr = splitResult[0];
+        String movesStr = splitResult[1];
+
+        pgnFile.parseMeta(metaStr);
+        //convert ".\s*" to ". "
+        movesStr = movesStr.replaceAll("\\.\\s*", ". ");
+        pgnFile.parseMoves(movesStr);
+
+        return pgnFile;
     }
 
     public static PGNFile parsePGN(Context context, String path) throws PGNParseException, IOException {
@@ -197,8 +219,21 @@ public class PGNFile {
         putMeta("Round", round);
     }
 
-    public void addResult(String round){
-        putMeta("Round", round);
+    public void addResult(int result){
+        switch (result){
+            case DyConst.GAME_DRAW:
+                putMeta("Result", "1/2-1/2");
+                break;
+            case DyConst.GAME_WHITE_WIN:
+                putMeta("Result", "1-0");
+                break;
+            case DyConst.GAME_BLACK_WIN:
+                putMeta("Result", "0-1");
+                break;
+            default:
+                putMeta("Result", "*");
+                break;
+        }
     }
 
     public void addWhitePlayer(String whitePlayer){
@@ -247,7 +282,7 @@ public class PGNFile {
             if(i%MOVE_PER_LINE == 0) builder.append("\n");
 
             Move move = moves.get(i);
-            builder.append((i+1) + ". " + move.white + " " + move.black);
+            builder.append((i+1) + ". " + move.white + " " + move.black + " ");
         }
 
         return builder.toString();
@@ -272,4 +307,19 @@ public class PGNFile {
     }
 
     public static int MOVE_PER_LINE = 6;
+    public int getGameResult(){
+        String result = meta.get("Result");
+        if(result.equals("1/2-1/2")) return DyConst.GAME_DRAW;
+        if(result.equals("1-0")) return DyConst.GAME_WHITE_WIN;
+        if(result.equals("0-1")) return DyConst.GAME_BLACK_WIN;
+        return DyConst.GAME_NOT_END;
+    }
+
+    public String getGameDate() {
+        return meta.get("Date");
+    }
+
+    public String getEvent(){
+        return meta.get("Event");
+    }
 }

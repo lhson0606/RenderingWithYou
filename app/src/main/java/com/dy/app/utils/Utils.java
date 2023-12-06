@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
@@ -15,6 +16,11 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
+
+import com.dy.app.activity.MultiPlayerOnSameDeviceActivity;
+import com.dy.app.gameplay.screenshot.ITakeScreenshot;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -108,77 +114,80 @@ public class Utils {
 
     public static void shareImageMedia(Activity activity, Uri imageUri){
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        //convert uri to file provider uri
+        Uri pUri = FileProvider.getUriForFile(activity, activity.getApplicationContext().getPackageName() + ".provider", new File(imageUri.getPath()));
         shareIntent.setType("image/png");
-        shareIntent.putExtra(Intent.EXTRA_STREAM, imageUri); // Uri of the screenshot
+        shareIntent.putExtra(Intent.EXTRA_STREAM, pUri); // Uri of the screenshot
         activity.startActivity(Intent.createChooser(shareIntent, "gameplay.png"));
     }
 
-    //see https://stackoverflow.com/questions/30196965/how-to-take-a-screenshot-of-a-current-activity-and-then-share-it
-    public static void takeCurrentScreenShotAndShare(Activity activity){
-        Bitmap bitmap = getScreenShot(activity);
-        File screenShotFile = storeBitmap(bitmap, "gameplay.png");
-        shareFile(activity, screenShotFile);
-    }
-
-    private void shareFileWithType(Activity activity, File file, String type){
-        Uri uri = Uri.fromFile(file);
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.setType(type);
-
-        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
-        intent.putExtra(android.content.Intent.EXTRA_TEXT, "");
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        try {
-            activity.startActivity(Intent.createChooser(intent, "Share file"));
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(activity, "No App Available", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private static void shareFile(Activity activity, File file){
-        Uri uri = Uri.fromFile(file);
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND);
-        intent.setType("*/*");
-
-        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
-        intent.putExtra(android.content.Intent.EXTRA_TEXT, "");
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        try {
-            activity.startActivity(Intent.createChooser(intent, "Share file"));
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(activity, "No App Available", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public static Bitmap getScreenShot(Activity activity){
-        View screenView = activity.getWindow().getDecorView().getRootView();
-        screenView.setDrawingCacheEnabled(true);
-        Bitmap bitmap = Bitmap.createBitmap(screenView.getDrawingCache());
-        screenView.setDrawingCacheEnabled(false);
+    public static Bitmap getScreenShot(View view){
+        Bitmap bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
         return bitmap;
     }
 
-    public static File storeBitmap(Bitmap bm, String filename){
-        File dir = new File(DyConst.dirPath);
+    //https://stackoverflow.com/questions/30789590/take-screenshot-from-layout-and-share-via-android
+    public static void shareContent(Activity activity) {
+        final Bitmap bitmap = getScreenShot(activity.getWindow().getDecorView().getRootView());
+        String bitmapPath = MediaStore.Images.Media.insertImage(
+                activity.getContentResolver(), bitmap, "result screenshot", "");
+        Uri uri = Uri.parse(bitmapPath);
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("image/*");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "App");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "Currently a new version of KiKi app is available.");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        activity.startActivity(Intent.createChooser(shareIntent, "Share"));
+    }
 
-        if(!dir.exists()){
-            dir.mkdirs();
+    public static void shareScreenShot(Activity activity, ITakeScreenshot driver, String title){
+        final Bitmap bitmap = driver.getScreenshot();
+        String bitmapPath = MediaStore.Images.Media.insertImage(
+                activity.getContentResolver(), bitmap, title, "");
+        //we now can remove the bitmap from memory
+        bitmap.recycle();
+        //process the uri
+        Uri uri = Uri.parse(bitmapPath);
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("image/*");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "App");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "screenshot");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        activity.startActivity(Intent.createChooser(shareIntent, title));
+    }
+
+    public static Bitmap mergeBitmapCenter(Bitmap... bitmaps){
+        int width = 0;
+        int height = 0;
+
+        //find max width and height
+        for(Bitmap bitmap : bitmaps){
+            width = Math.max(width, bitmap.getWidth());
+            height = Math.max(height, bitmap.getHeight());
         }
 
-        File file = new File(dir, filename);
-        try{
-            FileOutputStream fos = new FileOutputStream(file);
-            bm.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.flush();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(result);
+
+        for(Bitmap bitmap : bitmaps){
+            int xOff = (width - bitmap.getWidth()) / 2;
+            int yOff = (height - bitmap.getHeight()) / 2;
+            canvas.drawBitmap(bitmap, xOff, yOff, null);
         }
 
-        return file;
+        return result;
+    }
+
+    public static String getCurrentDate() {
+        return java.text.DateFormat.getDateTimeInstance().format(new java.util.Date());
+    }
+
+    public static void shareFile(MultiPlayerOnSameDeviceActivity multiPlayerOnSameDeviceActivity, Uri currentSavedFileUri, String type) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType(type);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, currentSavedFileUri);
+        multiPlayerOnSameDeviceActivity.startActivity(Intent.createChooser(shareIntent, "Share your PGN using ..."));
     }
 }

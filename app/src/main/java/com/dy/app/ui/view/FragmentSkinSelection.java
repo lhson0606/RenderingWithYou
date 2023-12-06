@@ -4,23 +4,18 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
-import com.dy.app.activity.MainActivity;
 import com.dy.app.core.FragmentCallback;
 import com.dy.app.manager.UIManager;
-import com.dy.app.ui.adapter.AdapterSkinPage;
 import com.google.android.material.tabs.TabLayout;
 
 public class FragmentSkinSelection extends Fragment

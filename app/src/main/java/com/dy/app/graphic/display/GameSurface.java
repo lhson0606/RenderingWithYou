@@ -1,6 +1,7 @@
 package com.dy.app.graphic.display;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 import android.view.GestureDetector;

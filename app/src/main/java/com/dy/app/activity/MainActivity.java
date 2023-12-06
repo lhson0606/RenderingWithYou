@@ -23,12 +23,14 @@ import com.dy.app.R;
 import com.dy.app.core.MainCallback;
 import com.dy.app.db.Database;
 import com.dy.app.db.OnDBRequestListener;
+import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.player.PlayerInventory;
 import com.dy.app.gameplay.player.PlayerProfile;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.manager.UIManager;
 import com.dy.app.ui.dialog.LoadingDialog;
+import com.dy.app.ui.dialog.PlayerHistoryDialog;
 import com.dy.app.ui.view.FragmentCreateAccount;
 import com.dy.app.ui.view.FragmentCredits;
 import com.dy.app.ui.view.FragmentLoginForm;
@@ -63,6 +65,7 @@ public class MainActivity extends FragmentHubActivity
 
     private void init(){
         btnConfig = findViewById(R.id.btnConfig);
+        btnHistory = findViewById(R.id.btnHistory);
         btnStatistics = findViewById(R.id.btnStatistics);
         btnAbout = findViewById(R.id.btnAbout);
         btnAccount = findViewById(R.id.btnAccount);
@@ -83,6 +86,7 @@ public class MainActivity extends FragmentHubActivity
         EmojiCompat.init(config);
         loadingDialog = new LoadingDialog();
         //#todo loadingDialog.onDismiss();
+        playerHistoryDialog = new PlayerHistoryDialog(this, playerHistoryDialogListener);
 
     }
 
@@ -113,6 +117,7 @@ public class MainActivity extends FragmentHubActivity
 
     private void attachListener() {
         btnConfig.setOnClickListener(this);
+        btnHistory.setOnClickListener(this);
         btnStatistics.setOnClickListener(this);
         btnAbout.setOnClickListener(this);
         btnAccount.setOnClickListener(this);
@@ -458,6 +463,10 @@ public class MainActivity extends FragmentHubActivity
         if(v.getId() == R.id.btnConfig) {
             btnConfig.playAnimation();
             showFragment(settingFragment);
+        } else if(v.getId() == R.id.btnHistory){
+            btnHistory.playAnimation();
+            //show player history dialog
+            playerHistoryDialog.show(getSupportFragmentManager(), "PlayerHistoryDialog");
         } else if(v.getId() == R.id.btnStatistics){
             btnStatistics.playAnimation();
             Intent intent = new Intent(this, StatisticsActivity.class);
@@ -628,6 +637,18 @@ public class MainActivity extends FragmentHubActivity
         }
     }
 
+    private PlayerHistoryDialog.PlayerHistoryDialogListener playerHistoryDialogListener = new PlayerHistoryDialog.PlayerHistoryDialogListener() {
+        @Override
+        public void onBtnReplay(PGNFile selectedFile) {
+
+        }
+
+        @Override
+        public void onBtnShare(PGNFile selectedFile) {
+
+        }
+    };
+
     //store the register information if user sign up with email and password
     private FragmentCreateAccount.RegisterInformation registerInformation = null;
     private SoundManager soundManager;
@@ -642,7 +663,8 @@ public class MainActivity extends FragmentHubActivity
     private TextView tvUsername, tvUserCoin, tvUserElo;
     private FragmentManager fm;
     private Handler handler;
-    private LottieAnimationView btnConfig,btnAbout, btnAccount, btnChooseSkin, btnSpeaker, btnShop, btnStatistics;
+    private LottieAnimationView btnConfig, btnHistory, btnAbout, btnAccount, btnChooseSkin, btnSpeaker, btnShop, btnStatistics;
     private LottieAnimationView btnGamePass;
     private Fragment currentFragment;
+    private PlayerHistoryDialog playerHistoryDialog;
 }

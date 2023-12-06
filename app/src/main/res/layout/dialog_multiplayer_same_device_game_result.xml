@@ -4,8 +4,8 @@
     android:layout_height="331dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_dialog_game_result"
-    android:paddingStart="50dp"
-    android:paddingEnd="50dp">
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp">
 
     <TextView
         android:id="@+id/tvGameResultTitle"
@@ -13,6 +13,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/btnContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:fontFamily="@font/leckerli_one"
         android:textColor="@color/black"
         android:textAlignment="center"
@@ -26,6 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/clShareAs">
+        
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSavePGN"
             android:layout_width="match_parent"
@@ -41,11 +44,24 @@
             android:background="@drawable/bg_btn_save_2_pgn" />
 
         <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnReplay"
+            android:layout_width="match_parent"
+            android:layout_height="69dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnSavePGN"
+            android:textColor="@color/black"
+            android:text="Replay"
+            android:fontFamily="@font/leckerli_one"
+            android:textSize="20sp"
+            android:background="@drawable/bg_btn_replay" />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnRematch"
             android:layout_width="0dp"
             android:layout_height="50dp"
             app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintTop_toBottomOf="@+id/btnSavePGN"
+            app:layout_constraintTop_toBottomOf="@+id/btnReplay"
             app:layout_constraintStart_toStartOf="parent"
             android:fontFamily="@font/leckerli_one"
             android:textColor="@color/black"
@@ -58,7 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="50dp"
             app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintTop_toBottomOf="@+id/btnSavePGN"
+            app:layout_constraintTop_toBottomOf="@+id/btnReplay"
             app:layout_constraintEnd_toEndOf="parent"
             android:fontFamily="@font/leckerli_one"
             android:textColor="@color/black"
@@ -88,6 +104,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/tvShareAsImage"
             android:text="share as: "
+            android:paddingStart="16sp"
             android:textSize="16sp"/>
 
         <TextView
@@ -124,7 +141,8 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:text=" PGN "
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:paddingEnd="16sp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

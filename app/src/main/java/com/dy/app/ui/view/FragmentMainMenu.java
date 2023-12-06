@@ -4,23 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.activity.FragmentHubActivity;
-import com.dy.app.activity.MainActivity;
 import com.dy.app.core.FragmentCallback;
-import com.dy.app.ui.adapter.AdapterMenuItems;
-import com.dy.app.utils.ImageLoader;
 
 public class FragmentMainMenu extends Fragment
         implements FragmentCallback, View.OnClickListener {

@@ -9,6 +9,7 @@ import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.ConnectionManager;
+import com.dy.app.utils.DyConst;
 
 public class MultiPlayerSameDeviceHandler extends Thread
 implements TilePicker.TilePickerListener{
@@ -63,7 +64,7 @@ implements TilePicker.TilePickerListener{
                 if(gameEnd){
                     return;
                 }
-                endGame(player.isWhitePiece());
+                endGame(player.isWhitePiece()? DyConst.GAME_WHITE_WIN:DyConst.GAME_BLACK_WIN);
             }
             return;
         }
@@ -110,20 +111,20 @@ implements TilePicker.TilePickerListener{
 
     private void checkForTimeWin(){
         if(whiteTimeRemainingMS <= 0){
-            endGame(false);
+            endGame(DyConst.GAME_BLACK_WIN);
         }else if(blackTimeRemainingMS <= 0){
-            endGame(true);
+            endGame(DyConst.GAME_WHITE_WIN);
         }
     }
 
-    public void endGame(boolean isWhiteWin){
+    public void endGame(int result){
         synchronized (gameEnd) {
             if (gameEnd) {
                 return;
             }
             gameEnd = true;
             isRunning = false;
-            activity.onGameResult(isWhiteWin);
+            activity.onGameResult(result);
             tilePicker.setListener(null);
         }
     }
