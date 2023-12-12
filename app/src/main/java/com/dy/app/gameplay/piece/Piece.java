@@ -299,33 +299,24 @@ public class Piece implements GameEntity {
         return tile;
     }
 
-    public void setStateAtMoveNumber(int moveNumber){
+    public void setStateAndTileAtMoveNumber(int moveNumber){
         PieceState stateToGo = history.get(moveNumber);
+        //update its state
         currentState = stateToGo.clone();
+        //make tile point to the tile at that state
         this.tile = board.getTile(stateToGo.pos);
         this.tile.setPiece(this);
     }
 
-    public void checkForUndoCapture(int moveNumber){
+    public void checkForUndoCaptureState(int moveNumber){
         PieceState stateToGo = history.get(moveNumber);
         assert stateToGo != null;
         //#todo: have deeper look at this
         if(!stateToGo.isCaptured && currentState.isCaptured){
             board.undoCapture(this);
+        }else if(stateToGo.isCaptured && !currentState.isCaptured){
+            board.getPieceManager().capturePiece(this);
         }
-
-//        if(stateToGo.isPromoted && !currentState.isPromoted){
-//
-//            try {
-//                ((Pawn)this).promote(stateToGo.promotingNotation, false);
-//            } catch (ClassCastException e) {
-//                throw new RuntimeException(e);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }else if(!stateToGo.isPromoted && currentState.isPromoted){
-//            demote();
-//        }
     }
 
     public void checkForUndoPromotionState(int moveNumber){
@@ -341,6 +332,31 @@ public class Piece implements GameEntity {
             }
         }else if(!stateToGo.isPromoted && currentState.isPromoted){
             demote();
+        }
+    }
+
+    /**
+     * This method is used to go to a specific position at a specific move number
+     * assumes the board is clean (means that there's tile has a piece on it)
+     * @param moveNumber
+     * @param isMoveAnimated
+     */
+    public void goToPositionAtState(int moveNumber, boolean isMoveAnimated){
+        PieceState stateToGo = history.get(moveNumber);
+
+        if(stateToGo == null){
+            //ensure that state to go shouldn't be null
+            throw new RuntimeException("stateToGo is null");
+        }
+
+        Tile dstTile = board.getTile(stateToGo.pos);
+        Tile srcTile = board.getTile(currentState.pos);
+
+        dstTile.setPiece(this);
+        tile = dstTile;
+
+        if(isMoveAnimated){
+            startMoveAnimation(srcTile, dstTile, null);
         }
     }
 

@@ -433,6 +433,7 @@ public class MainActivity extends FragmentHubActivity
     }
 
     private void startScriptsGame(){
+        //these comments are uncommented for debug purpose
         Intent intent = new Intent(this, RunScriptsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
