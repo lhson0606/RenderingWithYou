@@ -53,6 +53,7 @@ public class ScriptsRunner extends Thread{
         Vector<PGNFile.Move> moves = pgnFile.getMoves();
 
         jumpToMove(0);
+        //jumpToMove(123);
 
         while(isRunning){
             while(currentMove < pgnFile.getBothSideMoveCount() && isRunning) {

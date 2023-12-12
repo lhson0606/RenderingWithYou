@@ -309,12 +309,29 @@ public class Piece implements GameEntity {
     public void checkForUndoCapture(int moveNumber){
         PieceState stateToGo = history.get(moveNumber);
         assert stateToGo != null;
+        //#todo: have deeper look at this
         if(!stateToGo.isCaptured && currentState.isCaptured){
             board.undoCapture(this);
         }
 
-        if(stateToGo.isPromoted && !currentState.isPromoted){
+//        if(stateToGo.isPromoted && !currentState.isPromoted){
+//
+//            try {
+//                ((Pawn)this).promote(stateToGo.promotingNotation, false);
+//            } catch (ClassCastException e) {
+//                throw new RuntimeException(e);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }else if(!stateToGo.isPromoted && currentState.isPromoted){
+//            demote();
+//        }
+    }
 
+    public void checkForUndoPromotionState(int moveNumber){
+        PieceState stateToGo = history.get(moveNumber);
+        assert stateToGo != null;
+        if(stateToGo.isPromoted && !currentState.isPromoted){
             try {
                 ((Pawn)this).promote(stateToGo.promotingNotation, false);
             } catch (ClassCastException e) {
@@ -322,7 +339,6 @@ public class Piece implements GameEntity {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
         }else if(!stateToGo.isPromoted && currentState.isPromoted){
             demote();
         }
