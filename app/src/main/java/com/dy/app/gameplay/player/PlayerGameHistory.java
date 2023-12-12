@@ -11,6 +11,8 @@ public class PlayerGameHistory {
     private Map<String, Object> data;
     public static final String KEY_P_V_P = "pvp";
     public static final String KEY_P_V_E = "pve";
+    public static final String KEY_ELO_HISTORY_DATE = "eloHistoryDate";
+    public static final String KEY_ELO_HISTORY_VALUE = "eloHistoryValue";
 
     public PlayerGameHistory(){
         data = new HashMap<>();
@@ -18,6 +20,12 @@ public class PlayerGameHistory {
         List<String> pve = new ArrayList<>();
         data.put(KEY_P_V_P,pvp);
         data.put(KEY_P_V_E, pve);
+        List<Long> eloHisDate = new ArrayList<>();
+        eloHisDate.add(System.currentTimeMillis());
+        List<Long> eloHisValue = new ArrayList<>();
+        eloHisValue.add(0L);
+        data.put(KEY_ELO_HISTORY_DATE, eloHisDate);
+        data.put(KEY_ELO_HISTORY_VALUE, eloHisValue);
     }
 
     public Object get(String key){
@@ -55,5 +63,14 @@ public class PlayerGameHistory {
 
     public void newGame(String gameType, PGNFile gamePlay){
         newGame(gameType, gamePlay.toString());
+    }
+
+    public void addNewEloHistory(long date, long value){
+        List<Long> eloHisDate = (List<Long>) get(KEY_ELO_HISTORY_DATE);
+        List<Long> eloHisValue = (List<Long>) get(KEY_ELO_HISTORY_VALUE);
+        eloHisDate.add(date);
+        eloHisValue.add(value);
+        set(KEY_ELO_HISTORY_DATE, eloHisDate);
+        set(KEY_ELO_HISTORY_VALUE, eloHisValue);
     }
 }

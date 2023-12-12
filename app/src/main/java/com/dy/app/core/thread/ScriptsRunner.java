@@ -29,8 +29,8 @@ public class ScriptsRunner extends Thread{
 
     public interface IScriptRunnerCallback{
         void updateProgress(int progress);
-
         void changePlayButtonToContinue();
+        void exitWithError(String error);
     }
 
     public ScriptsRunner(IScriptRunnerCallback activity, PGNFile pgnFile, Board board){
@@ -47,13 +47,15 @@ public class ScriptsRunner extends Thread{
             loadAllMove();
         } catch (Exception e) {
             throw new RuntimeException(e);
+//            activity.exitWithError("Cannot load moves");
+//            return;
         }
         Vector<PGNFile.Move> moves = pgnFile.getMoves();
 
         jumpToMove(0);
 
         while(isRunning){
-            while(currentMove < moves.size()*2 && isRunning) {
+            while(currentMove < pgnFile.getBothSideMoveCount() && isRunning) {
                 try{
                     Log.d("Debug concurrent", "worker is waiting for mutex");
                     moveLock.lock();
@@ -72,6 +74,9 @@ public class ScriptsRunner extends Thread{
                         Log.d(TAG, "at move " + currentMove + " " + moveNotation);
                         Log.d(TAG, board.toString());
                         throw new RuntimeException(e);
+//                        activity.exitWithError("Invalid move notation: " + moveNotation);
+//                        isPaused = true;
+//                        break;
                     }
                     Piece piece = chessMove.getSrcTile().getPiece();
                     try {
@@ -82,6 +87,9 @@ public class ScriptsRunner extends Thread{
                         Log.d(TAG, "at move " + currentMove + " " + moveNotation);
                         Log.d(TAG, board.toString());
                         throw new RuntimeException(e);
+//                        activity.exitWithError("Invalid move notation: " + moveNotation);
+//                        isPaused = true;
+//                        break;
                     }
                     Log.d("Debug concurrent", ">");
 
@@ -127,7 +135,7 @@ public class ScriptsRunner extends Thread{
             moveLock.lock();
             isPaused = false;
             //if it's the end of the game, jump to the beginning for replay
-            if(currentMove == pgnFile.getMoves().size()*2){
+            if(currentMove == pgnFile.getBothSideMoveCount()){
                 jumpToMove(0);
             }
 
@@ -156,40 +164,16 @@ public class ScriptsRunner extends Thread{
         board.moveByNotation(moveData, isWhite);
     }
 
-    private void performMove(String moveData, boolean isWhite) {
-        ChessMove move = null;
-        try {
-            move = new ChessMove(isWhite, moveData, board);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        Tile srcTile = move.getSrcTile();
-        Piece piece = srcTile.getPiece();
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        piece.pickUp();
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        piece.putDown();
-        //piece.move(desTile.pos);
-        try {
-            board.moveByNotation(moveData, isWhite);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void jumpToMove(int move){
         try {
             moveLock.lock();
             Log.d("Debug concurrent", "[");
-            board.goToMove(move);
+            try {
+                board.goToMove(move);
+            } catch (Exception e) {
+                //activity.exitWithError("Cannot jump to move " + move);
+                throw new RuntimeException(e);
+            }
             Log.d("Debug concurrent", "User: on board state reset: ");
             Log.d("Debug concurrent", board.toString());
             Log.d(TAG, "received jump to move " + move);
@@ -207,7 +191,7 @@ public class ScriptsRunner extends Thread{
         try {
             moveLock.lock();
             if(currentMove == 0){
-                jumpToMove(pgnFile.getMoves().size()*2-1);
+                jumpToMove(pgnFile.getBothSideMoveCount());
                 return;
             }
             jumpToMove(currentMove-1);
@@ -219,7 +203,7 @@ public class ScriptsRunner extends Thread{
     public void nextMove(){
         try {
             moveLock.lock();
-            if(currentMove == pgnFile.getMoves().size()*2-1){
+            if(currentMove == pgnFile.getBothSideMoveCount()){
                 jumpToMove(0);
                 return;
             }

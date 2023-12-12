@@ -684,7 +684,7 @@ public class Board implements GameEntity {
         }
     }
 
-    public void goToMove(int moveNumber){
+    public void goToMove(int moveNumber) throws Exception {
         Log.d("Board", String.format(Locale.ENGLISH, "run: %d", moveNumber));
         try{
             mutex.lock();

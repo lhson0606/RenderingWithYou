@@ -64,6 +64,7 @@ public class DyConst {
     public static final int REQUEST_CHOOSE_FILE_LOCATION = 1;
     public static final int REQUEST_TAKE_SCREENSHOT_AND_SHARE = 2;
     public static final int REQUEST_SAVE_FILE_BEFORE_SHARE = 3;
+    public static final int REQUEST_IMPORT_PGN = 4;
     final static String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/DyChess/";
     public static final int GAME_NOT_END = -1;
     public static final int GAME_DRAW = 0;

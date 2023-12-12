@@ -84,5 +84,5 @@ dependencies {
     implementation ("com.google.firebase:firebase-analytics")
 
     //Anychart for graphs
-    implementation ("com.github.AnyChart:AnyChart-Android:1.1.5")
+    implementation ("com.github.AnyChart:AnyChart-Android:1.0.1")
 }

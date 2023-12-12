@@ -190,4 +190,74 @@ public class Utils {
         shareIntent.putExtra(Intent.EXTRA_STREAM, currentSavedFileUri);
         multiPlayerOnSameDeviceActivity.startActivity(Intent.createChooser(shareIntent, "Share your PGN using ..."));
     }
+
+    public static void openFile(Activity activity, String type, int requestCode) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(type);
+        activity.startActivityForResult(intent, requestCode);
+    }
+
+    public static String getTitle(long elo){
+        if(elo < 1000){
+            return "Beginner";
+        }else if(elo < 1200){
+            return "Novice";
+        }else if(elo < 1400){
+            return "Intermediate";
+        }else if(elo < 1600){
+            return "Advanced";
+        }else if(elo < 1800){
+            return "Expert";
+        }else if(elo < 2000){
+            return "Master";
+        }else if(elo < 2200){
+            return "Grandmaster";
+        }else if(elo < 2400){
+            return "International Master";
+        }else if(elo < 2600){
+            return "Grandmaster";
+        }else {
+            return "Super Grandmaster";
+        }
+    }
+
+    public static String getWinRateDisplay(long win, long total){
+        if(total == 0) {
+            return "n/a";
+        }else{
+            return String.format("%.2f", (float)win/total * 100) + "%";
+        }
+    }
+
+    public static String getAlphabetRating(long x, long max){
+        float value = (float)x / max;
+        if(value < 0.1){
+            return "F";
+        }else if(value < 0.2){
+            return "E";
+        }else if (value < 0.3){
+            return "D";
+        }else if (value < 0.4){
+            return "C";
+        }else if(value < 0.5){
+            return "B";
+        }else if(value < 0.6){
+            return "A";
+        }else if(value < 0.7){
+            return "A+";
+        }else if(value < 0.8){
+            return "A++";
+        }else if(value < 0.9){
+            return "S";
+        }else if(value>=1){
+            return "SS";
+        }else {
+            return "S+";
+        }
+    }
+
+    public static String getDate(Long aLong) {
+        return java.text.DateFormat.getDateTimeInstance().format(new java.util.Date(aLong));
+    }
 }

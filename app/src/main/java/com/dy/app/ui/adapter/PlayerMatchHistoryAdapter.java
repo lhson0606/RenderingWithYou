@@ -1,5 +1,6 @@
 package com.dy.app.ui.adapter;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,5 +70,10 @@ public class PlayerMatchHistoryAdapter extends BaseAdapter {
         gameType.setText(pgnFile.getEvent());
 
         return v;
+    }
+
+    public void updateData(Vector<PGNFile> pgnFiles) {
+        this.pgnFiles = pgnFiles;
+        notifyDataSetChanged();
     }
 }

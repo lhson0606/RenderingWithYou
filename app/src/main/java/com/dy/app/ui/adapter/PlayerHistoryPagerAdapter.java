@@ -23,11 +23,11 @@ public class PlayerHistoryPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position) {
             case 0:
-                return new FragmentAllGamePlayHistory(playerHistoryDialog);
+                return playerHistoryDialog.getFragmentAllGamePlayHistory();
             case 1:
-                return new FragmentPvPHistory(playerHistoryDialog);
+                return playerHistoryDialog.getFragmentPvPHistory();
             case 2:
-                return new FragmentPvEHistory(playerHistoryDialog);
+                return playerHistoryDialog.getFragmentPvEHistory();
         }
         return null;
     }

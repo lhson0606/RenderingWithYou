@@ -73,7 +73,11 @@ public class WhiteRunner extends Thread{
             }
         }
 
-        board.goToMove(0);
+        try {
+            board.goToMove(0);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -84,7 +88,11 @@ public class WhiteRunner extends Thread{
 //        board.goToMove(96);
         for(int x = 0; x<100; x++){
             for(int k = 0; k<moveCount; k++){
-                board.goToMove(k);
+                try {
+                    board.goToMove(k);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
 //            try {
 //                //Thread.sleep(500);
 //            } catch (InterruptedException e) {
@@ -93,7 +101,11 @@ public class WhiteRunner extends Thread{
             }
 
             for(int k = moveCount; k >= 0; k--){
-                board.goToMove(k);
+                try {
+                    board.goToMove(k);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
 //            try {
 //                //Thread.sleep(500);
 //            } catch (InterruptedException e) {

@@ -12,7 +12,9 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -20,8 +22,13 @@ import com.dy.app.R;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.ui.adapter.PlayerHistoryPagerAdapter;
 import com.dy.app.ui.adapter.PlayerMatchHistoryAdapter;
+import com.dy.app.ui.view.FragmentAllGamePlayHistory;
+import com.dy.app.ui.view.FragmentPvEHistory;
+import com.dy.app.ui.view.FragmentPvPHistory;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.Vector;
 
 public class PlayerHistoryDialog extends DialogFragment
 implements View.OnClickListener{
@@ -41,8 +48,8 @@ implements View.OnClickListener{
     }
 
     public interface PlayerHistoryDialogListener{
-        void onBtnReplay(PGNFile selectedFile);
-        void onBtnShare(PGNFile selectedFile);
+        void onBtnReplayClick(PGNFile selectedFile);
+        void onBtnSaveClick(PGNFile selectedFile);
     }
 
     private PlayerHistoryDialogListener listener;
@@ -67,13 +74,13 @@ implements View.OnClickListener{
 
         btnClose = v.findViewById(R.id.btnClose);
         btnReplay = v.findViewById(R.id.btnReplay);
-        btnShare = v.findViewById(R.id.btnShare);
+        btnSave = v.findViewById(R.id.btnSave);
         tabLayout = v.findViewById(R.id.tabLayout);
         viewPager = v.findViewById(R.id.viewPager);
 
         btnClose.setOnClickListener(this);
         btnReplay.setOnClickListener(this);
-        btnShare.setOnClickListener(this);
+        btnSave.setOnClickListener(this);
         viewPager.setAdapter(adapter);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
@@ -88,14 +95,38 @@ implements View.OnClickListener{
     }
 
     @Override
+    public void show(@NonNull FragmentManager manager, @Nullable String tag) {
+        super.show(manager, tag);
+        //we need to update player history view after showing
+        updatePlayerHistoryView();
+    }
+
+    private void updatePlayerHistoryView() {
+        //update player history in case it is changed for all fragments
+        //run on ui thread so that it can update view (otherwise, user have to touch it to update view)
+        if(fragmentAllGamePlayHistory.isAdded()){
+            fragmentAllGamePlayHistory.updateView();
+        }
+
+        if(fragmentPvPHistory.isAdded()){
+            fragmentPvPHistory.updateView();
+        }
+
+        if(fragmentPvEHistory.isAdded()){
+            fragmentPvEHistory.updateView();
+        }
+
+    }
+
+    @Override
     public void onClick(View v) {
         if(v == btnClose) {
             btnClose.playAnimation();
             dismiss();
         } else if(v == btnReplay){
-            listener.onBtnReplay(replayFile);
-        }else if(v == btnShare){
-            listener.onBtnShare(replayFile);
+            listener.onBtnReplayClick(replayFile);
+        }else if(v == btnSave){
+            listener.onBtnSaveClick(replayFile);
         }
     }
 
@@ -120,7 +151,7 @@ implements View.OnClickListener{
     }
 
     private LottieAnimationView btnClose;
-    private Button btnReplay, btnShare;
+    private Button btnReplay, btnSave;
     private ViewPager2 viewPager;
     private final String[] pagerTabs = {"All", "PvP", "PvE"};
     private FragmentActivity activity;
@@ -129,6 +160,9 @@ implements View.OnClickListener{
         return pagerTabs;
     }
     private PGNFile replayFile = null;
+    private final FragmentAllGamePlayHistory fragmentAllGamePlayHistory = new FragmentAllGamePlayHistory(this);
+    private final FragmentPvPHistory fragmentPvPHistory = new FragmentPvPHistory(this);
+    private final FragmentPvEHistory fragmentPvEHistory = new FragmentPvEHistory(this);
     PlayerHistoryPagerAdapter adapter;
     final ViewPager2.OnPageChangeCallback callback = new ViewPager2.OnPageChangeCallback() {
         @Override
@@ -137,9 +171,22 @@ implements View.OnClickListener{
             if(currentSelectedView != null) {
                 currentSelectedView.setBackgroundColor(Color.parseColor("#00000000"));
                 currentSelectedView = null;
+                replayFile = null;
             }
             //do something when page is selected
             super.onPageSelected(position);
         }
     };
+
+    public FragmentAllGamePlayHistory getFragmentAllGamePlayHistory() {
+        return fragmentAllGamePlayHistory;
+    }
+
+    public FragmentPvPHistory getFragmentPvPHistory() {
+        return fragmentPvPHistory;
+    }
+
+    public FragmentPvEHistory getFragmentPvEHistory() {
+        return fragmentPvEHistory;
+    }
 }

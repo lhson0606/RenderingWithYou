@@ -23,8 +23,9 @@ import java.util.Vector;
 
 public class FragmentPvPHistory extends Fragment
         implements AdapterView.OnItemClickListener {
-    PlayerHistoryDialog playerHistoryDialog;
+    private PlayerHistoryDialog playerHistoryDialog;
     private ImageView ivEmpty;
+    private PlayerMatchHistoryAdapter adapter;
 
     public FragmentPvPHistory(PlayerHistoryDialog playerHistoryDialog) {
         this.playerHistoryDialog = playerHistoryDialog;
@@ -35,11 +36,14 @@ public class FragmentPvPHistory extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_game_history, container, false);
         lvGameHistory = v.findViewById(R.id.lvGameHistory);
+        ivEmpty = v.findViewById(R.id.ivEmpty);
         Vector<PGNFile> pgnFiles = Player.getInstance().getPvPHistory();
         if(pgnFiles.size() == 0) {
             ivEmpty.setVisibility(View.VISIBLE);
+        }else{
+            ivEmpty.setVisibility(View.INVISIBLE);
         }
-        PlayerMatchHistoryAdapter adapter = new PlayerMatchHistoryAdapter(playerHistoryDialog, pgnFiles);
+        adapter = new PlayerMatchHistoryAdapter(playerHistoryDialog, pgnFiles);
         lvGameHistory.setAdapter(adapter);
         lvGameHistory.setOnItemClickListener(this);
         return v;
@@ -57,6 +61,18 @@ public class FragmentPvPHistory extends Fragment
         View selectedView = parent.getChildAt(position);
         playerHistoryDialog.setCurrentSelectedView(selectedView);
         playerHistoryDialog.setReplayFile((PGNFile) parent.getItemAtPosition(position));
+    }
+
+    public void updateView(){
+        Vector<PGNFile> pgnFiles = Player.getInstance().getPvPHistory();
+        getActivity().runOnUiThread(()->{
+            if(pgnFiles.size() == 0) {
+                ivEmpty.setVisibility(View.VISIBLE);
+            }else{
+                ivEmpty.setVisibility(View.INVISIBLE);
+            }
+            adapter.updateData(pgnFiles);
+        });
     }
 }
 

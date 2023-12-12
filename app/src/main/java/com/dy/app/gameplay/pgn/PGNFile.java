@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.dy.app.activity.MainActivity;
 import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.utils.DyConst;
@@ -29,6 +30,55 @@ public class PGNFile implements Serializable {
     private String data;
     private final Map<String, String> meta = new HashMap<>();
     public static final String TAG = "PGNFile";
+
+    public static PGNFile parsePGN(MainActivity context, Uri openingPGNuri) throws PGNParseException {
+        StringBuilder builder = new StringBuilder();
+        String curLine = null;
+        final int BUFFER_SIZE = 1024;
+        char[] buffer = new char[BUFFER_SIZE];
+        int count = -1;
+        final InputStream is;
+        InputStreamReader reader;
+        PGNFile pgnFile = new PGNFile();
+
+        try {
+            is = context.getContentResolver().openInputStream(openingPGNuri);
+            reader = new InputStreamReader(is);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        while(true){
+            try {
+                count = reader.read(buffer, 0, BUFFER_SIZE);
+                if(count == -1) break;
+                curLine = new String(buffer, 0, count);
+                Log.d(TAG, curLine);
+                builder.append(curLine);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        pgnFile.data = builder.toString();
+        pgnFile.data = preProcess(pgnFile.data);
+
+        String[] splitResult = pgnFile.data.split("\n\n");
+
+        if(splitResult.length != 2) {
+            throw new RuntimeException("Invalid PGN file");
+        }
+
+        String metaStr = splitResult[0];
+        String movesStr = splitResult[1];
+
+        pgnFile.parseMeta(metaStr);
+
+        //convert ".\s*" to ". "
+        movesStr = movesStr.replaceAll("\\.\\s*", ". ");
+        pgnFile.parseMoves(movesStr);
+        return pgnFile;
+    }
 
     public String getBlackPlayerName() {
         return meta.get("Black");
@@ -321,5 +371,11 @@ public class PGNFile implements Serializable {
 
     public String getEvent(){
         return meta.get("Event");
+    }
+
+    public int getBothSideMoveCount(){
+        int result = moves.size()*2;
+        if(moves.lastElement().black.equals("")) result--;
+        return result;
     }
 }

@@ -68,7 +68,7 @@ public class ReplayActivity extends FragmentHubActivity
             ((TextView)findViewById(R.id.tvWhitePlayerName)).setText(pgnFile.getWhitePlayerName());
             ((TextView)findViewById(R.id.tvBlackPlayerElo)).setText(pgnFile.getBlackPlayerElo());
             ((TextView)findViewById(R.id.tvWhitePlayerElo)).setText(pgnFile.getWhitePlayerElo());
-            sbProgress.setMax(pgnFile.getMoves().size()*2);
+            sbProgress.setMax(pgnFile.getBothSideMoveCount());
             sbProgress.setProgress(0);
             btnPlay.setEnabled(true);
             btnPrev.setEnabled(true);
@@ -231,6 +231,13 @@ public class ReplayActivity extends FragmentHubActivity
     public void changePlayButtonToContinue(){
         runOnUiThread(()->{
             btnPlay.setImageResource(R.drawable.ic_continue_playing);
+        });
+    }
+
+    @Override
+    public void exitWithError(String error) {
+        runOnUiThread(()->{
+            showErrorDialog(error);
         });
     }
 

@@ -1,15 +1,19 @@
 package com.dy.app.activity;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.provider.FontRequest;
 import androidx.emoji.text.EmojiCompat;
@@ -38,12 +42,15 @@ import com.dy.app.ui.view.FragmentLogoutForm;
 import com.dy.app.ui.view.FragmentMainMenu;
 import com.dy.app.ui.view.FragmentSetting;
 import com.dy.app.ui.view.FragmentSkinSelection;
+import com.dy.app.utils.DyConst;
+import com.dy.app.utils.Utils;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -429,6 +436,7 @@ public class MainActivity extends FragmentHubActivity
         Intent intent = new Intent(this, RunScriptsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
+        //Utils.openFile(this, "*/*", DyConst.REQUEST_IMPORT_PGN);
     }
 
     private void startFindingLobby(){
@@ -465,6 +473,10 @@ public class MainActivity extends FragmentHubActivity
             showFragment(settingFragment);
         } else if(v.getId() == R.id.btnHistory){
             btnHistory.playAnimation();
+            if(!Player.getInstance().hasLogin()){
+                displayAlertMessage("Please sign in first to use this feature");
+                return;
+            }
             //show player history dialog
             playerHistoryDialog.show(getSupportFragmentManager(), "PlayerHistoryDialog");
         } else if(v.getId() == R.id.btnStatistics){
@@ -639,15 +651,88 @@ public class MainActivity extends FragmentHubActivity
 
     private PlayerHistoryDialog.PlayerHistoryDialogListener playerHistoryDialogListener = new PlayerHistoryDialog.PlayerHistoryDialogListener() {
         @Override
-        public void onBtnReplay(PGNFile selectedFile) {
+        public void onBtnReplayClick(PGNFile selectedFile) {
+            if(selectedFile == null){
+                displayAlertMessage("Please select a game to replay");
+                return;
+            }
 
+            //put pgn file into intent and start replay activity
+            Intent intent = new Intent(MainActivity.this, ReplayActivity.class);
+            intent.putExtra("pgn", selectedFile);
+            startActivity(intent);
         }
 
         @Override
-        public void onBtnShare(PGNFile selectedFile) {
+        public void onBtnSaveClick(PGNFile selectedFile) {
+            if(selectedFile == null){
+                displayAlertMessage("Please select a game to save");
+                return;
+            }
 
+            //save pgn file to storage
+            Utils.askForFileLocation(MainActivity.this, "gameplay.pgn", "", "*/*", DyConst.REQUEST_CHOOSE_FILE_LOCATION);
+            currentPGNFile = selectedFile;
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode != Activity.RESULT_OK) {
+            displayAlertMessage("Something went wrong, please try again");
+            return;
+        }
+        switch (requestCode){
+            case DyConst.REQUEST_CHOOSE_FILE_LOCATION:
+                // The result data contains a URI for the document or directory that
+                // the user selected.
+                Uri uri = null;
+                if (data != null) {
+                    uri = data.getData();
+                    savePGN(uri);
+                }
+            break;
+            case DyConst.REQUEST_IMPORT_PGN:
+                Uri openingPGNuri = null;
+                if (data != null) {
+                    openingPGNuri = data.getData();
+                    try{
+                        PGNFile pgnFile = PGNFile.parsePGN(this, openingPGNuri);
+                        Intent intent = new Intent(this, ReplayActivity.class);
+                        intent.putExtra("pgn", pgnFile);
+                        startActivity(intent);
+                    }catch (Exception e){
+                        displayAlertMessage("Invalid PGN file, or the file is corrupted.");
+                    }
+                }
+            break;
+        }
+
+    }
+
+    private PGNFile currentPGNFile;
+
+    private void savePGN(Uri uri){
+        showLoadingDialog(false);
+        Thread worker = new Thread(()->{
+            try {
+                currentPGNFile.savePGN(this, uri, new PGNFile.IOnSavePGNListener() {
+                    @Override
+                    public void onSavePGN(String path) {
+                        runOnUiThread(() -> {
+                            hideLoadingDialog();
+                            Toast.makeText(MainActivity.this, "Saved", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                });
+            } catch (IOException e) {
+                hideLoadingDialog();
+                displayAlertMessage(e.getMessage());
+            }
+        });
+        worker.start();
+    }
 
     //store the register information if user sign up with email and password
     private FragmentCreateAccount.RegisterInformation registerInformation = null;

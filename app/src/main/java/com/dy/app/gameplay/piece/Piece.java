@@ -328,7 +328,7 @@ public class Piece implements GameEntity {
         }
     }
 
-    public void goToMove(int moveNumber) {
+    public void goToMove(int moveNumber) throws Exception{
         PieceState stateToGo = history.get(moveNumber);
 
 //        if(stateToGo.equals(currentState)){
