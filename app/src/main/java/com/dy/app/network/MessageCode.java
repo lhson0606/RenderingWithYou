@@ -11,4 +11,9 @@ public class MessageCode {
     public static final int PIECE_COLOR_CHANGE_REQUEST_CODE = 7;
     public static final int ON_PIECE_COLOR_CHANGED_CODE = 8;
     public static final int ON_PIECE_MOVE_REQUEST = 9;
+    public static final int ON_TIME_REMAIN_INFO = 10;
+    public static final int ON_GAME_LOST_INFORM = 11;
+    public static final int ON_REMATCH_REQUEST = 12;
+    public static final int ON_REMATCH_ACCEPTED = 13;
+    public static final int ON_REMATCH_REJECTED = 14;
 }

@@ -17,12 +17,14 @@ implements TilePicker.TilePickerListener{
     final Board board;
     private boolean isRunning = false;
     //15 mins
-    private long blackTimeRemainingMS = 3000;
-    //private long blackTimeRemainingMS = 15 * 60 * 1000;
+    //private long blackTimeRemainingMS = 3000;
+    private long blackTimeRemainingMS = 15 * 60 * 1000;
     private long whiteTimeRemainingMS = 15 * 60 * 1000;
     private MultiPlayerOnSameDeviceActivity activity;
     private Boolean gameEnd = false;
     private TilePicker tilePicker;
+    private int continuousWhiteCheckCount = 0;
+    private int continuousBlackCheckCount = 0;
 
     @Override
     public void run() {
@@ -30,19 +32,25 @@ implements TilePicker.TilePickerListener{
 
         while(isRunning){
             if(player.isWhitePiece()){
-                whiteTimeRemainingMS -= 1000;
+                whiteTimeRemainingMS -= 100;
                 activity.updateTimeRemain(player.isWhitePiece(), whiteTimeRemainingMS);
             } else {
-                blackTimeRemainingMS -= 1000;
+                blackTimeRemainingMS -= 100;
                 activity.updateTimeRemain(player.isWhitePiece(), blackTimeRemainingMS);
             }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 //throw new RuntimeException(e);
             }
 
             checkForTimeWin();
+        }
+    }
+
+    private void checkForDrawByStaleMate(boolean isWhitePiece) {
+        if(!board.hasPossibleMove(isWhitePiece)){
+            endGame(DyConst.GAME_DRAW);
         }
     }
 
@@ -53,6 +61,14 @@ implements TilePicker.TilePickerListener{
             throw new RuntimeException(e);
         }
         int testResult = board.testForCheck(!player.isWhitePiece());
+
+        if(testResult == Board.NO_CHECK){
+            if(Player.getInstance().isWhitePiece()){
+                continuousBlackCheckCount = 0;
+            }else{
+                continuousWhiteCheckCount = 0;
+            }
+        }
         if(testResult == Board.IS_CHECK){
             moveNotation += "+";
         }else if(testResult == Board.IS_CHECKMATE){
@@ -69,6 +85,7 @@ implements TilePicker.TilePickerListener{
             return;
         }
         player.setWhitePiece(!player.isWhitePiece());
+        checkForDrawByStaleMate(player.isWhitePiece());
     }
 
     private boolean checkForSpecialMove(String moveNotation) {

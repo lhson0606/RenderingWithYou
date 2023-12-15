@@ -12,6 +12,7 @@ import com.dy.app.graphic.gl.VAO;
 import com.dy.app.graphic.gl.VBO;
 import com.dy.app.graphic.shader.Obj3DShader;
 import com.dy.app.graphic.shader.TileShader;
+import com.dy.app.setting.GameSetting;
 
 import java.util.Map;
 import java.util.concurrent.Semaphore;
@@ -104,7 +105,8 @@ public class Obj3D implements Cloneable{
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  tex.getID());
 
-        GLES30.glDrawElements(GLES30.GL_TRIANGLES, EBOIndices.length(), EBOIndices.getType(), 0);
+        //GLES30.glDrawElements(GLES30.GL_TRIANGLES, EBOIndices.length(), EBOIndices.getType(), 0);
+        GLES30.glDrawElements(GameSetting.getInstance().getDrawMode(), EBOIndices.length(), EBOIndices.getType(), 0);
 
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
         GLES30.glDisable(GLES30.GL_TEXTURE_2D);

@@ -13,6 +13,7 @@ import com.dy.app.manager.ConnectionManager;
 import com.dy.app.network.IMessageHandler;
 import com.dy.app.network.Message;
 import com.dy.app.network.MessageCode;
+import com.dy.app.ui.dialog.P2pGameResultDialog;
 import com.dy.app.utils.MessageFactory;
 
 import java.util.Vector;
@@ -31,7 +32,8 @@ public class MultiDeviceInGameHandler extends Thread
     public static final String TAG = "MultiDeviceInGameHandler";
     private TilePicker tilePicker;
     private final Player player = Player.getInstance();
-    private Long startTime = null;
+    private long duration = 15 * 60 * 1000;//15 mins
+    private Timer timer;
 
     public MultiDeviceInGameHandler(GameActivity gameActivity, Board board, ConnectionManager connectionManager, TilePicker tilePicker){
         this.board = board;
@@ -40,13 +42,27 @@ public class MultiDeviceInGameHandler extends Thread
         connectionManager.startReceiving(this);
         this.tilePicker = tilePicker;
         tilePicker.setListener(this);
-        startTime = System.currentTimeMillis();
 
         if(player.isWhitePiece()){
             player.setInTurn(true);
         }else{
             player.setInTurn(false);
         }
+
+        timer = new Timer(duration, new Timer.OnTimerTickListener() {
+            @Override
+            public void onTimeUpdate(long timeRemaining) {
+                gameActivity.updateTimeRemain(player.isWhitePiece(), timeRemaining);
+                informRemainTime(timeRemaining);
+                gameActivity.updatePlayerTimeRemain(timeRemaining);
+            }
+
+            @Override
+            public void onTimeOut() {
+                gameActivity.onGameResult(P2pGameResultDialog.LOSE);
+                informLoss();
+            }
+        });
     }
 
     @Override
@@ -70,8 +86,8 @@ public class MultiDeviceInGameHandler extends Thread
         }else if(testResult == Board.IS_CHECKMATE){
             moveNotation += "#";
         }
-        //send move to other device
-        sendMove(moveNotation);
+        //handle move by player
+        handlePlayerMove(moveNotation);
     }
 
     private boolean checkForSpecialMove(String moveNotation) {
@@ -93,8 +109,7 @@ public class MultiDeviceInGameHandler extends Thread
                     tempMoveNotation += "#";
                 }
                 //send move to other device
-                sendMove(tempMoveNotation);
-                player.setInTurn(false);
+                handlePlayerMove(tempMoveNotation);
             });
             return true;
         }
@@ -113,6 +128,23 @@ public class MultiDeviceInGameHandler extends Thread
             case MessageCode.PLAYER_CHAT_MESSAGE_CODE:
                 handlePlayerChatMessage(data);
                 break;
+            case MessageCode.ON_TIME_REMAIN_INFO:
+                long remainTime = Long.parseLong(new String(data));
+                gameActivity.updateTimeRemain(Rival.getInstance().isWhitePiece(), remainTime);
+                break;
+            case MessageCode.ON_GAME_LOST_INFORM:
+                //we are the winner
+                gameActivity.onGameResult(P2pGameResultDialog.WIN);
+                break;
+            case MessageCode.ON_REMATCH_REQUEST:
+                gameActivity.showRematchConfirmDialog();
+                break;
+            case MessageCode.ON_REMATCH_ACCEPTED:
+                gameActivity.onRematchAccepted();
+                break;
+            case MessageCode.ON_REMATCH_REJECTED:
+                gameActivity.onRematchRejected();
+            break;
             default:
                 throw new RuntimeException("Unknown message code: " + code);
         }
@@ -131,18 +163,47 @@ public class MultiDeviceInGameHandler extends Thread
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        //check for checkmate
+        if(isCheckMate(moveNotation)){
+            gameActivity.onGameResult(P2pGameResultDialog.LOSE);
+            return;
+        }
+        //resume timer
+        timer.resumeTimer();
     }
 
-    private void sendMove(String moveNotation){
+    private void handlePlayerMove(String moveNotation){
         //#todo
+        //stop timer
+        timer.pauseTimer();
         Message moveMessage = MessageFactory.getInstance().createDataMessage(moveNotation.getBytes(), MessageCode.ON_PIECE_MOVE_REQUEST);
         connectionManager.postMessage(moveMessage);
+        player.setInTurn(false);
+
+        //check for checkmate
+        if(isCheckMate(moveNotation)){
+            gameActivity.onGameResult(P2pGameResultDialog.WIN);
+        }
+    }
+
+    private boolean isCheckMate(String moveNotation){
+        return moveNotation.contains("#");
     }
 
     @Override
     public void run() {
         isRunning = true;
         Vector<Message> processingMessages = new Vector<>();
+        timer.start();
+
+        //update UI on start
+        gameActivity.updateTimeRemain(player.isWhitePiece(), duration);
+        gameActivity.updatePlayerTimeRemain(duration);
+        informRemainTime(duration);
+
+        if(player.isWhitePiece()) {
+            timer.resumeTimer();
+        }
 
         while(isRunning){
             //check if there is any message
@@ -184,7 +245,18 @@ public class MultiDeviceInGameHandler extends Thread
         }
     }
 
-    public void close(){
+    public void informRemainTime(long remainTime){
+        Message remainTimeMessage = MessageFactory.getInstance().createDataMessage(String.valueOf(remainTime).getBytes(), MessageCode.ON_TIME_REMAIN_INFO);
+        connectionManager.postMessage(remainTimeMessage);
+    }
+
+    public void informLoss(){
+        Message loseMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_GAME_LOST_INFORM);
+        connectionManager.postMessage(loseMessage);
+    }
+
+    public void shutDown(){
         interrupt();
+        timer.stopTimer();
     }
 }

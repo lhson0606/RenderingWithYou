@@ -15,6 +15,12 @@ import androidx.fragment.app.DialogFragment;
 import com.dy.app.R;
 
 public class P2pGameResultDialog extends DialogFragment implements View.OnClickListener {
+
+    public static final String TAG = "P2pGameResultDialog";
+    public static final int DRAW = 0;
+    public static final int WIN = 1;
+    public static final int LOSE = 2;
+
     public interface P2pGameResultDialogListener{
         void onBtnSavePGNClick();
         void onBtnRematchClick();
@@ -25,8 +31,14 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
 
     private P2pGameResultDialogListener listener;
 
-    public P2pGameResultDialog(String title, int playerTrophyDiff, int playerGoldDiff, int playerGemDiff, int opponentTrophyDiff, P2pGameResultDialogListener listener){
+    public P2pGameResultDialog(int gameResult, int playerTrophyDiff, int playerGoldDiff, int playerGemDiff, int opponentTrophyDiff, P2pGameResultDialogListener listener){
         this.listener = listener;
+        this.gameResult = gameResult;
+        this.playerTrophyDiff = playerTrophyDiff;
+        this.playerGoldDiff = playerGoldDiff;
+        this.playerGemDiff = playerGemDiff;
+        this.opponentTrophyDiff = opponentTrophyDiff;
+        setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
     }
 
     @Override
@@ -62,11 +74,27 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
     }
 
     private void updateDisplay() {
-        tvGameResultTitle.setText(title);
+        setTitle();
         setSingleValue(tvTrophyDifference, playerTrophyDiff);
         setSingleValue(tvGoldDifference, playerGoldDiff);
         setSingleValue(tvGemDifference, playerGemDiff);
         setSingleValue(tvOppoPlayerTrophyDifference, opponentTrophyDiff);
+    }
+
+    private void setTitle(){
+        switch (gameResult){
+            case DRAW:
+                tvGameResultTitle.setText("Draw");
+                break;
+            case WIN:
+                tvGameResultTitle.setText("You won!");
+                break;
+            case LOSE:
+                tvGameResultTitle.setText("You lost!");
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + gameResult);
+        }
     }
 
     private void setSingleValue(TextView tv, int value){
@@ -101,6 +129,6 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
     private TextView tvShareAsPGN, tvShareAsImage;
     private TextView tvTrophyDifference, tvGoldDifference, tvGemDifference, tvOppoPlayerTrophyDifference;
     int playerTrophyDiff, playerGoldDiff, playerGemDiff, opponentTrophyDiff;
-    private String title;
+    private int gameResult;
     private TextView tvGameResultTitle;
 }

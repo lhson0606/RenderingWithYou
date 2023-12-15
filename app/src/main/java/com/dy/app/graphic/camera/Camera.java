@@ -5,6 +5,8 @@ import static java.lang.Math.abs;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec3;
 
@@ -22,12 +24,16 @@ public class Camera {
     }
 
     public void update(){
+        //Rotate around Y axis
+        Vec3 vecFor = (mCenter.sub(mPos)).normalize();
+        mUp = vecFor.cross(Y_AXIS).cross(vecFor).normalize();
         final float aspect_ratio = (float)mWidth/(float)mHeight;
         Matrix.setLookAtM(mViewMat.mData, mViewMat.mOffset,
                 mPos.x, mPos.y, mPos.z,
                 mCenter.x, mCenter.y, mCenter.z,
                 mUp.x, mUp.y, mUp.z);
         Matrix.frustumM(mProjMat.mData, mProjMat.mOffset,-aspect_ratio, aspect_ratio, mBottom, mTop, mNear, mFar);
+        Log.d(TAG, toString());
     }
 
     private int mWidth = 1260;
@@ -44,17 +50,19 @@ public class Camera {
 
     //Constants
     public static final Vec3 Y_AXIS = new Vec3(0,1,0);
-    float sensitivity = 0.1f;
+    private float sensitivity = 0.1f;
     final float MAX_MOVE_LENGTH = 1;
     final float MAX_DX = MAX_MOVE_LENGTH;
     final float MAX_DY = MAX_MOVE_LENGTH;
     final float MIN_DX = -MAX_MOVE_LENGTH;
     final float MIN_DY = -MAX_MOVE_LENGTH;
     final float MIN_ANGLE_TO_Y = (float)Math.toRadians(10.0f);
-
+    private boolean isBlocked = false;
 
 
     public void move(float dx, float dy) {
+        if(isBlocked) return;
+
         dx *= sensitivity;
         dy *= sensitivity;
 
@@ -93,8 +101,8 @@ public class Camera {
         }
 
         mPos = newPos;
-        //update vector up
-        mUp = vecFor.cross(Y_AXIS).cross(vecFor).normalize();
+        //update vector up, put it in update()
+        //mUp = vecFor.cross(Y_AXIS).cross(vecFor).normalize();
         update();
     }
 
@@ -120,7 +128,8 @@ public class Camera {
     private static Camera instance = null;
 
     public void setSensitivity(float value) {
-        this.sensitivity = 0.1f*((value + 50f)/100f);
+        //this.sensitivity = 0.1f*((value + 50f)/100f);
+        this.sensitivity = value;
     }
 
     public void setPos(Vec3 pos){
@@ -142,4 +151,26 @@ public class Camera {
         mBottom = bottom;
     }
 
+    public float getSensitivity() {
+        return sensitivity;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Camera{" +
+                "Pos=" + mPos +
+                ", Center=" + mCenter +
+                '}';
+    }
+
+    public void unlockMovement(){
+        isBlocked = false;
+    }
+
+    public void lockMovement(){
+        isBlocked = true;
+    }
+
+    public static final String TAG = "Camera";
 }

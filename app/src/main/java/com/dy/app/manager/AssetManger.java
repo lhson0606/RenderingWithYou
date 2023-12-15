@@ -6,6 +6,7 @@ import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.Material;
 import com.dy.app.graphic.Skin;
+import com.dy.app.setting.GameSetting;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.GLHelper;
 
@@ -34,6 +35,7 @@ public class AssetManger {
     }
 
     public void loadSkin () throws IOException {
+        GameSetting gameSetting = GameSetting.getInstance();
         String player_piece_skin_path = Player.getInstance().getPieceSkinPath();
         String rival_piece_skin_path = Rival.getInstance().getPieceSkinPath();
         String board_skin_path = Player.getInstance().getBoardSkinPath();
@@ -43,46 +45,42 @@ public class AssetManger {
         String whitePieceSkinPath =  Player.getInstance().isWhitePiece()? player_piece_skin_path : rival_piece_skin_path;
         String blackPieceSkinPath =  Player.getInstance().isWhitePiece()? rival_piece_skin_path : player_piece_skin_path;
         Skin player_skin = new Skin(
-                DyConst.default_material,
+                gameSetting.getPieceMaterial(),
                 GLHelper.loadBitmap(context.getAssets().open(player_piece_skin_path))
         );
 
         Skin rival_skin = new Skin(
-                DyConst.default_material,
+                gameSetting.getPieceMaterial(),
                 GLHelper.loadBitmap(context.getAssets().open(rival_piece_skin_path))
         );
 
         Skin board_skin = new Skin(
-                DyConst.default_material,
+                gameSetting.getTileMaterial(),
                 GLHelper.loadBitmap(context.getAssets().open(board_skin_path))
         );
 
         Skin black_tile_skin = new Skin(
-                DyConst.default_material,
+                gameSetting.getTileMaterial(),
                 GLHelper.loadBitmap(context.getAssets().open(black_tile_skin_path))
         );
 
         Skin white_tile_skin = new Skin(
-                DyConst.default_material,
+                gameSetting.getTileMaterial(),
                 GLHelper.loadBitmap(context.getAssets().open(white_tile_skin_path))
         );
 
-        Material terrain_mtl = new Material(
-          0, 0
-        );
-
         Skin terrain_texture = new Skin(
-                terrain_mtl,
+                gameSetting.getTerrainMaterial(),
                 GLHelper.loadBitmap(context.getAssets().open(terrain_texture_path))
         );
 
         Skin white_piece_skin = new Skin(
-                DyConst.default_material,
+                gameSetting.getPieceMaterial(),
                 GLHelper.loadBitmap(context.getAssets().open(whitePieceSkinPath))
         );
 
         Skin black_piece_skin = new Skin(
-                DyConst.default_material,
+                gameSetting.getPieceMaterial(),
                 GLHelper.loadBitmap(context.getAssets().open(blackPieceSkinPath))
         );
 

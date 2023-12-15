@@ -73,10 +73,10 @@ public class MultiPlayerSameDeviceGameResultDialog extends DialogFragment implem
                 setGameResultTitle("Draw");
                 break;
             case DyConst.GAME_WHITE_WIN:
-                setGameResultTitle("White Win");
+                setGameResultTitle("White won");
                 break;
             case DyConst.GAME_BLACK_WIN:
-                setGameResultTitle("Black Win");
+                setGameResultTitle("Black won");
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + gameResult);

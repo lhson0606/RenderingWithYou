@@ -137,18 +137,16 @@ public class MainActivity extends FragmentHubActivity
     private void attachFragment() {
         FragmentTransaction ft = fm.beginTransaction();
 
-        mainMenuFragment = (FragmentMainMenu) UIManager.getInstance().getUI(UIManager.UIType.MENU);
-        ft.add(R.id.flStage, mainMenuFragment, FragmentMainMenu.TAG);
-        ft.show(mainMenuFragment);
-
-        settingFragment = (FragmentSetting) UIManager.getInstance().getUI(UIManager.UIType.CONFIG);
-        creditsFragment = (FragmentCredits) UIManager.getInstance().getUI(UIManager.UIType.CREDITS);
-        loginFormFragment = (FragmentLoginForm) UIManager.getInstance().getUI(UIManager.UIType.LOGIN);
-        logoutFormFragment = (FragmentLogoutForm) UIManager.getInstance().getUI(UIManager.UIType.LOGOUT);
-        createAccountFragment = (FragmentCreateAccount) UIManager.getInstance().getUI(UIManager.UIType.CREATE_ACCOUNT);
-        skinSelectionFragment = (FragmentSkinSelection) UIManager.getInstance().getUI(UIManager.UIType.SKIN_SELECTION);
+        mainMenuFragment = FragmentMainMenu.newInstance();
+        settingFragment = FragmentSetting.newInstance();
+        creditsFragment = FragmentCredits.newInstance();
+        loginFormFragment = FragmentLoginForm.newInstance();
+        logoutFormFragment = FragmentLogoutForm.newInstance();
+        createAccountFragment = FragmentCreateAccount.newInstance();
+        skinSelectionFragment = FragmentSkinSelection.newInstance();
         ft.commit();
-        currentFragment = mainMenuFragment;
+        currentFragment = null;
+        showFragment(mainMenuFragment);
     }
 
     @Override
@@ -413,7 +411,7 @@ public class MainActivity extends FragmentHubActivity
                 break;
             }
             case 2: {
-                finish();
+                this.finishAffinity();
                 break;
             }
             case 3:{
@@ -454,9 +452,7 @@ public class MainActivity extends FragmentHubActivity
         if(fragment == null) return;
 
         FragmentTransaction ft = fm.beginTransaction();
-        //ft.remove(currentFragment);
         ft.replace(R.id.flStage, fragment);
-//        ft.hide(currentFragment);
 
         ft.show(fragment);
         if(!isFinishing() && !fragment.isAdded()){
@@ -733,6 +729,14 @@ public class MainActivity extends FragmentHubActivity
             }
         });
         worker.start();
+    }
+
+    @Override
+    public void onBackPressed() {
+        //disable back button
+        if(false){
+            super.onBackPressed();
+        }
     }
 
     //store the register information if user sign up with email and password

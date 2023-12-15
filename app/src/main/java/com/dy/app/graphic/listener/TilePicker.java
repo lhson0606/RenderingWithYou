@@ -44,6 +44,19 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
 
         if(!Player.getInstance().isInTurn()) return false;
 
+        if(isDragModeEnabled) {
+            return handleDragMode(v, event);
+        }else{
+            return handleNormalPickMode(v, event);
+        }
+
+    }
+
+    private boolean handleDragMode(View v, MotionEvent event) {
+        return false;
+    }
+
+    private boolean handleNormalPickMode(View v, MotionEvent event){
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 if(firstTouch) {
@@ -184,4 +197,5 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
     public void setListener(TilePickerListener listener) {
         this.listener = listener;
     }
+    private static boolean isDragModeEnabled = false;
 }

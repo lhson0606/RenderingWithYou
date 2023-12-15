@@ -1,8 +1,10 @@
 package com.dy.app.common.maths;
 
+import androidx.annotation.NonNull;
+
 import java.util.Vector;
 
-public class Vec3 {
+public class Vec3 implements Cloneable{
     public float x;
     public float y;
     public float z;
@@ -128,5 +130,11 @@ public class Vec3 {
                 ", y=" + y +
                 ", z=" + z +
                 '}';
+    }
+
+    @NonNull
+    @Override
+    public Vec3 clone() throws CloneNotSupportedException {
+        return new Vec3(x, y, z);
     }
 }

@@ -323,10 +323,6 @@ public class PGNFile implements Serializable {
             builder.append("[" + entry.getKey() + " \"" + entry.getValue() + "\"]\n");
         }
 
-        if(moves.size()==0){
-            throw new RuntimeException("No moves");
-        }
-
         //moves
         for(int i = 0; i < moves.size(); i++){
             if(i%MOVE_PER_LINE == 0) builder.append("\n");

@@ -17,7 +17,6 @@ import java.io.IOException;
 
 public class GameCore {
     private FragmentHubActivity gameActivity;
-    private GameSetting gameSetting;
     public static final String TAG = "GameCore";
     private BackgroundManger backgroundManger;
     private ObjManager objManager;
@@ -37,7 +36,6 @@ public class GameCore {
     }
 
     public void init() {
-        gameSetting = new GameSetting();
 
         //entity manager
         entityManger = new EntityManger();
@@ -70,7 +68,7 @@ public class GameCore {
         //load board boundary
 
         //load chess pieces
-        pieceManager = new PieceManager(gameActivity, entityManger, board, objManager, assetManger, gameSetting);
+        pieceManager = new PieceManager(gameActivity, entityManger, board, objManager, assetManger, GameSetting.getInstance());
         try {
             pieceManager.init();
         } catch (IOException e) {
@@ -85,10 +83,6 @@ public class GameCore {
 
     public FragmentHubActivity getGameActivity() {
         return gameActivity;
-    }
-
-    public GameSetting getGameSetting() {
-        return gameSetting;
     }
 
     public void startGame(){

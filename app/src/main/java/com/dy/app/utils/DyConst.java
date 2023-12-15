@@ -4,6 +4,7 @@ import android.os.Environment;
 
 import com.dy.app.R;
 import com.dy.app.common.maths.Vec3;
+import com.dy.app.gameplay.viewport.ViewPort;
 import com.dy.app.graphic.Material;
 import com.dy.app.graphic.Light;
 
@@ -44,7 +45,7 @@ public class DyConst {
     public static final Vec3 white_target = new Vec3(0.0f, 0.0f, -1.0f);
     public static final int row_count = 8;
     public static final int col_count = 8;
-    public static final float default_ambient_factor = 0.4f;
+    public static final float default_ambient_factor = 0.3f;
     public static final Vec3 light_color = new Vec3(1.0f, 1.0f, 1.0f);
     public static final Vec3 light_pos = new Vec3(0.0f, 20.0f, 0.0f);
     public static final float light_intensity = 1.0f;
@@ -70,5 +71,6 @@ public class DyConst {
     public static final int GAME_DRAW = 0;
     public static final int GAME_WHITE_WIN = 1;
     public static final int GAME_BLACK_WIN = 2;
+    public static final ViewPort[] viewPorts = {ViewPort.WHITE_SIDE, ViewPort.BLACK_SIDE, ViewPort.WHITE_BLACK, ViewPort.BLACK_WHITE};
 
 }

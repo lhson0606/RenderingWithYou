@@ -74,6 +74,9 @@ implements View.OnClickListener {
         messageHandler = new MessageHandler();
         //send player initial data
         sendPlayerInitialData();
+        //reset ready status, this activity can be started multiple times (when we rematch)
+        Player.getInstance().setReady(false);
+        Rival.getInstance().setReady(false);
     }
 
     private void startMatch() {

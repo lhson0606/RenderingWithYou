@@ -32,7 +32,6 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     private boolean isScreenShotRequested = false;
 
     public DyRenderer(GameSurface gameSurface, EntityManger entityManger, Board board) {
-        this.board = board;
         this.entityManger = entityManger;
         this.gameSurface = gameSurface;
         tilePicker = new TilePicker(0,0, board);

@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -23,6 +24,8 @@ import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNParseException;
 import com.dy.app.graphic.display.GameFragment;
+import com.dy.app.manager.SoundManager;
+import com.dy.app.ui.view.FragmentSetting;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +54,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         mainHandler = new Handler(getMainLooper());
         initCore();
         init();
+        updateUI();
         attachListener();
     }
 
@@ -85,6 +89,29 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         btnPlay.setEnabled(false);
         btnPrev.setEnabled(false);
         btnNext.setEnabled(false);
+
+        btnConfig = findViewById(R.id.btnConfig);
+        btnSpeaker = findViewById(R.id.btnSpeaker);
+        btnMovePanel = findViewById(R.id.btnMovePanel);
+
+        fragmentSetting = new FragmentSetting();
+    }
+
+    private void updateUI() {
+        //we need to update button speaker according to the sound setting
+        if(SoundManager.getInstance().isSoundOn()){
+            setButtonSpeakerEnableIcon();
+        }else{
+            setButtonSpeakerDisableIcon();
+        }
+    }
+
+    private void setButtonSpeakerEnableIcon(){
+        btnSpeaker.setAnimation("animated_ui/btn_speaker_enable.json");
+    }
+
+    private void setButtonSpeakerDisableIcon(){
+        btnSpeaker.setAnimation("animated_ui/btn_speaker_mute.json");
     }
 
     private void attachListener(){
@@ -93,6 +120,9 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         btnPlay.setOnClickListener(this);
         btnPrev.setOnClickListener(this);
         btnNext.setOnClickListener(this);
+        btnConfig.setOnClickListener(this);
+        btnSpeaker.setOnClickListener(this);
+        btnMovePanel.setOnClickListener(this);
     }
 
     private void runScript(String src) {
@@ -117,6 +147,9 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
     @Override
     protected void onDestroy() {
         gameLoop.shutDown();
+        runner.close();
+        //remove only if it is showing
+        removeFragment(fragmentSetting);
         super.onDestroy();
     }
 
@@ -139,6 +172,17 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         switch (TAG){
             case GameCore.TAG:
                 handleGameCoreMsg(TAG, type, o1, o2);
+                break;
+            case FragmentSetting.TAG:
+                handleFragmentSettingMsg(TAG, type, o1, o2);
+                break;
+        }
+    }
+
+    private void handleFragmentSettingMsg(String tag, int type, Object o1, Object o2) {
+        switch (type){
+            case FragmentSetting.CLOSE_PANEL:
+                removeFragment(fragmentSetting);
                 break;
         }
     }
@@ -263,6 +307,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
 
     @Override
     public void onClick(View v) {
+        SoundManager.getInstance().playSound(this, SoundManager.SoundType.BTN_BLOP);
         if(v == btnClose){
             btnClose.playAnimation();
             showQuitDialog();
@@ -278,6 +323,56 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
             runner.prevMove();
         }else if(v == btnNext){
             runner.nextMove();
+        }else if(v == btnSpeaker){
+            if(SoundManager.getInstance().isSoundOn()){
+                SoundManager.getInstance().setSoundOn(false);
+                setButtonSpeakerDisableIcon();
+            }else{
+                SoundManager.getInstance().setSoundOn(true);
+                setButtonSpeakerEnableIcon();
+            }
+            btnSpeaker.playAnimation();
+        } else if (v == btnConfig) {
+            if(isShowingFragment(fragmentSetting)){
+                removeFragment(fragmentSetting);
+            }else{
+                showFragment(fragmentSetting);
+            }
+        }else if(v == btnMovePanel){
+            btnMovePanel.playAnimation();
         }
     }
+
+    private boolean isShowingFragment(Fragment fragment){
+        if(currenFragment == null){
+            return false;
+        }else {
+            return currenFragment == fragment;
+        }
+    }
+
+    private void showFragment(Fragment fragment){
+        if(isShowingFragment(fragment)){
+            return;
+        }
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.flStage, fragment);
+        ft.commit();
+        currenFragment = fragment;
+    }
+
+    private void removeFragment(Fragment fragment){
+        if(isShowingFragment(fragment)){
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.remove(fragment);
+            ft.commit();
+            currenFragment = null;
+        }
+    }
+
+    private LottieAnimationView btnConfig, btnSpeaker, btnMovePanel;
+    private FragmentSetting fragmentSetting;
+    private Fragment currenFragment = null;
 }

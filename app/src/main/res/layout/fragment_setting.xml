@@ -57,6 +57,72 @@
                 android:dropDownHeight="wrap_content"
                 android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
                 android:spinnerMode="dropdown" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Camera view"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+
+            <Spinner
+                android:id="@+id/spnViewPort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:dropDownWidth="match_parent"
+                android:dropDownHeight="wrap_content"
+                android:dropDownHorizontalOffset="20dp"
+                android:dropDownVerticalOffset="37dp"
+                android:gravity="center"
+                android:spinnerMode="dropdown"
+                android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/swBlockViewPort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Block view"
+                android:checked="false"
+                android:typeface="monospace"
+                android:gravity="center|left"
+                android:textSize="16sp"
+                android:paddingStart="10sp"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/swSemanticView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enable semantic view"
+                android:checked="false"
+                android:typeface="monospace"
+                android:gravity="center|left"
+                android:textSize="16sp"
+                android:paddingStart="10sp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pick mode"
+                android:typeface="monospace"
+                android:gravity="left"
+                android:textSize="16sp"
+                android:textColor="#000000"
+                android:background="#0000ff"/>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/swEnableDragMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enable drag mode"
+                android:checked="false"
+                android:typeface="monospace"
+                android:gravity="center|left"
+                android:textSize="16sp"
+                android:paddingStart="10sp"/>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -71,10 +137,10 @@
                 android:id="@+id/sldSensorSensitivity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:value="50"
+                android:value="0.1"
                 android:valueFrom="0"
-                android:valueTo="100"
-                android:stepSize="1"/>
+                android:valueTo="1"
+                android:stepSize="0.05"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,12 +160,13 @@
                 android:textColor="#000000"/>
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/sldDirectionalLightRed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:value="255"
+                android:value="1"
                 android:valueFrom="0"
-                android:valueTo="255"
-                android:stepSize="1"/>
+                android:valueTo="1"
+                android:stepSize="0.1"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -110,12 +177,13 @@
                 android:textColor="#000000"/>
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/sldDirectionalLightGreen"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:value="255"
+                android:value="1"
                 android:valueFrom="0"
-                android:valueTo="255"
-                android:stepSize="1"/>
+                android:valueTo="1"
+                android:stepSize="0.1"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,12 +194,13 @@
                 android:textColor="#000000"/>
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/sldDirectionalLightBlue"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:value="255"
+                android:value="1"
                 android:valueFrom="0"
-                android:valueTo="255"
-                android:stepSize="1"/>
+                android:valueTo="1"
+                android:stepSize="0.1"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -144,6 +213,7 @@
                 android:background="#0000ff"/>
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/sldAmbientLight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:value="0.3"
@@ -179,6 +249,7 @@
                 android:background="#0000ff"/>
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/sldSpectacularLightIntensity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:value="50"
@@ -207,11 +278,12 @@
                 android:textColor="#000000"/>
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/sldSpectacularLightShineDamper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:value="1"
+                android:value="2"
                 android:valueFrom="0.1"
-                android:valueTo="10"
+                android:valueTo="20"
                 android:stepSize="0.1"/>
             <TextView
                 android:layout_width="match_parent"
@@ -223,9 +295,10 @@
                 android:textColor="#000000"/>
 
             <com.google.android.material.slider.Slider
+                android:id="@+id/sldSpectacularLightReflectivity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:value="0.1"
+                android:value="0.5"
                 android:valueFrom="0"
                 android:valueTo="1"
                 android:stepSize="0.05"/>

@@ -141,6 +141,7 @@
             app:lottie_fileName="animated_ui/btn_speaker_enable.json"/>
 
         <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/btnMovePanel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"

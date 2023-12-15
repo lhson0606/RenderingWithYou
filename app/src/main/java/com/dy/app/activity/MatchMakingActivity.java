@@ -29,6 +29,7 @@ import androidx.core.app.ActivityCompat;
 import com.airbnb.lottie.LottieAnimationView;
 import com.dy.app.R;
 import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.Rival;
 import com.dy.app.manager.ConnectionManager;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.network.WiFiDirectBroadcastReceiver;
@@ -116,7 +117,9 @@ public class MatchMakingActivity extends AppCompatActivity
         if (v == btnExit) {
             btnExit.playAnimation();
             disconnectAllWifiDirect();
-            finish();
+            //return to MainActivity
+            Intent intent = new Intent(MatchMakingActivity.this, MainActivity.class);
+            startActivity(intent);
         } else if (v == btnReload) {
             btnReload.playAnimation();
             startDiscovery();
@@ -456,6 +459,14 @@ public class MatchMakingActivity extends AppCompatActivity
             throw new RuntimeException(e.getMessage());
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        //disable back button
+        if(false){
+            super.onBackPressed();
+        }
     }
 
     private TextView tvLog;

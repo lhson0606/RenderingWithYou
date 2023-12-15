@@ -385,34 +385,36 @@ public class Board implements GameEntity {
             Log.d("Board", "moveCount: " + moveCount);
             Log.d("Board", "moveHistory: " + moveHistoryBuilder.toString());
 
-            changeKingColorInCheckState(!isWhite);
+            changeKingColorInCheckState();
         }finally {
             mutex.unlock();
         }
     }
 
-    public void changeKingColorInCheckState(boolean isWhite){
+    public void changeKingColorInCheckState(){
         int testResult = -1;
         //test for white check
-        testResult = testForCheck(isWhite);
+        testResult = testForCheck(true);
+        King king = pieceManager.getWhiteKing();
 
         if(testResult == NO_CHECK){
             //change king color to normal
-            pieceManager.getWhiteKing().getObj().changeState(Obj3D.State.NORMAL);
+            king.getObj().changeState(Obj3D.State.NORMAL);
         }else{
             //change king color to check
-            pieceManager.getWhiteKing().getObj().changeState(Obj3D.State.ENDANGERED);
+            king.getObj().changeState(Obj3D.State.ENDANGERED);
         }
 
         //test for black check
         testResult = testForCheck(false);
+        king = pieceManager.getBlackKing();
 
         if(testResult == NO_CHECK){
             //change king color to normal
-            pieceManager.getBlackKing().getObj().changeState(Obj3D.State.NORMAL);
+            king.getObj().changeState(Obj3D.State.NORMAL);
         }else{
             //change king color to check
-            pieceManager.getBlackKing().getObj().changeState(Obj3D.State.ENDANGERED);
+            king.getObj().changeState(Obj3D.State.ENDANGERED);
         }
     }
 
@@ -788,5 +790,15 @@ public class Board implements GameEntity {
         file.addBlackPlayer(Player.getInstance().isWhitePiece()? Rival.getInstance().getName() : Player.getInstance().getDisplayName());
         file.addDate(Utils.getCurrentDate());
         return file;
+    }
+
+    public boolean hasPossibleMove(boolean isWhite){
+        Vector<Piece> pieces = isWhite ? pieceManager.getWhitePieces() : pieceManager.getBlackPieces();
+        for(Piece piece : pieces){
+            if(piece.getPossibleMoves().size() > 0){
+                return true;
+            }
+        }
+        return false;
     }
 }

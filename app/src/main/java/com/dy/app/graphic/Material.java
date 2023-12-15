@@ -1,6 +1,8 @@
 package com.dy.app.graphic;
 
-public class Material {
+import androidx.annotation.NonNull;
+
+public class Material implements Cloneable{
     float lightDamper = 1f;
     float reflectivity = 0f;
 
@@ -20,5 +22,19 @@ public class Material {
 
     public float getReflectivity() {
         return reflectivity;
+    }
+
+    @NonNull
+    @Override
+    public Material clone() throws CloneNotSupportedException {
+        return new Material(this);
+    }
+
+    public void setLightDamper(float val) {
+        this.lightDamper = val;
+    }
+
+    public void setReflectivity(float val) {
+        this.reflectivity = val;
     }
 }
