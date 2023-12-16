@@ -3,8 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#330077ff"
-    android:alpha="0.69">
+    android:background="@drawable/bg_shop"
+    android:alpha="0.9">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/btnClose"
@@ -44,6 +44,8 @@
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
                 android:background="#0000ff"/>
 
             <Spinner
@@ -56,17 +58,20 @@
                 android:dropDownHorizontalOffset="20dp"
                 android:dropDownHeight="wrap_content"
                 android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
-                android:spinnerMode="dropdown" />
+                android:spinnerMode="dropdown"
+                android:textColor= "@color/white"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Camera view"
-                android:typeface="monospace"
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
-                android:background="#0000ff"/>
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
+                android:background="#0000ff"
+                android:typeface="monospace"/>
 
             <Spinner
                 android:id="@+id/spnViewPort"
@@ -78,7 +83,8 @@
                 android:dropDownVerticalOffset="37dp"
                 android:gravity="center"
                 android:spinnerMode="dropdown"
-                android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar" />
+                android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+                android:textColor= "@color/white"/>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/swBlockViewPort"
@@ -89,7 +95,8 @@
                 android:typeface="monospace"
                 android:gravity="center|left"
                 android:textSize="16sp"
-                android:paddingStart="10sp"/>
+                android:paddingStart="10sp"
+                android:textColor= "@color/white"/>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/swSemanticView"
@@ -100,7 +107,8 @@
                 android:typeface="monospace"
                 android:gravity="center|left"
                 android:textSize="16sp"
-                android:paddingStart="10sp"/>
+                android:paddingStart="10sp"
+                android:textColor= "@color/white"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -110,6 +118,8 @@
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
                 android:background="#0000ff"/>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
@@ -121,7 +131,8 @@
                 android:typeface="monospace"
                 android:gravity="center|left"
                 android:textSize="16sp"
-                android:paddingStart="10sp"/>
+                android:paddingStart="10sp"
+                android:textColor= "@color/white"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -131,6 +142,8 @@
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
                 android:background="#0000ff"/>
 
             <com.google.android.material.slider.Slider
@@ -149,6 +162,8 @@
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
                 android:background="#0000ff"/>
             <TextView
                 android:layout_width="match_parent"
@@ -157,7 +172,7 @@
                 android:typeface="monospace"
                 android:gravity="left"
                 android:textSize="12sp"
-                android:textColor="#000000"/>
+                android:textColor= "@color/white"/>
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sldDirectionalLightRed"
@@ -174,7 +189,7 @@
                 android:typeface="monospace"
                 android:gravity="left"
                 android:textSize="12sp"
-                android:textColor="#000000"/>
+                android:textColor= "@color/white"/>
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sldDirectionalLightGreen"
@@ -191,7 +206,7 @@
                 android:typeface="monospace"
                 android:gravity="left"
                 android:textSize="12sp"
-                android:textColor="#000000"/>
+                android:textColor= "@color/white"/>
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sldDirectionalLightBlue"
@@ -210,6 +225,8 @@
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
                 android:background="#0000ff"/>
 
             <com.google.android.material.slider.Slider
@@ -229,14 +246,20 @@
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
                 android:background="#0000ff"/>
 
-            <EditText
-                android:id="@+id/etPlaySpeed"
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slPlaySpeed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="numberDecimal|numberSigned"
-                android:textColor="#000000"/>
+                android:textColor="#000000"
+                android:valueFrom="100"
+                android:value="1500"
+                android:valueTo="10000"
+                android:stepSize="10"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -246,6 +269,8 @@
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
                 android:background="#0000ff"/>
 
             <com.google.android.material.slider.Slider
@@ -267,6 +292,8 @@
                 android:gravity="left"
                 android:textSize="16sp"
                 android:textColor="#000000"
+                android:fontFamily="@font/leckerli_one"
+                android:textStyle="bold|italic"
                 android:background="#0000ff"/>
             <TextView
                 android:layout_width="match_parent"
@@ -275,7 +302,7 @@
                 android:typeface="monospace"
                 android:gravity="left"
                 android:textSize="12sp"
-                android:textColor="#000000"/>
+                android:textColor="@color/white"/>
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sldSpectacularLightShineDamper"
@@ -283,7 +310,7 @@
                 android:layout_height="wrap_content"
                 android:value="2"
                 android:valueFrom="0.1"
-                android:valueTo="20"
+                android:valueTo="100"
                 android:stepSize="0.1"/>
             <TextView
                 android:layout_width="match_parent"
@@ -292,7 +319,7 @@
                 android:typeface="monospace"
                 android:gravity="left"
                 android:textSize="12sp"
-                android:textColor="#000000"/>
+                android:textColor= "@color/white"/>
 
             <com.google.android.material.slider.Slider
                 android:id="@+id/sldSpectacularLightReflectivity"
@@ -309,7 +336,7 @@
                 android:typeface="monospace"
                 android:gravity="left"
                 android:textSize="12sp"
-                android:textColor="#000000"/>
+                android:textColor= "@color/white"/>
 
             <com.google.android.material.slider.Slider
                 android:layout_width="match_parent"

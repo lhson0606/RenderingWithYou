@@ -8,7 +8,9 @@ import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.pgn.PGNFile;
+import com.dy.app.gameplay.pgn.PGNMove;
 import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.setting.GameSetting;
 
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
@@ -50,7 +52,7 @@ public class ScriptsRunner extends Thread{
 //            activity.exitWithError("Cannot load moves");
 //            return;
         }
-        Vector<PGNFile.Move> moves = pgnFile.getMoves();
+        Vector<PGNMove> moves = pgnFile.getMoves();
 
         jumpToMove(0);
 
@@ -64,7 +66,7 @@ public class ScriptsRunner extends Thread{
                     currentMove++;
                     activity.updateProgress(currentMove);
                     boolean isWhite = currentMove%2 == 1;
-                    PGNFile.Move move =isWhite? moves.get((currentMove-1)/2) : moves.get(currentMove/2 - 1);
+                    PGNMove move =isWhite? moves.get((currentMove-1)/2) : moves.get(currentMove/2 - 1);
                     ChessMove chessMove = null;
                     String moveNotation = isWhite? move.white : move.black;
                     Log.d("Debug concurrent", "move " + currentMove + " " + moveNotation);
@@ -109,7 +111,7 @@ public class ScriptsRunner extends Thread{
                 }
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(GameSetting.getInstance().getPlaybackSpeed());
                 } catch (InterruptedException e) {
                     //no need to handle
                 }
@@ -152,8 +154,8 @@ public class ScriptsRunner extends Thread{
     }
 
     private void loadAllMove() throws Exception {
-        Vector<PGNFile.Move> moves = pgnFile.getMoves();
-        for(PGNFile.Move move : moves){
+        Vector<PGNMove> moves = pgnFile.getMoves();
+        for(PGNMove move : moves){
             loadSingleMove(move.white, true);
             loadSingleMove(move.black, false);
         }

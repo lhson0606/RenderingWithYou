@@ -36,7 +36,8 @@ public class FragmentSetting extends Fragment
     private FragmentHubActivity main;
     private final GameSetting gameSetting = GameSetting.getInstance();
     private Slider sldSensorSensitivity, sldDirectionalLightRed, sldDirectionalLightGreen, sldDirectionalLightBlue,
-            sldAmbientLight, sldSpectacularLightIntensity, sldSpectacularLightShineDamper, sldSpectacularLightReflectivity;
+            sldAmbientLight, sldSpectacularLightIntensity, sldSpectacularLightShineDamper, sldSpectacularLightReflectivity,
+            slPlaySpeed;
     private Spinner spnGLDrawMode, spnViewPort;
     private SwitchMaterial swBlockViewPort;
 
@@ -65,6 +66,7 @@ public class FragmentSetting extends Fragment
         sldSpectacularLightIntensity = view.findViewById(R.id.sldSpectacularLightIntensity);
         sldSpectacularLightShineDamper = view.findViewById(R.id.sldSpectacularLightShineDamper);
         sldSpectacularLightReflectivity = view.findViewById(R.id.sldSpectacularLightReflectivity);
+        slPlaySpeed = view.findViewById(R.id.slPlaySpeed);
         spnViewPort = view.findViewById(R.id.spnViewPort);
         swBlockViewPort = view.findViewById(R.id.swBlockViewPort);
 
@@ -77,7 +79,7 @@ public class FragmentSetting extends Fragment
         spnGLDrawMode.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    gameSetting.setDrawMode(position);
+                gameSetting.setDrawModeIndex(position);
             }
 
             @Override
@@ -85,6 +87,9 @@ public class FragmentSetting extends Fragment
 
             }
         });
+
+        slPlaySpeed.setValue(gameSetting.getPlaybackSpeed());
+
         sldSensorSensitivity.addOnSliderTouchListener(this);
         sldDirectionalLightRed.addOnSliderTouchListener(this);
         sldDirectionalLightGreen.addOnSliderTouchListener(this);
@@ -93,10 +98,12 @@ public class FragmentSetting extends Fragment
         sldSpectacularLightIntensity.addOnSliderTouchListener(this);
         sldSpectacularLightShineDamper.addOnSliderTouchListener(this);
         sldSpectacularLightReflectivity.addOnSliderTouchListener(this);
+        slPlaySpeed.addOnSliderTouchListener(this);
         spnViewPort.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    Camera.getInstance().setPos(DyConst.viewPorts[position].getPos());
+                gameSetting.setSelectedViewPortIndex(position);
+                Camera.getInstance().setPos(DyConst.viewPorts[position].getPos());
             }
 
             @Override
@@ -109,7 +116,10 @@ public class FragmentSetting extends Fragment
         return view;
     }
 
-    private void updateUI(){
+    private void updateChanges(){
+        spnGLDrawMode.setSelection(gameSetting.getDrawModeIndex());
+        spnViewPort.setSelection(gameSetting.getSelectedViewPortIndex());
+        Camera.getInstance().setPos(DyConst.viewPorts[gameSetting.getSelectedViewPortIndex()].getPos());
         sldSensorSensitivity.setValue(Camera.getInstance().getSensitivity());
         sldDirectionalLightRed.setValue(gameSetting.getLight().getRed());
         sldDirectionalLightGreen.setValue(gameSetting.getLight().getGreen());
@@ -118,12 +128,14 @@ public class FragmentSetting extends Fragment
         sldSpectacularLightIntensity.setValue(0);
         sldSpectacularLightShineDamper.setValue(gameSetting.getPieceMaterial().getLightDamper());
         sldSpectacularLightReflectivity.setValue(gameSetting.getPieceMaterial().getReflectivity());
+        slPlaySpeed.setValue(gameSetting.getPlaybackSpeed());
+        swBlockViewPort.setChecked(Camera.getInstance().isMovementLocked());
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        updateUI();
+        updateChanges();
     }
 
     @Override
@@ -149,6 +161,7 @@ public class FragmentSetting extends Fragment
         if(slider == sldSensorSensitivity){
             float progress = (float) sldSensorSensitivity.getValue();
             Camera.getInstance().setSensitivity(progress);
+            gameSetting.setSensitivity(progress);
         }else if(slider == sldDirectionalLightRed){
             float progress = (float) sldDirectionalLightRed.getValue();
             gameSetting.getLight().setRed(progress);
@@ -173,6 +186,9 @@ public class FragmentSetting extends Fragment
         }else if(slider == sldSpectacularLightReflectivity){
             float progress = (float) sldSpectacularLightReflectivity.getValue();
             //#TODO
+        }else if(slider == slPlaySpeed){
+            int progress = (int) slPlaySpeed.getValue();
+            gameSetting.setPlaybackSpeed(progress);
         }
     }
 

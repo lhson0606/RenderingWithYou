@@ -17,7 +17,7 @@ public class PlayerProfile{
 
     public PlayerProfile(){
         data = new HashMap<>();
-        data.put(KEY_USERNAME, "");
+        data.put(KEY_USERNAME, "guest");
         data.put(KEY_EMAIL, "");
         data.put(KEY_PHONE, "");
         data.put(KEY_PHOTO_URL, "");
@@ -53,4 +53,9 @@ public class PlayerProfile{
         }
     }
 
+    public void addElo(long playerTrophyDiff) {
+        long elo = (long) get(KEY_ELO);
+        elo += playerTrophyDiff;
+        set(KEY_ELO, elo);
+    }
 }

@@ -140,9 +140,13 @@ implements TilePicker.TilePickerListener{
                 return;
             }
             gameEnd = true;
-            isRunning = false;
+            stopGame();
             activity.onGameResult(result);
-            tilePicker.setListener(null);
         }
+    }
+
+    public void stopGame(){
+        isRunning = false;
+        tilePicker.setListener(null);
     }
 }

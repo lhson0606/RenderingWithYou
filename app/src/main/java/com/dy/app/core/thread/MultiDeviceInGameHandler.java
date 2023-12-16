@@ -7,6 +7,7 @@ import com.dy.app.gameplay.algebraicNotation.AlgebraicChessInterpreter;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerProfile;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.ConnectionManager;
@@ -32,8 +33,10 @@ public class MultiDeviceInGameHandler extends Thread
     public static final String TAG = "MultiDeviceInGameHandler";
     private TilePicker tilePicker;
     private final Player player = Player.getInstance();
-    private long duration = 15 * 60 * 1000;//15 mins
+    private final long startDuration = 15 * 60 * 1000;//15 mins
+    private long duration = startDuration;//15 mins
     private Timer timer;
+    private long playerPromotionCount = 0;
 
     public MultiDeviceInGameHandler(GameActivity gameActivity, Board board, ConnectionManager connectionManager, TilePicker tilePicker){
         this.board = board;
@@ -59,7 +62,7 @@ public class MultiDeviceInGameHandler extends Thread
 
             @Override
             public void onTimeOut() {
-                gameActivity.onGameResult(P2pGameResultDialog.LOSE);
+                endGame(P2pGameResultDialog.LOSE);
                 informLoss();
             }
         });
@@ -108,6 +111,7 @@ public class MultiDeviceInGameHandler extends Thread
                 }else if(testResult == Board.IS_CHECKMATE){
                     tempMoveNotation += "#";
                 }
+                playerPromotionCount++;
                 //send move to other device
                 handlePlayerMove(tempMoveNotation);
             });
@@ -134,7 +138,7 @@ public class MultiDeviceInGameHandler extends Thread
                 break;
             case MessageCode.ON_GAME_LOST_INFORM:
                 //we are the winner
-                gameActivity.onGameResult(P2pGameResultDialog.WIN);
+                endGame(P2pGameResultDialog.WIN);
                 break;
             case MessageCode.ON_REMATCH_REQUEST:
                 gameActivity.showRematchConfirmDialog();
@@ -145,6 +149,42 @@ public class MultiDeviceInGameHandler extends Thread
             case MessageCode.ON_REMATCH_REJECTED:
                 gameActivity.onRematchRejected();
             break;
+            case MessageCode.ON_DRAW_ACCEPTED:
+                endGame(P2pGameResultDialog.DRAW);
+                break;
+            case MessageCode.ON_DRAW_REJECTED:
+                gameActivity.onDrawRejected();
+            break;
+            case MessageCode.ON_DRAW_REQUEST:
+                gameActivity.showDrawConfirmDialog();
+                break;
+            case MessageCode.ON_UNDO_REQUEST:
+                if(board.isUndoAllowed(Rival.getInstance().isWhitePiece())) {
+                    gameActivity.showUndoConfirmDialog();
+                }else{
+                    addSystemMsgBoth("Undo not allowed");
+                }
+            break;
+            case MessageCode.ON_UNDO_ACCEPTED:
+                try {
+                    board.undoMove();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                //set in turn
+                player.setInTurn(true);
+                //resume timer
+                timer.resumeTimer();
+                addSystemMsgBoth("Undo accepted");
+                gameActivity.onUndoAccepted();
+            break;
+            case MessageCode.ON_UNDO_REJECTED:
+                gameActivity.onUndoRejected();
+                addSystemMsgBoth("Undo rejected");
+            break;
+            case MessageCode.SYSTEM_MESSAGE_CODE:
+                gameActivity.addSystemMessage(new String(data));
+                break;
             default:
                 throw new RuntimeException("Unknown message code: " + code);
         }
@@ -165,7 +205,7 @@ public class MultiDeviceInGameHandler extends Thread
         }
         //check for checkmate
         if(isCheckMate(moveNotation)){
-            gameActivity.onGameResult(P2pGameResultDialog.LOSE);
+            endGame(P2pGameResultDialog.LOSE);
             return;
         }
         //resume timer
@@ -182,7 +222,7 @@ public class MultiDeviceInGameHandler extends Thread
 
         //check for checkmate
         if(isCheckMate(moveNotation)){
-            gameActivity.onGameResult(P2pGameResultDialog.WIN);
+            endGame(P2pGameResultDialog.WIN);
         }
     }
 
@@ -195,6 +235,7 @@ public class MultiDeviceInGameHandler extends Thread
         isRunning = true;
         Vector<Message> processingMessages = new Vector<>();
         timer.start();
+        timer.pauseTimer();
 
         //update UI on start
         gameActivity.updateTimeRemain(player.isWhitePiece(), duration);
@@ -258,5 +299,83 @@ public class MultiDeviceInGameHandler extends Thread
     public void shutDown(){
         interrupt();
         timer.stopTimer();
+    }
+
+    public void resign(){
+        endGame(P2pGameResultDialog.LOSE);
+        informLoss();
+    }
+
+    public void requestDraw(){
+        Message drawMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_DRAW_REQUEST);
+        connectionManager.postMessage(drawMessage);
+    }
+
+    public void acceptDraw() {
+        Message drawMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_DRAW_ACCEPTED);
+        connectionManager.postMessage(drawMessage);
+        endGame(P2pGameResultDialog.DRAW);
+    }
+
+    public void rejectDraw() {
+        Message drawMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_DRAW_REJECTED);
+        connectionManager.postMessage(drawMessage);
+    }
+
+    private void endGame(int result){
+        timer.stopTimer();
+        gameActivity.onGameResult(result);
+    }
+
+    public void checkAndRequestUndo() {
+        boolean isWhitePiece = player.isWhitePiece();
+        boolean isUndoAllowed = board.isUndoAllowed(isWhitePiece);
+
+        //if undo is not allowed, return
+        if(!isUndoAllowed){
+            gameActivity.informMessage("Undo not allowed right now");
+            addSystemMsgBoth("Undo not allowed right now");
+            return;
+        }
+
+        //else we send undo request to other device and wait for approval
+        Message undoRequestMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_UNDO_REQUEST);
+        connectionManager.postMessage(undoRequestMessage);
+        addSystemMsgBoth(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME) + " requested undo");
+    }
+
+    public void acceptUndo() {
+        //we need to undo the move and then send the undo accepted message
+        try {
+            board.undoMove();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        //set in turn to false
+        player.setInTurn(false);
+        tilePicker.putDownPiece();
+        //pause timer
+        timer.pauseTimer();
+        Message undoAcceptedMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_UNDO_ACCEPTED);
+        connectionManager.postMessage(undoAcceptedMessage);
+    }
+
+    public void rejectUndo() {
+        Message undoRejectedMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_UNDO_REJECTED);
+        connectionManager.postMessage(undoRejectedMessage);
+    }
+
+    public void addSystemMsgBoth(String msg){
+        gameActivity.addSystemMessage(msg);
+        Message systemMessage = MessageFactory.getInstance().createDataMessage(msg.getBytes(), MessageCode.SYSTEM_MESSAGE_CODE);
+        connectionManager.postMessage(systemMessage);
+    }
+
+    public long getGameDuration() {
+        return startDuration - duration;
+    }
+
+    public long getPromotionCount() {
+        return playerPromotionCount;
     }
 }

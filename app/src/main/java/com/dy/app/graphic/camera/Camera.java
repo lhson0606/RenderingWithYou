@@ -58,6 +58,7 @@ public class Camera {
     final float MIN_DY = -MAX_MOVE_LENGTH;
     final float MIN_ANGLE_TO_Y = (float)Math.toRadians(10.0f);
     private boolean isBlocked = false;
+    private boolean isMoving = false;
 
 
     public void move(float dx, float dy) {
@@ -173,4 +174,12 @@ public class Camera {
     }
 
     public static final String TAG = "Camera";
+
+    public boolean isMovementLocked() {
+        return isBlocked;
+    }
+
+    public void setMoving(boolean moving) {
+        isMoving = moving;
+    }
 }

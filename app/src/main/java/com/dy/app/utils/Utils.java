@@ -184,11 +184,11 @@ public class Utils {
         return java.text.DateFormat.getDateTimeInstance().format(new java.util.Date());
     }
 
-    public static void shareFile(MultiPlayerOnSameDeviceActivity multiPlayerOnSameDeviceActivity, Uri currentSavedFileUri, String type) {
+    public static void shareFile(Activity activity, Uri currentSavedFileUri, String type) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType(type);
         shareIntent.putExtra(Intent.EXTRA_STREAM, currentSavedFileUri);
-        multiPlayerOnSameDeviceActivity.startActivity(Intent.createChooser(shareIntent, "Share your PGN using ..."));
+        activity.startActivity(Intent.createChooser(shareIntent, "Share your PGN using ..."));
     }
 
     public static void openFile(Activity activity, String type, int requestCode) {

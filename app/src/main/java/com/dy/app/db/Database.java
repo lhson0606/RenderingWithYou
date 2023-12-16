@@ -153,7 +153,7 @@ public class Database {
         updateDocRef(battlePassRef, player.battlePass.getData(), listener);
     }
 
-    private void updateUserStatisticsOnDB(OnDBRequestListener allListener) {
+    public void updateUserStatisticsOnDB(OnDBRequestListener allListener) {
         Player player = Player.getInstance();
         DocumentReference statisticsRef =  getUserDataColRef().document("statistics");
         updateDocRef(statisticsRef, player.statistics.getData(), allListener);
@@ -359,14 +359,24 @@ public class Database {
         try{
             docRef.set(data, SetOptions.merge())
                     .addOnSuccessListener(aVoid -> {
-                        listener.onDBRequestCompleted(RESULT_SUCCESS, "Update successful");
+                        if(listener != null) {
+                            listener.onDBRequestCompleted(RESULT_SUCCESS, "Update successful");
+                        }
                     })
                     .addOnFailureListener(e -> {
-                        listener.onDBRequestCompleted(RESULT_FAILED, getUserMessage(e));
+
+                        if(listener != null){
+                            listener.onDBRequestCompleted(RESULT_FAILED, getUserMessage(e));
+                        }
+
                         throw new RuntimeException(e.getMessage());
                     });
         }catch (Exception e){
-            listener.onDBRequestCompleted(RESULT_FAILED, getUserMessage(e));
+
+            if(listener != null){
+                listener.onDBRequestCompleted(RESULT_FAILED, getUserMessage(e));
+            }
+
             throw new RuntimeException(e.getMessage());
         }
     }
@@ -534,5 +544,4 @@ public class Database {
     public static final String FB_TOO_MANY_REQUESTS_EXCEPTION = "FirebaseTooManyRequestsException";
     public static final String FB_INVALID_CREDENTIAL_EXCEPTION = "FirebaseInvalidCredentialsException";
     public static final String FB_INVALID_LOGIN_CREDENTIAL_EXCEPTION = "INVALID_LOGIN_CREDENTIALS";
-
 }

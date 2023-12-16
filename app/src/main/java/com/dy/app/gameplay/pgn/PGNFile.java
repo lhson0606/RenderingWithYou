@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Vector;
 
 public class PGNFile implements Serializable {
-    private final Vector<Move> moves = new Vector<>();
+    private final Vector<PGNMove> moves = new Vector<>();
     private String data;
     private final Map<String, String> meta = new HashMap<>();
     public static final String TAG = "PGNFile";
@@ -96,13 +96,8 @@ public class PGNFile implements Serializable {
         return meta.get("WhiteElo");
     }
 
-    public Vector<Move> getMoves() {
+    public Vector<PGNMove> getMoves() {
         return moves;
-    }
-
-    public class Move implements Serializable{
-        public String white = "";
-        public String black = "";
     }
 
     public PGNFile(String moveData){
@@ -200,7 +195,7 @@ public class PGNFile implements Serializable {
     private void parseMoves(String movesStr) throws PGNParseException {
         if(movesStr.length() == 0) return;
         String[] splitResults = movesStr.split("\\s+");
-        Move move = null;
+        PGNMove move = null;
 
         for(int i = 0; i < splitResults.length; i++){
             String curStr = splitResults[i];
@@ -221,7 +216,7 @@ public class PGNFile implements Serializable {
 
                 if(index != i/3 + 1) throw new PGNParseException("Index error");
             }else if(i%3 == 1){
-                move = new Move();
+                move = new PGNMove();
                 move.white = curStr;
             }else{
                 move.black = curStr;
@@ -323,15 +318,17 @@ public class PGNFile implements Serializable {
             builder.append("[" + entry.getKey() + " \"" + entry.getValue() + "\"]\n");
         }
 
+        builder.append("\n\n");
+
         //moves
         for(int i = 0; i < moves.size(); i++){
             if(i%MOVE_PER_LINE == 0) builder.append("\n");
 
-            Move move = moves.get(i);
+            PGNMove move = moves.get(i);
             builder.append((i+1) + ". " + move.white + " " + move.black + " ");
         }
 
-        return builder.toString();
+        return builder.toString().replaceAll("\\n{3,}", "\n\n");
     }
 
     public interface IOnSavePGNListener{
@@ -370,6 +367,7 @@ public class PGNFile implements Serializable {
     }
 
     public int getBothSideMoveCount(){
+        if(moves.size() == 0) return 0;
         int result = moves.size()*2;
         if(moves.lastElement().black.equals("")) result--;
         return result;

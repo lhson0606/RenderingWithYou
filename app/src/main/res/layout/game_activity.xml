@@ -150,6 +150,7 @@
             app:lottie_fileName="animated_ui/btn_speaker_enable.json"/>
 
         <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/btnEndGameOptions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
@@ -184,12 +185,22 @@
             app:lottie_fileName="animated_ui/btn_ping.json"/>
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/btnOpenChat"
+            android:id="@+id/btnUndoRequest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/btnPing"
-            android:layout_marginTop="125dp"
+            app:lottie_autoPlay="false"
+            app:lottie_loop="false"
+            app:lottie_fileName="animated_ui/btn_undo_request.json"/>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/btnOpenChat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnUndoRequest"
+            android:layout_marginTop="69dp"
             app:lottie_autoPlay="false"
             app:lottie_loop="false"
             app:lottie_fileName="animated_ui/btn_open_chat_default.json"/>

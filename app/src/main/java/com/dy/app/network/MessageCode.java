@@ -16,4 +16,10 @@ public class MessageCode {
     public static final int ON_REMATCH_REQUEST = 12;
     public static final int ON_REMATCH_ACCEPTED = 13;
     public static final int ON_REMATCH_REJECTED = 14;
+    public static final int ON_DRAW_REQUEST = 15;
+    public static final int ON_DRAW_ACCEPTED = 16;
+    public static final int ON_DRAW_REJECTED = 17;
+    public static final int ON_UNDO_REQUEST = 18;
+    public static final int ON_UNDO_ACCEPTED = 19;
+    public static final int ON_UNDO_REJECTED = 20;
 }

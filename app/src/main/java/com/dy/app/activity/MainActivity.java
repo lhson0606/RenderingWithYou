@@ -376,7 +376,8 @@ public class MainActivity extends FragmentHubActivity
     private synchronized void loadUserData(){
         //update UI
         tvUsername.setText(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME).toString());
-        tvUserCoin.setText("x" + Player.getInstance().inventory.get(PlayerInventory.KEY_COIN).toString());
+        tvUserCoin.setText(Player.getInstance().inventory.get(PlayerInventory.KEY_COIN).toString());
+        tvUserElo.setText(Player.getInstance().profile.get(PlayerProfile.KEY_ELO).toString());
     }
 
 

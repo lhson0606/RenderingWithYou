@@ -73,4 +73,6 @@ public class DyConst {
     public static final int GAME_BLACK_WIN = 2;
     public static final ViewPort[] viewPorts = {ViewPort.WHITE_SIDE, ViewPort.BLACK_SIDE, ViewPort.WHITE_BLACK, ViewPort.BLACK_WHITE};
 
+    public static float default_sensitivity = 0.1f;
+    public static int default_playback_speed = 1000;
 }

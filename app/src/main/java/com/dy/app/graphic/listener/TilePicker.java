@@ -190,6 +190,13 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
         this.height = height;
     }
 
+    public void putDownPiece() {
+        if(lastPiece != null){
+            lastPiece.putDown();
+            lastPiece = null;
+        }
+    }
+
     public interface TilePickerListener{
         void onMoveDetected(Tile src, Tile dst);
     }

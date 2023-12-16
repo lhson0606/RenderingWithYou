@@ -13,6 +13,9 @@ public class GameSetting {
     private Material boardMaterial;
     private Material tileMaterial;
     private Material terrainMaterial;
+    private float sensitivity = DyConst.default_sensitivity;
+    private int selectedViewPortIndex = 0;
+    private int playbackSpeed = DyConst.default_playback_speed;
     public static final String[] DRAW_MODES = {
             "Triangle",
             "Line",
@@ -22,7 +25,7 @@ public class GameSetting {
             "Line Strip",
             "Line Loop"
     };
-    private int drawMode = GLES30.GL_TRIANGLES;
+    private int drawMode = 0;
 
     private GameSetting(){
         try {
@@ -68,37 +71,56 @@ public class GameSetting {
         return terrainMaterial;
     }
 
-    public int getDrawMode() {
+    public int getDrawModeIndex() {
         return drawMode;
+    }
+
+    public int getDrawMode() {
+        switch (DRAW_MODES[drawMode]){
+            case "Triangle":
+                return GLES30.GL_TRIANGLES;
+            case "Line":
+                return GLES30.GL_LINES;
+            case "Point":
+                return GLES30.GL_POINTS;
+            case "Triangle Strip":
+                return GLES30.GL_TRIANGLE_STRIP;
+            case "Triangle Fan":
+                return GLES30.GL_TRIANGLE_FAN;
+            case "Line Strip":
+                return GLES30.GL_LINE_STRIP;
+            case "Line Loop":
+                return GLES30.GL_LINE_LOOP;
+            default:
+                return GLES30.GL_TRIANGLES;
+        }
     }
 
     public void setAmbientFactor(float ambientFactor) {
         this.ambientFactor = ambientFactor;
     }
 
-    public void setDrawMode(int drawMode) {
-        switch (DRAW_MODES[drawMode]){
-            case "Triangle":
-                this.drawMode = GLES30.GL_TRIANGLES;
-                break;
-            case "Line":
-                this.drawMode = GLES30.GL_LINES;
-                break;
-            case "Point":
-                this.drawMode = GLES30.GL_POINTS;
-                break;
-            case "Triangle Strip":
-                this.drawMode = GLES30.GL_TRIANGLE_STRIP;
-                break;
-            case "Triangle Fan":
-                this.drawMode = GLES30.GL_TRIANGLE_FAN;
-                break;
-            case "Line Strip":
-                this.drawMode = GLES30.GL_LINE_STRIP;
-                break;
-            case "Line Loop":
-                this.drawMode = GLES30.GL_LINE_LOOP;
-                break;
-        }
+    public void setDrawModeIndex(int drawMode) {
+        this.drawMode = drawMode;
     }
+
+    public void setSensitivity(float progress) {
+    }
+
+    public int getSelectedViewPortIndex() {
+        return selectedViewPortIndex;
+    }
+
+    public void setSelectedViewPortIndex(int position) {
+        this.selectedViewPortIndex = position;
+    }
+
+    public int getPlaybackSpeed() {
+        return playbackSpeed;
+    }
+
+    public void setPlaybackSpeed(int playbackSpeed) {
+        this.playbackSpeed = playbackSpeed;
+    }
+
 }

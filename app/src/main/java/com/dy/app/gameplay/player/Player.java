@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import com.dy.app.R;
+import com.dy.app.db.Database;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNParseException;
 import com.dy.app.utils.DyConst;
@@ -20,8 +21,6 @@ public class Player {
     private boolean whitePiece = true;
     private boolean hasLogin = false;
     private boolean isHost;
-    private float xp = 0;
-    private int elo = 0;
     public PlayerProfile profile;
     public PlayerInventory inventory;
     public PlayerGameHistory history;
@@ -54,8 +53,6 @@ public class Player {
         preferences = new PlayerPreferences();
         purchase = new PlayerPurchase();
         isHost = false;
-        xp = 0;
-        elo = 0;
     }
 
     public boolean isInTurn() {
@@ -215,5 +212,32 @@ public class Player {
         }
 
         return res;
+    }
+
+    public void addTrophy(long playerTrophyDiff) {
+        profile.addElo(playerTrophyDiff);
+        history.addNewEloHistory(System.currentTimeMillis(), (long)profile.get(PlayerProfile.KEY_ELO));
+        Database.getInstance().updateUserProfileOnDB(null);
+        Database.getInstance().updateUserHistoryOnDB(null);
+    }
+
+    public void addGold(long playerGoldDiff) {
+        inventory.addGold(playerGoldDiff);
+        Database.getInstance().updateUserInventoryOnDB(null);
+    }
+
+    public void addGem(long playerGemDiff) {
+        inventory.addGem(playerGemDiff);
+        Database.getInstance().updateUserInventoryOnDB(null);
+    }
+
+    public void addNewGamepassPoint(int i) {
+        battlePass.addNewGamepassPoint(i);
+        Database.getInstance().updateBattlePassOnDB(null);
+    }
+
+    public void addNewGameStats(int gameResult, boolean whitePiece, long duration, long promotionCount) {
+        statistics.addNewGameStats(gameResult, whitePiece, duration, promotionCount);
+        Database.getInstance().updateUserStatisticsOnDB(null);
     }
 }

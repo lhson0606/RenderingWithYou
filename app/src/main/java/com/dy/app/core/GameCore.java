@@ -4,6 +4,7 @@ import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.terrain.Terrain;
+import com.dy.app.gameplay.viewport.ViewPort;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.manager.AssetManger;
 import com.dy.app.manager.BackgroundManger;
@@ -88,9 +89,11 @@ public class GameCore {
     public void startGame(){
         //setting game camera
         if(Player.getInstance().isWhitePiece()){
-            Camera.getInstance().setPos(DyConst.default_white_cam_pos);
+            GameSetting.getInstance().setSelectedViewPortIndex(ViewPort.WHITE_VIEWPORT_INDEX);
+            Camera.getInstance().setPos(ViewPort.WHITE_SIDE.getPos());
         }else{
-            Camera.getInstance().setPos(DyConst.default_black_cam_pos);
+            GameSetting.getInstance().setSelectedViewPortIndex(ViewPort.BLACK_VIEWPORT_INDEX);
+            Camera.getInstance().setPos(ViewPort.BLACK_SIDE.getPos());
         }
         gameActivity.onMsgToMain(TAG, -1, TaskType.START_GAME, null);
     }

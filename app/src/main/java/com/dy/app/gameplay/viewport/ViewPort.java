@@ -4,6 +4,10 @@ import com.dy.app.common.maths.Vec3;
 import com.dy.app.utils.DyConst;
 
 public class ViewPort {
+    public static final int WHITE_VIEWPORT_INDEX = 0;
+    public static final int BLACK_VIEWPORT_INDEX = 1;
+    public static final int WHITE_BLACK_VIEWPORT_INDEX = 2;
+    public static final int BLACK_WHITE_VIEWPORT_INDEX = 3;
     private String name;
     private Vec3 pos;
     public ViewPort(String name, Vec3 pos){

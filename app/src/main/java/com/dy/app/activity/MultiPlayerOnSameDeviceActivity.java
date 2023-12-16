@@ -90,6 +90,7 @@ implements View.OnClickListener, ITakeScreenshot {
     @Override
     protected void onDestroy() {
         gameLoop.shutDown();
+        multiPlayerSameDeviceHandler.stopGame();
         super.onDestroy();
     }
 
@@ -237,6 +238,7 @@ implements View.OnClickListener, ITakeScreenshot {
         public void onBtnRematchClick(MultiPlayerSameDeviceGameResultDialog dialog) {
             dialog.dismiss();
             gameLoop.shutDown();
+            multiPlayerSameDeviceHandler.stopGame();
             currentSavedFileUri = null;
             initCore();
         }
@@ -298,8 +300,11 @@ implements View.OnClickListener, ITakeScreenshot {
     }
 
     private PGNFile getPGNFile(){
-        PGNFile file = gameCore.getBoard().getPGNFile();
+        PGNFile file = new PGNFile(gameCore.getBoard().getMoveHistory());
+        file.addWhitePlayer(Player.getInstance().isWhitePiece()? Player.getInstance().getDisplayName() : Rival.getInstance().getName());
+        file.addBlackPlayer(Player.getInstance().isWhitePiece()? Rival.getInstance().getName() : Player.getInstance().getDisplayName());
         file.addResult(gameResult);
+        file.addDate(Utils.getCurrentDate());
         file.addEvent("Multiplayer on same device");
         file.addSite("Local");
         return file;
@@ -336,14 +341,7 @@ implements View.OnClickListener, ITakeScreenshot {
     }
 
     private void savePGNAndShare(Uri uri) {
-        PGNFile file = new PGNFile(gameCore.getBoard().getMoveHistory());
-        //put meta
-        file.addWhitePlayer(Player.getInstance().isWhitePiece()? Player.getInstance().getDisplayName() : Rival.getInstance().getName());
-        file.addBlackPlayer(Player.getInstance().isWhitePiece()? Rival.getInstance().getName() : Player.getInstance().getDisplayName());
-        file.addResult(gameResult);
-        file.addDate(Utils.getCurrentDate());
-        file.addEvent("Multiplayer on same device");
-        file.addSite("Local");
+        PGNFile file =getPGNFile();
         showLoadingDialog(false);
         Thread worker = new Thread(()->{
             try {

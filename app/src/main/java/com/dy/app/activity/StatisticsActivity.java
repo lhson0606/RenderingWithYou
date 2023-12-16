@@ -118,20 +118,23 @@ implements View.OnClickListener {
         List<DataEntry> seriesData = new ArrayList<>();
 
         for(int i = 0; i < eloValue.size(); i++){
-            seriesData.add(new ValueDataEntry(i, eloValue.get(i)));
+            long elo = eloValue.get(i);
+            long date = eloDate.get(i);
+            String strDate = Utils.getDate(date);
+            seriesData.add(new ValueDataEntry(strDate, elo));
         }
 
         Set set = Set.instantiate();
         set.data(seriesData);
-        Mapping series1Mapping = set.mapAs("{ x: 'x', value: 'value' }");
+        Mapping eloSeriesMapping = set.mapAs("{ x: 'x', value: 'value' }");
 
-
-        com.anychart.core.cartesian.series.Line series1 = cartesian.line(series1Mapping);
-        series1.hovered().markers().enabled(true);
-        series1.hovered().markers()
+        com.anychart.core.cartesian.series.Line eloSeries = cartesian.line(eloSeriesMapping);
+        eloSeries.name("Elo changes history");
+        eloSeries.hovered().markers().enabled(true);
+        eloSeries.hovered().markers()
                 .type(MarkerType.CIRCLE)
                 .size(4d);
-        series1.tooltip()
+        eloSeries.tooltip()
                 .position("right")
                 .anchor(Anchor.LEFT_CENTER)
                 .offsetX(5d)

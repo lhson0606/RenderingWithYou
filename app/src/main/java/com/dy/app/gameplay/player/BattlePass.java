@@ -79,4 +79,10 @@ public class BattlePass {
             }
         });
     }
+
+    public void addNewGamepassPoint(int i) {
+        long level = ((Long)get(KEY_LEVEL)).longValue();
+        level += i;
+        set(KEY_LEVEL, level);
+    }
 }

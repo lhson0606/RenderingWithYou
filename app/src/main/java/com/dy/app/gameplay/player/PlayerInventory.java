@@ -112,4 +112,16 @@ public class PlayerInventory {
         });
 
     }
+
+    public void addGold(long playerGoldDiff) {
+        long coin = ((Long)get(KEY_COIN)).longValue();
+        coin += playerGoldDiff;
+        set(KEY_COIN, coin);
+    }
+
+    public void addGem(long playerGemDiff) {
+        long gems = ((Long)get(KEY_GEMS)).longValue();
+        gems += playerGemDiff;
+        set(KEY_GEMS, gems);
+    }
 }

@@ -31,7 +31,7 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
 
     private P2pGameResultDialogListener listener;
 
-    public P2pGameResultDialog(int gameResult, int playerTrophyDiff, int playerGoldDiff, int playerGemDiff, int opponentTrophyDiff, P2pGameResultDialogListener listener){
+    public P2pGameResultDialog(int gameResult, long playerTrophyDiff, long playerGoldDiff, long playerGemDiff, long opponentTrophyDiff, P2pGameResultDialogListener listener){
         this.listener = listener;
         this.gameResult = gameResult;
         this.playerTrophyDiff = playerTrophyDiff;
@@ -75,10 +75,10 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
 
     private void updateDisplay() {
         setTitle();
-        setSingleValue(tvTrophyDifference, playerTrophyDiff);
-        setSingleValue(tvGoldDifference, playerGoldDiff);
-        setSingleValue(tvGemDifference, playerGemDiff);
-        setSingleValue(tvOppoPlayerTrophyDifference, opponentTrophyDiff);
+        setSingleValue(tvTrophyDifference, (int)playerTrophyDiff);
+        setSingleValue(tvGoldDifference, (int)playerGoldDiff);
+        setSingleValue(tvGemDifference, (int)playerGemDiff);
+        setSingleValue(tvOppoPlayerTrophyDifference, (int)opponentTrophyDiff);
     }
 
     private void setTitle(){
@@ -128,7 +128,7 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
     private Button btnSavePGN, btnRematch, btnExit;
     private TextView tvShareAsPGN, tvShareAsImage;
     private TextView tvTrophyDifference, tvGoldDifference, tvGemDifference, tvOppoPlayerTrophyDifference;
-    int playerTrophyDiff, playerGoldDiff, playerGemDiff, opponentTrophyDiff;
+    long playerTrophyDiff, playerGoldDiff, playerGemDiff, opponentTrophyDiff;
     private int gameResult;
     private TextView tvGameResultTitle;
 }

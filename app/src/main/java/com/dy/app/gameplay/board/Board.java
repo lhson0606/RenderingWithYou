@@ -11,6 +11,7 @@ import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.gameplay.pgn.PGNFile;
+import com.dy.app.gameplay.pgn.PGNMove;
 import com.dy.app.gameplay.piece.King;
 import com.dy.app.gameplay.piece.Pawn;
 import com.dy.app.gameplay.piece.Piece;
@@ -28,7 +29,9 @@ import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -46,7 +49,7 @@ public class Board implements GameEntity {
     public static int IS_CHECK = 1;
     public static int IS_CHECKMATE = 2;
     private int moveCount = 0;
-    private final StringBuilder moveHistoryBuilder = new StringBuilder();
+    private final Vector<String> moveRecord = new Vector<>();
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
         this.context = context;
@@ -374,21 +377,17 @@ public class Board implements GameEntity {
             prevSrcTile = srcTile;
             prevDesTile = desTile;
 
-            //save to board history
-            if(isWhite) {
-                moveHistoryBuilder.append(moveCount / 2).append(". ").append(moveNotation).append(" ");
-            }else{
-                moveHistoryBuilder.append(moveNotation).append(" ");
-            }
-
-            Log.d("Board", toString());
-            Log.d("Board", "moveCount: " + moveCount);
-            Log.d("Board", "moveHistory: " + moveHistoryBuilder.toString());
-
             changeKingColorInCheckState();
+
+            //save to move record
+            saveMoveRecord(moveNotation);
         }finally {
             mutex.unlock();
         }
+    }
+
+    private void saveMoveRecord(String moveNotation){
+        moveRecord.add(moveNotation);
     }
 
     public void changeKingColorInCheckState(){
@@ -780,16 +779,19 @@ public class Board implements GameEntity {
     }
 
     public String getMoveHistory(){
-        return moveHistoryBuilder.toString();
-    }
+        StringBuilder builder = new StringBuilder();
+        int moveNumber = 0;
 
-    public PGNFile getPGNFile(){
-        PGNFile file = new PGNFile(moveHistoryBuilder.toString());
-        //put meta
-        file.addWhitePlayer(Player.getInstance().isWhitePiece()? Player.getInstance().getDisplayName() : Rival.getInstance().getName());
-        file.addBlackPlayer(Player.getInstance().isWhitePiece()? Rival.getInstance().getName() : Player.getInstance().getDisplayName());
-        file.addDate(Utils.getCurrentDate());
-        return file;
+        for(String move : moveRecord){
+            if(moveNumber%2 == 0){
+                builder.append(String.format(Locale.ENGLISH, "%d. %s ", moveNumber/2 + 1, move));
+            }else{
+                builder.append(String.format(Locale.ENGLISH, "%s ", move));
+            }
+            moveNumber++;
+        }
+
+        return builder.toString();
     }
 
     public boolean hasPossibleMove(boolean isWhite){
@@ -800,5 +802,31 @@ public class Board implements GameEntity {
             }
         }
         return false;
+    }
+
+    public boolean isUndoAllowed(boolean isWhitePiece) {
+        try{
+            mutex.lock();
+
+            if(moveCount == 1){
+                return false;
+            }
+
+            if(isWhitePiece && moveCount%2 == 0){
+                return true;
+            }else if(!isWhitePiece && moveCount%2 == 1) {
+                return true;
+            }
+
+            return false;
+
+        }finally {
+            mutex.unlock();
+        }
+    }
+
+    public void undoMove() throws Exception {
+        moveRecord.remove(moveRecord.size() - 1);
+        goToMove(moveCount - 2);
     }
 }
