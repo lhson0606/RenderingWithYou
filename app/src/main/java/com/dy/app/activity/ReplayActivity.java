@@ -3,9 +3,12 @@ package com.dy.app.activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -30,6 +33,7 @@ import com.dy.app.graphic.display.GameFragment;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.ui.dialog.MoveControlPanel;
 import com.dy.app.ui.view.FragmentSetting;
+import com.dy.app.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,6 +78,9 @@ public class ReplayActivity extends FragmentHubActivity
     public void updateProgress(int progress){
         runOnUiThread(()->{
             sbProgress.setProgress(progress);
+            if(!moveControlPanel.isVisible()){
+                return;
+            }
             if(progress>0){
                 moveControlPanel.updateMoveIndex(progress-1);
             }else{
@@ -159,6 +166,11 @@ public class ReplayActivity extends FragmentHubActivity
             case MoveControlPanel.JUMP_TO_MOVE:
                 int moveIndex = (int) o1;
                 runner.jumpToMove(moveIndex + 1);
+                break;
+            case MoveControlPanel.SHARE_GAME_IMAGE:
+                Bitmap bitmap = (Bitmap) o1;
+                Utils.shareBitmap(this, bitmap);
+                bitmap.recycle();
                 break;
         }
     }
@@ -265,6 +277,13 @@ public class ReplayActivity extends FragmentHubActivity
     public void changePlayButtonToContinue(){
         runOnUiThread(()->{
             btnPlay.setImageResource(R.drawable.ic_continue_playing);
+        });
+    }
+
+    @Override
+    public void exitWithError(String message) {
+        runOnUiThread(()->{
+            showErrorDialog(message);
         });
     }
 

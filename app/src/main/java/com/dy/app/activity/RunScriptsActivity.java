@@ -2,6 +2,7 @@ package com.dy.app.activity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +29,7 @@ import com.dy.app.graphic.display.GameFragment;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.ui.dialog.MoveControlPanel;
 import com.dy.app.ui.view.FragmentSetting;
+import com.dy.app.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -187,6 +189,11 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
                 int moveIndex = (int) o1;
                 runner.jumpToMove(moveIndex + 1);
                 break;
+            case MoveControlPanel.SHARE_GAME_IMAGE:
+                Bitmap bitmap = (Bitmap) o1;
+                Utils.shareBitmap(this, bitmap);
+                bitmap.recycle();
+                break;
         }
     }
 
@@ -309,6 +316,11 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         runOnUiThread(()->{
             btnPlay.setImageResource(R.drawable.ic_continue_playing);
         });
+    }
+
+    @Override
+    public void exitWithError(String message) {
+        showErrorDialog(message);
     }
 
     @Override

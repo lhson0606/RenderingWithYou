@@ -1,5 +1,6 @@
 package com.dy.app.ui.dialog;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,10 +22,12 @@ import com.dy.app.activity.RunScriptsActivity;
 import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.ui.adapter.MoveCellAdapter;
+import com.dy.app.utils.Utils;
 
 public class MoveControlPanel extends DialogFragment implements View.OnClickListener, AdapterView.OnItemClickListener {
     public static final String TAG = "MoveControlPanel";
     public static final int JUMP_TO_MOVE = 0;
+    public static final int SHARE_GAME_IMAGE = 1;
     private FragmentHubActivity activity;
     public MoveControlPanel(){
         setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
@@ -48,6 +52,8 @@ public class MoveControlPanel extends DialogFragment implements View.OnClickList
         btnClose = v.findViewById(R.id.btnClose);
         gvMovesTable = v.findViewById(R.id.gvMovesTable);
         sbProgress = v.findViewById(R.id.sbProgress);
+        tvShareAsImage = v.findViewById(R.id.tvShareAsImage);
+        rootView = v.findViewById(R.id.clMovesTable);
 
         moveCellAdapter = new MoveCellAdapter(pgnFile.getMoveNotations());
 
@@ -57,6 +63,7 @@ public class MoveControlPanel extends DialogFragment implements View.OnClickList
         gvMovesTable.setOnItemClickListener(this);
         sbProgress.setProgress(1);
         sbProgress.setMax(pgnFile.getBothSideMoveCount());
+        tvShareAsImage.setOnClickListener(this);
 
         return v;
     }
@@ -67,6 +74,9 @@ public class MoveControlPanel extends DialogFragment implements View.OnClickList
     public void onClick(View v) {
         if(v == btnClose){
             dismiss();
+        }else if(v == tvShareAsImage) {
+            Bitmap bitmap = Utils.getScreenShot(rootView);
+            activity.onMsgToMain(TAG, SHARE_GAME_IMAGE, bitmap, null);
         }
     }
 
@@ -107,4 +117,6 @@ public class MoveControlPanel extends DialogFragment implements View.OnClickList
     private GridView gvMovesTable = null;
     private MoveCellAdapter moveCellAdapter;
     private SeekBar sbProgress;
+    private TextView tvShareAsImage;
+    private View rootView;
 }

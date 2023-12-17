@@ -158,6 +158,16 @@ public class Utils {
         activity.startActivity(Intent.createChooser(shareIntent, title));
     }
 
+    public static void shareBitmap(Activity activity, Bitmap bitmap){
+        String bitmapPath = MediaStore.Images.Media.insertImage(
+                activity.getContentResolver(), bitmap, "result screenshot", "");
+        Uri uri = Uri.parse(bitmapPath);
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("image/*");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        activity.startActivity(Intent.createChooser(shareIntent, "Share"));
+    }
+
     public static Bitmap mergeBitmapCenter(Bitmap... bitmaps){
         int width = 0;
         int height = 0;

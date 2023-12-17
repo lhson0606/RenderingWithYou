@@ -37,6 +37,7 @@ public class ScriptsRunner extends Thread{
     public interface IScriptRunnerCallback{
         void updateProgress(int progress);
         void changePlayButtonToContinue();
+        void exitWithError(String message);
     }
 
     public ScriptsRunner(IScriptRunnerCallback activity, PGNFile pgnFile, Board board){
@@ -52,9 +53,9 @@ public class ScriptsRunner extends Thread{
         try {
             loadAllMove();
         } catch (Exception e) {
-            throw new RuntimeException(e);
-//            activity.exitWithError("Cannot load moves");
-//            return;
+            //throw new RuntimeException(e);
+            activity.exitWithError("Cannot load moves");
+            return;
         }
         Vector<PGNMove> moves = pgnFile.getMoves();
 
@@ -79,10 +80,10 @@ public class ScriptsRunner extends Thread{
                     } catch (Exception e) {
                         Log.d(TAG, "at move " + currentMove + " " + moveNotation);
                         Log.d(TAG, board.toString());
-                        throw new RuntimeException(e);
-//                        activity.exitWithError("Invalid move notation: " + moveNotation);
-//                        isPaused = true;
-//                        break;
+                        //throw new RuntimeException(e);
+                        activity.exitWithError("Invalid move notation: " + moveNotation);
+                        isPaused = true;
+                        break;
                     }
                     Piece piece = chessMove.getSrcTile().getPiece();
                     try {
@@ -92,10 +93,10 @@ public class ScriptsRunner extends Thread{
                     } catch (Exception e) {
                         Log.d(TAG, "at move " + currentMove + " " + moveNotation);
                         Log.d(TAG, board.toString());
-                        throw new RuntimeException(e);
-//                        activity.exitWithError("Invalid move notation: " + moveNotation);
-//                        isPaused = true;
-//                        break;
+                        //throw new RuntimeException(e);
+                        activity.exitWithError("Invalid move notation: " + moveNotation);
+                        isPaused = true;
+                        break;
                     }
                     Log.d("Debug concurrent", ">");
 
@@ -177,8 +178,8 @@ public class ScriptsRunner extends Thread{
             try {
                 board.goToMove(move);
             } catch (Exception e) {
-                //activity.exitWithError("Cannot jump to move " + move);
-                throw new RuntimeException(e);
+                activity.exitWithError("Cannot jump to move " + move);
+                //throw new RuntimeException(e);
             }
             Log.d("Debug concurrent", "User: on board state reset: ");
             Log.d("Debug concurrent", board.toString());
