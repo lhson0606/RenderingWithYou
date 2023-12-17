@@ -78,7 +78,13 @@ public class FragmentTerrainSelection extends Fragment
         player = Player.getInstance();
         exqListener();
         createCarousel(slider);
+        updateUI();
         return view;
+    }
+
+    private void updateUI() {
+        int index = Utils.long2int((long)player.inventory.get(PlayerInventory.KEY_TERRAIN_SKIN_INDEX));
+        slider.setCurrentPosition(index);
     }
 
     private void exqListener() {

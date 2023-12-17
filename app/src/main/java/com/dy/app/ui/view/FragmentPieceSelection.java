@@ -78,7 +78,13 @@ implements View.OnClickListener, ViewPagerEx.OnPageChangeListener {
         player = Player.getInstance();
         exqListener();
         createCarousel(slider);
+        updateUI();
         return view;
+    }
+
+    private void updateUI() {
+        int index = Utils.long2int((long)player.inventory.get(PlayerInventory.KEY_PIECE_SKIN_INDEX));
+        slider.setCurrentPosition(index);
     }
 
     private void exqListener() {

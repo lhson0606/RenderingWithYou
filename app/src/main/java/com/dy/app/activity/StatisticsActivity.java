@@ -1,9 +1,11 @@
 package com.dy.app.activity;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,10 +68,12 @@ implements View.OnClickListener {
         ((TextView)findViewById(R.id.tvTotalGames)).setText(totalGames.toString());
         String winRateStr = Utils.getWinRateDisplay((Long)player.statistics.get(PlayerStatistics.KEY_WIN), totalGames);
         ((TextView)findViewById(R.id.tvWinRate)).setText(winRateStr);
+        btnShare = findViewById(R.id.btnShare);
     }
 
     private void attachListener() {
         btnClose.setOnClickListener(this);
+        btnShare.setOnClickListener(this);
     }
 
     private void updateUI() {
@@ -155,8 +159,13 @@ implements View.OnClickListener {
         if(v == btnClose){
             btnClose.playAnimation();
             finish();
+        }else if(v == btnShare){
+            Bitmap screenshot = Utils.getScreenShot(this.getWindow().getDecorView().getRootView());
+            Utils.shareBitmap(this, screenshot);
+            screenshot.recycle();
         }
     }
 
     private LottieAnimationView btnClose;
+    private ImageView btnShare;
 }

@@ -31,12 +31,18 @@ public class PlayerInventory {
         data.put(KEY_TILE_SKIN_INDEX, 0L);
         List<Long> piece_skin = new ArrayList<>();
         piece_skin.add(0L);
+        piece_skin.add(1L);
+        piece_skin.add(2L);
         List<Long> terrain_skin = new ArrayList<>();
         terrain_skin.add(0L);
+        terrain_skin.add(1L);
+        terrain_skin.add(2L);
+        terrain_skin.add(3L);
         List<Long> board_skin = new ArrayList<>();
         board_skin.add(0L);
         List<Long> tile_skin = new ArrayList<>();
         tile_skin.add(0L);
+        tile_skin.add(1L);
         data.put(KEY_PIECE_SKIN, piece_skin);
         data.put(KEY_TERRAIN_SKIN, terrain_skin);
         data.put(KEY_BOARD_SKIN, board_skin);

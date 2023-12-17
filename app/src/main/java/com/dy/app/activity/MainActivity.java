@@ -493,6 +493,12 @@ public class MainActivity extends FragmentHubActivity
                 showFragment(loginFormFragment);
 
         }else if (v.getId() == R.id.btnChooseSkin){
+
+            if(!Database.getInstance().isSignedIn()){
+                displayAlertMessage("Please sign in first");
+                return;
+            }
+
             btnChooseSkin.playAnimation();
             showFragment(skinSelectionFragment);
         }else if(v.getId() == R.id.btnSpeaker){
@@ -535,7 +541,9 @@ public class MainActivity extends FragmentHubActivity
     }
 
     private void hideLoadingDialog(){
-        loadingDialog.dismiss();
+        if(loadingDialog != null && loadingDialog.isVisible() && !isFinishing()){
+            loadingDialog.dismiss();
+        }
     }
 
     public void displayAlertMessage(String message){
