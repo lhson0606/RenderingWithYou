@@ -292,7 +292,7 @@ public class MultiDeviceInGameHandler extends Thread
     }
 
     public void informLoss(){
-        Message loseMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_GAME_LOST_INFORM);
+        Message loseMessage = MessageFactory.getInstance().createDataMessage(null, MessageCode.ON_GAME_LOST_INFORM);
         connectionManager.postMessage(loseMessage);
     }
 
@@ -307,18 +307,18 @@ public class MultiDeviceInGameHandler extends Thread
     }
 
     public void requestDraw(){
-        Message drawMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_DRAW_REQUEST);
+        Message drawMessage = MessageFactory.getInstance().createDataMessage(null, MessageCode.ON_DRAW_REQUEST);
         connectionManager.postMessage(drawMessage);
     }
 
     public void acceptDraw() {
-        Message drawMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_DRAW_ACCEPTED);
+        Message drawMessage = MessageFactory.getInstance().createDataMessage(null, MessageCode.ON_DRAW_ACCEPTED);
         connectionManager.postMessage(drawMessage);
         endGame(P2pGameResultDialog.DRAW);
     }
 
     public void rejectDraw() {
-        Message drawMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_DRAW_REJECTED);
+        Message drawMessage = MessageFactory.getInstance().createDataMessage(null, MessageCode.ON_DRAW_REJECTED);
         connectionManager.postMessage(drawMessage);
     }
 
@@ -339,7 +339,7 @@ public class MultiDeviceInGameHandler extends Thread
         }
 
         //else we send undo request to other device and wait for approval
-        Message undoRequestMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_UNDO_REQUEST);
+        Message undoRequestMessage = MessageFactory.getInstance().createDataMessage(null, MessageCode.ON_UNDO_REQUEST);
         connectionManager.postMessage(undoRequestMessage);
         addSystemMsgBoth(Player.getInstance().profile.get(PlayerProfile.KEY_USERNAME) + " requested undo");
     }
@@ -356,12 +356,12 @@ public class MultiDeviceInGameHandler extends Thread
         tilePicker.putDownPiece();
         //pause timer
         timer.pauseTimer();
-        Message undoAcceptedMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_UNDO_ACCEPTED);
+        Message undoAcceptedMessage = MessageFactory.getInstance().createDataMessage(null, MessageCode.ON_UNDO_ACCEPTED);
         connectionManager.postMessage(undoAcceptedMessage);
     }
 
     public void rejectUndo() {
-        Message undoRejectedMessage = MessageFactory.getInstance().createDataMessage("".getBytes(), MessageCode.ON_UNDO_REJECTED);
+        Message undoRejectedMessage = MessageFactory.getInstance().createDataMessage(null, MessageCode.ON_UNDO_REJECTED);
         connectionManager.postMessage(undoRejectedMessage);
     }
 

@@ -826,7 +826,69 @@ public class Board implements GameEntity {
     }
 
     public void undoMove() throws Exception {
-        moveRecord.remove(moveRecord.size() - 1);
-        goToMove(moveCount - 2);
+        try{
+            //we have to lock mutex to prevent concurrent access
+            mutex.lock();
+            moveRecord.remove(moveRecord.size() - 1);
+            int moveNumber = moveCount - 2;
+            Log.d("Board", String.format(Locale.ENGLISH, "run: %d", moveNumber));
+            if(moveNumber < 0){
+                throw new RuntimeException("Invalid move number");
+            }
+
+            if(moveNumber == moveCount - 1) {
+                //moveNumber is always 1 ahead so we have to subtract 1
+                //if the desired move number is the current move number, we don't have to do anything
+                return;
+            }
+
+            //remove all the pieces from tiles
+            for(int i = 0; i<8; i++){
+                for(int j = 0; j<8; j++){
+                    tiles[i][j].setPiece(null);
+                }
+            }
+
+            //we now undo capture state to all pieces, if it's captured at moveNumber, it will be captured again
+            //if it's not captured at moveNumber, it will be uncaptured
+            //only perform when the captured state is different from the current state
+            //note that its position is not reset, only captured state is reset (now it's present when draw)
+            for(Piece piece: pieceManager.getAllPieces()){
+                piece.checkForUndoCaptureState(moveNumber);
+            }
+
+            //move all the active pieces on the board to its corresponding position at moveNumber
+            //all pieces on the board capture state is valid now, we need to move them to correct position
+            for(Piece piece : pieceManager.getActivePieces()){
+                if(!piece.isInitialized){// for extra safety
+                    throw new RuntimeException("Piece not initialized");
+                }
+                piece.goToPositionAtState(moveNumber, true);
+            }
+
+            //we now need to undoPromotionState to the active pieces
+            for(Piece piece : pieceManager.getActivePieces()){
+                piece.checkForUndoPromotionState(moveNumber);
+            }
+
+            //set its state at moveNumber including make its tile point to it and update current state to corresponding state
+            for(Piece piece : pieceManager.getActivePieces()){
+                if(!piece.isInitialized){
+                    throw new RuntimeException("Piece not initialized");
+                }
+                piece.setStateAndTileAtMoveNumber(moveNumber);
+            }
+
+            for(Piece piece : pieceManager.getActivePieces()){
+                piece.updatePossibleMoves();
+            }
+
+            Log.d("Board", "board at " + moveNumber + "is restated\n" + toString());
+
+            //update the current count
+            moveCount = moveNumber + 1;
+        }finally {
+            mutex.unlock();
+        }
     }
 }

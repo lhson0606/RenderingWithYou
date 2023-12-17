@@ -133,14 +133,16 @@ public class PGNFile implements Serializable {
     public static PGNFile parsePGN(String data) throws PGNParseException {
         PGNFile pgnFile = new PGNFile();
         pgnFile.data = preProcess(data);
-        String[] splitResult = pgnFile.data.split("\n\n");
 
-        if(splitResult.length != 2) {
+        String metaStr = null;
+        String movesStr = null;
+
+        try{
+            metaStr = data.substring(0, data.indexOf("\n\n"));
+            movesStr = data.substring(data.indexOf("\n\n")+2);
+        }catch (StringIndexOutOfBoundsException e){
             throw new PGNParseException("Invalid PGN file");
         }
-
-        String metaStr = splitResult[0];
-        String movesStr = splitResult[1];
 
         pgnFile.parseMeta(metaStr);
         //convert ".\s*" to ". "
@@ -175,14 +177,15 @@ public class PGNFile implements Serializable {
         pgnFile.data = builder.toString();
         pgnFile.data = preProcess(pgnFile.data);
 
-        String[] splitResult = pgnFile.data.split("\n\n");
+        String metaStr = null;
+        String movesStr = null;
 
-        if(splitResult.length != 2) {
+        try{
+            metaStr = pgnFile.data.substring(0, pgnFile.data.indexOf("\n\n"));
+            movesStr = pgnFile.data.substring(pgnFile.data.indexOf("\n\n")+2);
+        }catch (StringIndexOutOfBoundsException e){
             throw new PGNParseException("Invalid PGN file");
         }
-
-        String metaStr = splitResult[0];
-        String movesStr = splitResult[1];
 
         pgnFile.parseMeta(metaStr);
 
@@ -352,9 +355,15 @@ public class PGNFile implements Serializable {
     public static int MOVE_PER_LINE = 6;
     public int getGameResult(){
         String result = meta.get("Result");
-        if(result.equals("1/2-1/2")) return DyConst.GAME_DRAW;
-        if(result.equals("1-0")) return DyConst.GAME_WHITE_WIN;
-        if(result.equals("0-1")) return DyConst.GAME_BLACK_WIN;
+        if(result.equals("1/2-1/2")) {
+            return DyConst.GAME_DRAW;
+        }
+        if(result.equals("1-0")) {
+            return DyConst.GAME_WHITE_WIN;
+        }
+        if(result.equals("0-1")) {
+            return DyConst.GAME_BLACK_WIN;
+        }
         return DyConst.GAME_NOT_END;
     }
 
@@ -370,6 +379,21 @@ public class PGNFile implements Serializable {
         if(moves.size() == 0) return 0;
         int result = moves.size()*2;
         if(moves.lastElement().black.equals("")) result--;
+        return result;
+    }
+
+    public Vector<String> getMoveNotations(){
+        Vector<String> result = new Vector<>();
+
+        for(PGNMove move : moves){
+
+            if(move.white.equals("")) break;
+
+            result.add(move.white);
+
+            if(move.black.equals("")) break;
+            result.add(move.black);
+        }
         return result;
     }
 }

@@ -11,6 +11,7 @@ import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNMove;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.setting.GameSetting;
+import com.dy.app.ui.dialog.MoveControlPanel;
 
 import java.util.Vector;
 import java.util.concurrent.Semaphore;
@@ -29,10 +30,13 @@ public class ScriptsRunner extends Thread{
     private final ReentrantLock moveLock = new ReentrantLock();
     private final Condition resumeCondition = moveLock.newCondition();
 
+    public PGNFile getRunningPGNFile() {
+        return pgnFile;
+    }
+
     public interface IScriptRunnerCallback{
         void updateProgress(int progress);
         void changePlayButtonToContinue();
-        void exitWithError(String error);
     }
 
     public ScriptsRunner(IScriptRunnerCallback activity, PGNFile pgnFile, Board board){

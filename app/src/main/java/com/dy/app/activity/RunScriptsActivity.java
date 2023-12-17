@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -25,6 +26,7 @@ import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNParseException;
 import com.dy.app.graphic.display.GameFragment;
 import com.dy.app.manager.SoundManager;
+import com.dy.app.ui.dialog.MoveControlPanel;
 import com.dy.app.ui.view.FragmentSetting;
 
 import java.io.IOException;
@@ -33,16 +35,6 @@ import java.util.concurrent.Semaphore;
 
 public class RunScriptsActivity extends FragmentHubActivity
 implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.IScriptRunnerCallback {
-    private ProgressDialog progressDialog;
-    private Handler mainHandler;
-    private GameFragment gameFragment;
-    private GameLoop gameLoop;
-    private GameCore gameCore;
-    private LottieAnimationView btnClose;
-    PGNFile pgnFile = null;
-    private SeekBar sbProgress;
-    private ScriptsRunner runner = null;
-    private ImageView btnPlay, btnPrev, btnNext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +68,12 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
     public void updateProgress(int progress){
         runOnUiThread(()->{
             sbProgress.setProgress(progress);
+            if(!moveControlPanel.isVisible()) return;
+            if(progress>0){
+                moveControlPanel.updateMoveIndex(progress-1);
+            }else{
+                moveControlPanel.unhighlight();
+            }
         });
     }
 
@@ -139,6 +137,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        moveControlPanel = MoveControlPanel.newInstance(pgnFile);
         updateDisplay(pgnFile);
         runner = new ScriptsRunner(this, pgnFile, gameCore.getBoard());
         runner.start();
@@ -175,6 +174,18 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
                 break;
             case FragmentSetting.TAG:
                 handleFragmentSettingMsg(TAG, type, o1, o2);
+                break;
+            case MoveControlPanel.TAG:
+                handleMoveControlPanelMsg(TAG, type, o1, o2);
+                break;
+        }
+    }
+
+    private void handleMoveControlPanelMsg(String tag, int type, Object o1, Object o2) {
+        switch (type){
+            case MoveControlPanel.JUMP_TO_MOVE:
+                int moveIndex = (int) o1;
+                runner.jumpToMove(moveIndex + 1);
                 break;
         }
     }
@@ -301,11 +312,6 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
     }
 
     @Override
-    public void exitWithError(String error) {
-        showErrorDialog(error);
-    }
-
-    @Override
     public void onClick(View v) {
         SoundManager.getInstance().playSound(this, SoundManager.SoundType.BTN_BLOP);
         if(v == btnClose){
@@ -340,7 +346,16 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
             }
         }else if(v == btnMovePanel){
             btnMovePanel.playAnimation();
+            showMoveControlPanel();
         }
+    }
+
+    private void showMoveControlPanel() {
+        if(moveControlPanel == null){
+            return;
+        }
+
+        moveControlPanel.show(getSupportFragmentManager(), MoveControlPanel.TAG);
     }
 
     private boolean isShowingFragment(Fragment fragment){
@@ -372,6 +387,25 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         }
     }
 
+    public ScriptsRunner getRunner(){
+        return runner;
+    }
+
+    public PGNFile getRunningPGNFile(){
+        return pgnFile;
+    }
+    private ProgressDialog progressDialog;
+    private Handler mainHandler;
+    private GameFragment gameFragment;
+    private GameLoop gameLoop;
+    private GameCore gameCore;
+    private LottieAnimationView btnClose;
+    PGNFile pgnFile = null;
+    private SeekBar sbProgress;
+    private ScriptsRunner runner = null;
+    private ImageView btnPlay, btnPrev, btnNext;
+
+    private MoveControlPanel moveControlPanel = null;
     private LottieAnimationView btnConfig, btnSpeaker, btnMovePanel;
     private FragmentSetting fragmentSetting;
     private Fragment currenFragment = null;

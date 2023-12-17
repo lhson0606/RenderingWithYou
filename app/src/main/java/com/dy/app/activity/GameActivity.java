@@ -379,7 +379,7 @@ public class GameActivity extends FragmentHubActivity
         if(Database.getInstance().isSignedIn()){
             obtainLoot(lootCalculator);
         }else{
-            informMessage("You are not signed in. Loot will not be saved.");
+            informMessage("You are not signed in. Your data will not be saved.");
         }
     }
 

@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -26,6 +27,9 @@ import com.dy.app.gameplay.pgn.PGNParseException;
 import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.display.GameFragment;
+import com.dy.app.manager.SoundManager;
+import com.dy.app.ui.dialog.MoveControlPanel;
+import com.dy.app.ui.view.FragmentSetting;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,16 +37,6 @@ import java.util.concurrent.Semaphore;
 
 public class ReplayActivity extends FragmentHubActivity
         implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.IScriptRunnerCallback {
-    private ProgressDialog progressDialog;
-    private Handler mainHandler;
-    private GameFragment gameFragment;
-    private GameLoop gameLoop;
-    private GameCore gameCore;
-    private LottieAnimationView btnClose;
-    private PGNFile pgnFile = null;
-    private SeekBar sbProgress;
-    private ScriptsRunner runner = null;
-    private ImageView btnPlay, btnPrev, btnNext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +48,7 @@ public class ReplayActivity extends FragmentHubActivity
         mainHandler = new Handler(getMainLooper());
         Intent callerIntent = getIntent();
         pgnFile = (PGNFile) callerIntent.getSerializableExtra("pgn");
+        moveControlPanel = MoveControlPanel.newInstance(pgnFile);
         Player.getInstance().setWhitePiece(true);
         Rival.getInstance().setWhitePiece(false);
         initCore();
@@ -79,7 +74,14 @@ public class ReplayActivity extends FragmentHubActivity
     public void updateProgress(int progress){
         runOnUiThread(()->{
             sbProgress.setProgress(progress);
+            if(progress>0){
+                moveControlPanel.updateMoveIndex(progress-1);
+            }else{
+                moveControlPanel.unhighlight();
+            }
+
         });
+
     }
 
     private void init(){
@@ -92,6 +94,12 @@ public class ReplayActivity extends FragmentHubActivity
         btnPlay.setEnabled(false);
         btnPrev.setEnabled(false);
         btnNext.setEnabled(false);
+
+        btnConfig = findViewById(R.id.btnConfig);
+        btnSpeaker = findViewById(R.id.btnSpeaker);
+        btnMovePanel = findViewById(R.id.btnMovePanel);
+
+        fragmentSetting = new FragmentSetting();
     }
 
     private void attachListener(){
@@ -100,6 +108,9 @@ public class ReplayActivity extends FragmentHubActivity
         btnPlay.setOnClickListener(this);
         btnPrev.setOnClickListener(this);
         btnNext.setOnClickListener(this);
+        btnConfig.setOnClickListener(this);
+        btnSpeaker.setOnClickListener(this);
+        btnMovePanel.setOnClickListener(this);
     }
 
     private void runScript(PGNFile pgnFile) {
@@ -133,6 +144,29 @@ public class ReplayActivity extends FragmentHubActivity
         switch (TAG){
             case GameCore.TAG:
                 handleGameCoreMsg(TAG, type, o1, o2);
+                break;
+            case FragmentSetting.TAG:
+                handleFragmentSettingMsg(TAG, type, o1, o2);
+                break;
+            case MoveControlPanel.TAG:
+                handleMoveControlPanelMsg(TAG, type, o1, o2);
+                break;
+        }
+    }
+
+    private void handleMoveControlPanelMsg(String tag, int type, Object o1, Object o2) {
+        switch (type){
+            case MoveControlPanel.JUMP_TO_MOVE:
+                int moveIndex = (int) o1;
+                runner.jumpToMove(moveIndex + 1);
+                break;
+        }
+    }
+
+    private void handleFragmentSettingMsg(String tag, int type, Object o1, Object o2) {
+        switch (type){
+            case FragmentSetting.CLOSE_PANEL:
+                removeFragment(fragmentSetting);
                 break;
         }
     }
@@ -235,14 +269,8 @@ public class ReplayActivity extends FragmentHubActivity
     }
 
     @Override
-    public void exitWithError(String error) {
-        runOnUiThread(()->{
-            showErrorDialog(error);
-        });
-    }
-
-    @Override
     public void onClick(View v) {
+        SoundManager.getInstance().playSound(this, SoundManager.SoundType.BTN_BLOP);
         if(v == btnClose){
             btnClose.playAnimation();
             showQuitDialog();
@@ -258,6 +286,92 @@ public class ReplayActivity extends FragmentHubActivity
             runner.prevMove();
         }else if(v == btnNext){
             runner.nextMove();
+        }else if(v == btnSpeaker){
+            if(SoundManager.getInstance().isSoundOn()){
+                SoundManager.getInstance().setSoundOn(false);
+                setButtonSpeakerDisableIcon();
+            }else{
+                SoundManager.getInstance().setSoundOn(true);
+                setButtonSpeakerEnableIcon();
+            }
+            btnSpeaker.playAnimation();
+        } else if (v == btnConfig) {
+            if(isShowingFragment(fragmentSetting)){
+                removeFragment(fragmentSetting);
+            }else{
+                showFragment(fragmentSetting);
+            }
+        }else if(v == btnMovePanel){
+            btnMovePanel.playAnimation();
+            showMoveControlPanel();
         }
     }
+
+    private void setButtonSpeakerEnableIcon(){
+        btnSpeaker.setAnimation("animated_ui/btn_speaker_enable.json");
+    }
+
+    private void setButtonSpeakerDisableIcon(){
+        btnSpeaker.setAnimation("animated_ui/btn_speaker_mute.json");
+    }
+
+    private void showMoveControlPanel() {
+        if(moveControlPanel == null){
+            return;
+        }
+
+        moveControlPanel.show(getSupportFragmentManager(), MoveControlPanel.TAG);
+    }
+
+    private boolean isShowingFragment(Fragment fragment){
+        if(currenFragment == null){
+            return false;
+        }else {
+            return currenFragment == fragment;
+        }
+    }
+
+    private void showFragment(Fragment fragment){
+        if(isShowingFragment(fragment)){
+            return;
+        }
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.flStage, fragment);
+        ft.commit();
+        currenFragment = fragment;
+    }
+
+    private void removeFragment(Fragment fragment){
+        if(isShowingFragment(fragment)){
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.remove(fragment);
+            ft.commit();
+            currenFragment = null;
+        }
+    }
+
+    public ScriptsRunner getRunner(){
+        return runner;
+    }
+
+    public PGNFile getRunningPGNFile(){
+        return pgnFile;
+    }
+
+    private ProgressDialog progressDialog;
+    private Handler mainHandler;
+    private GameFragment gameFragment;
+    private GameLoop gameLoop;
+    private GameCore gameCore;
+    private LottieAnimationView btnClose;
+    private PGNFile pgnFile = null;
+    private SeekBar sbProgress;
+    private ScriptsRunner runner = null;
+    private ImageView btnPlay, btnPrev, btnNext;
+    private MoveControlPanel moveControlPanel = null;
+    private LottieAnimationView btnConfig, btnSpeaker, btnMovePanel;
+    private FragmentSetting fragmentSetting;
+    private Fragment currenFragment = null;
 }

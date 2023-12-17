@@ -62,6 +62,10 @@ public class PlayerMatchHistoryAdapter extends BaseAdapter {
                 gameResult.setText("White win");
                 gameResult.setTextColor(Color.parseColor("#FFFFFF"));
                 break;
+                case DyConst.GAME_DRAW:
+                gameResult.setText("Draw");
+                gameResult.setTextColor(Color.parseColor("#00ffc3"));
+                break;
         }
 
         TextView gameDate = v.findViewById(R.id.tvDate);
