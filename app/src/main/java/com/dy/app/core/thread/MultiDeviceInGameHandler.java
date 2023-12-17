@@ -11,6 +11,7 @@ import com.dy.app.gameplay.player.PlayerProfile;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.ConnectionManager;
+import com.dy.app.manager.SoundManager;
 import com.dy.app.network.IMessageHandler;
 import com.dy.app.network.Message;
 import com.dy.app.network.MessageCode;
@@ -91,6 +92,11 @@ public class MultiDeviceInGameHandler extends Thread
         }
         //handle move by player
         handlePlayerMove(moveNotation);
+    }
+
+    @Override
+    public void onNotPossibleMoveDetected() {
+        SoundManager.getInstance().playSound(gameActivity, SoundManager.SoundType.NOTIFY);
     }
 
     private boolean checkForSpecialMove(String moveNotation) {
@@ -210,6 +216,8 @@ public class MultiDeviceInGameHandler extends Thread
         }
         //resume timer
         timer.resumeTimer();
+        //handle move sound effect
+        handleMoveSoundEffect(moveNotation);
     }
 
     private void handlePlayerMove(String moveNotation){
@@ -223,7 +231,11 @@ public class MultiDeviceInGameHandler extends Thread
         //check for checkmate
         if(isCheckMate(moveNotation)){
             endGame(P2pGameResultDialog.WIN);
+            return;
         }
+
+        //handle move sound effect
+        handleMoveSoundEffect(moveNotation);
     }
 
     private boolean isCheckMate(String moveNotation){
@@ -241,6 +253,8 @@ public class MultiDeviceInGameHandler extends Thread
         gameActivity.updateTimeRemain(player.isWhitePiece(), duration);
         gameActivity.updatePlayerTimeRemain(duration);
         informRemainTime(duration);
+
+        SoundManager.getInstance().playSound(gameActivity, SoundManager.SoundType.GAME_START);
 
         if(player.isWhitePiece()) {
             timer.resumeTimer();
@@ -323,6 +337,7 @@ public class MultiDeviceInGameHandler extends Thread
     }
 
     private void endGame(int result){
+        SoundManager.getInstance().playSound(gameActivity, SoundManager.SoundType.GAME_OVER);
         timer.stopTimer();
         gameActivity.onGameResult(result);
     }
@@ -377,5 +392,19 @@ public class MultiDeviceInGameHandler extends Thread
 
     public long getPromotionCount() {
         return playerPromotionCount;
+    }
+
+    public void handleMoveSoundEffect(String moveNotation){
+        if(moveNotation.contains("+")){
+            SoundManager.getInstance().playSound(gameActivity, SoundManager.SoundType.MOVE_CHECK);
+        } else if(moveNotation.contains("x")){
+            SoundManager.getInstance().playSound(gameActivity, SoundManager.SoundType.CAPTURE);
+        } else if(moveNotation.contains("O-O")){
+            SoundManager.getInstance().playSound(gameActivity, SoundManager.SoundType.CASTLE);
+        } else if(moveNotation.contains("=")){
+            SoundManager.getInstance().playSound(gameActivity, SoundManager.SoundType.PROMOTE);
+        } else {
+            SoundManager.getInstance().playSound(gameActivity, SoundManager.SoundType.MOVE_SELF);
+        }
     }
 }

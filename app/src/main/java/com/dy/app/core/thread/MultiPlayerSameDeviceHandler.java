@@ -9,6 +9,7 @@ import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.ConnectionManager;
+import com.dy.app.manager.SoundManager;
 import com.dy.app.utils.DyConst;
 
 public class MultiPlayerSameDeviceHandler extends Thread
@@ -29,6 +30,7 @@ implements TilePicker.TilePickerListener{
     @Override
     public void run() {
         isRunning = true;
+        SoundManager.getInstance().playSound(activity, SoundManager.SoundType.GAME_START);
 
         while(isRunning){
             if(player.isWhitePiece()){
@@ -86,6 +88,7 @@ implements TilePicker.TilePickerListener{
         }
         player.setWhitePiece(!player.isWhitePiece());
         checkForDrawByStaleMate(player.isWhitePiece());
+        handleMoveSoundEffect(moveNotation);
     }
 
     private boolean checkForSpecialMove(String moveNotation) {
@@ -126,6 +129,11 @@ implements TilePicker.TilePickerListener{
         handleFinalMove(moveNotation);
     }
 
+    @Override
+    public void onNotPossibleMoveDetected() {
+        SoundManager.getInstance().playSound(activity, SoundManager.SoundType.NOTIFY);
+    }
+
     private void checkForTimeWin(){
         if(whiteTimeRemainingMS <= 0){
             endGame(DyConst.GAME_BLACK_WIN);
@@ -141,6 +149,7 @@ implements TilePicker.TilePickerListener{
             }
             gameEnd = true;
             stopGame();
+            SoundManager.getInstance().playSound(activity, SoundManager.SoundType.GAME_OVER);
             activity.onGameResult(result);
         }
     }
@@ -148,5 +157,19 @@ implements TilePicker.TilePickerListener{
     public void stopGame(){
         isRunning = false;
         tilePicker.setListener(null);
+    }
+
+    public void handleMoveSoundEffect(String moveNotation){
+        if(moveNotation.contains("+")){
+            SoundManager.getInstance().playSound(activity, SoundManager.SoundType.MOVE_CHECK);
+        } else if(moveNotation.contains("x")){
+            SoundManager.getInstance().playSound(activity, SoundManager.SoundType.CAPTURE);
+        } else if(moveNotation.contains("O-O")){
+            SoundManager.getInstance().playSound(activity, SoundManager.SoundType.CASTLE);
+        } else if(moveNotation.contains("=")){
+            SoundManager.getInstance().playSound(activity, SoundManager.SoundType.PROMOTE);
+        } else {
+            SoundManager.getInstance().playSound(activity, SoundManager.SoundType.MOVE_SELF);
+        }
     }
 }

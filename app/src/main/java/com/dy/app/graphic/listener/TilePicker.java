@@ -199,6 +199,7 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
 
     public interface TilePickerListener{
         void onMoveDetected(Tile src, Tile dst);
+        void onNotPossibleMoveDetected();
     }
 
     public void setListener(TilePickerListener listener) {

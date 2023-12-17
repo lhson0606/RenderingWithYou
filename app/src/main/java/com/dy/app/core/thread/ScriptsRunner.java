@@ -1,5 +1,6 @@
 package com.dy.app.core.thread;
 
+import android.content.Context;
 import android.util.Log;
 import android.widget.RelativeLayout;
 
@@ -10,6 +11,7 @@ import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNMove;
 import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.manager.SoundManager;
 import com.dy.app.setting.GameSetting;
 import com.dy.app.ui.dialog.MoveControlPanel;
 
@@ -29,6 +31,7 @@ public class ScriptsRunner extends Thread{
     private int currentMove = 0;
     private final ReentrantLock moveLock = new ReentrantLock();
     private final Condition resumeCondition = moveLock.newCondition();
+    private Context context;
 
     public PGNFile getRunningPGNFile() {
         return pgnFile;
@@ -40,10 +43,11 @@ public class ScriptsRunner extends Thread{
         void exitWithError(String message);
     }
 
-    public ScriptsRunner(IScriptRunnerCallback activity, PGNFile pgnFile, Board board){
+    public ScriptsRunner(IScriptRunnerCallback activity, PGNFile pgnFile, Board board, Context context){
         this.activity = activity;
         this.pgnFile = pgnFile;
         this.board = board;
+        this.context = context;
     }
 
     @Override
@@ -88,6 +92,7 @@ public class ScriptsRunner extends Thread{
                     Piece piece = chessMove.getSrcTile().getPiece();
                     try {
                         board.moveByNotation(moveNotation, isWhite);
+                        handleMoveSoundEffect(moveNotation);
                         Log.d("Debug concurrent", "Worker: on board state update: ");
                         Log.d("Debug concurrent", board.toString());
                     } catch (Exception e) {
@@ -237,6 +242,20 @@ public class ScriptsRunner extends Thread{
         }
         finally {
             moveLock.unlock();
+        }
+    }
+
+    public void handleMoveSoundEffect(String moveNotation){
+        if(moveNotation.contains("+")){
+            SoundManager.getInstance().playSound(context, SoundManager.SoundType.MOVE_CHECK);
+        } else if(moveNotation.contains("x")){
+            SoundManager.getInstance().playSound(context, SoundManager.SoundType.CAPTURE);
+        } else if(moveNotation.contains("O-O")){
+            SoundManager.getInstance().playSound(context, SoundManager.SoundType.CASTLE);
+        } else if(moveNotation.contains("=")){
+            SoundManager.getInstance().playSound(context, SoundManager.SoundType.PROMOTE);
+        } else {
+            SoundManager.getInstance().playSound(context, SoundManager.SoundType.MOVE_SELF);
         }
     }
 }

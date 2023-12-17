@@ -21,26 +21,14 @@ public class SoundManager {
     }
 
     public enum SoundType {
-        CLICK,
-        MOVE,
+        GAME_START,
+        GAME_OVER,
         CAPTURE,
-        CHECK,
-        CHECKMATE,
-        DRAW,
-        WIN,
-        LOSE,
-        PROMOTION,
-        CASTLING,
-        ENPASSANT,
-        STALEMATE,
-        RESIGN,
-        UNDO,
-        REDO,
-        NEWGAME,
-        SAVE,
-        LOAD,
-        EXIT,
-        ERROR,
+        CASTLE,
+        MOVE_CHECK,
+        MOVE_SELF,
+        NOTIFY,
+        PROMOTE,
         BTN_BLOP,
         BTN_SKIN_PICKING,
         COIN_CLINK,
@@ -74,7 +62,15 @@ public class SoundManager {
         addSound(SoundType.COIN_CLINK, R.raw.se_coins_clinking, 0.5f, 0.5f);
         addSound(SoundType.FIREWORK_LONG, R.raw.se_firework_long, 0.5f, 0.5f);
         addSound(SoundType.ANGELIC_CHORUS, R.raw.se_angelic_chorus, 1f, 1f);
-        addSound(SoundType.WOOD_HIT, R.raw.se_wood_hit, 1.5f, 1.5f);
+        addSound(SoundType.WOOD_HIT, R.raw.se_wood_hit, 1f, 1f);
+        addSound(SoundType.CAPTURE, R.raw.se_capture, 1f, 1f);
+        addSound(SoundType.CASTLE, R.raw.se_castle, 1f, 1f);
+        addSound(SoundType.MOVE_CHECK, R.raw.se_move_check, 1f, 1f);
+        addSound(SoundType.MOVE_SELF, R.raw.se_move_self, 1f, 1f);
+        addSound(SoundType.NOTIFY, R.raw.se_notify, 1f, 1f);
+        addSound(SoundType.PROMOTE, R.raw.se_promote, 1f, 1f);
+        addSound(SoundType.GAME_START, R.raw.se_game_start, 1f, 1f);
+        addSound(SoundType.GAME_OVER, R.raw.se_game_over, 1f, 1f);
 
         return this;
     }

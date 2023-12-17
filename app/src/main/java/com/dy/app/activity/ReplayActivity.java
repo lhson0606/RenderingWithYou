@@ -122,7 +122,7 @@ public class ReplayActivity extends FragmentHubActivity
 
     private void runScript(PGNFile pgnFile) {
         updateDisplay(pgnFile);
-        runner = new ScriptsRunner(this, pgnFile, gameCore.getBoard());
+        runner = new ScriptsRunner(this, pgnFile, gameCore.getBoard(), this);
         runner.start();
     }
 

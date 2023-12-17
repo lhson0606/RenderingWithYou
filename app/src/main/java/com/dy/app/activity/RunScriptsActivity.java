@@ -141,7 +141,7 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         }
         moveControlPanel = MoveControlPanel.newInstance(pgnFile);
         updateDisplay(pgnFile);
-        runner = new ScriptsRunner(this, pgnFile, gameCore.getBoard());
+        runner = new ScriptsRunner(this, pgnFile, gameCore.getBoard(), this);
         runner.start();
     }
 
