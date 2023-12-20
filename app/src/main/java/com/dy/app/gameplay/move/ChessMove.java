@@ -1,5 +1,7 @@
 package com.dy.app.gameplay.move;
 
+import android.util.Log;
+
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.gameplay.board.Board;
 import com.dy.app.gameplay.board.Tile;
@@ -96,6 +98,10 @@ public class ChessMove {
             }
         }
 
+        Log.d("ChessMove", "Invalid black move " + moveNotation);
+        Log.d("ChessMove", board.toString());
+        Log.d("ChessMove", board.getMoveHistory());
+
         throw new Exception("Invalid white move: " + moveNotation);
     }
 
@@ -153,6 +159,10 @@ public class ChessMove {
                 return result;
             }
         }
+
+        Log.d("ChessMove", "Invalid black move " + moveNotation);
+        Log.d("ChessMove", board.toString());
+        Log.d("ChessMove", board.getMoveHistory());
 
         throw new Exception("Invalid black move " + moveNotation);
     }

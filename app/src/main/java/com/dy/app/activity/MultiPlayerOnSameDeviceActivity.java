@@ -27,6 +27,7 @@ import com.dy.app.core.thread.MultiPlayerSameDeviceHandler;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.player.PlayerGameHistory;
+import com.dy.app.gameplay.player.PlayerInventory;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.gameplay.screenshot.ITakeScreenshot;
 import com.dy.app.graphic.display.GameFragment;
@@ -53,6 +54,8 @@ implements View.OnClickListener, ITakeScreenshot {
         //https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         mainHandler = new Handler(getMainLooper());
+        //set rival piece skin to the same as player
+        Rival.getInstance().setPieceSkinIndex((long)Player.getInstance().inventory.get(PlayerInventory.KEY_PIECE_SKIN_INDEX));
         init();
         attachFragment();
         attachListener();
@@ -141,6 +144,8 @@ implements View.OnClickListener, ITakeScreenshot {
                 gameFragment.onMsgFromMain(TAG, t, o1, o2);
                 break;
             case START_GAME:
+                //check if the activity is still alive
+                if(isFinishing()) return;
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
                 //Semaphore semaphore = new Semaphore(0);

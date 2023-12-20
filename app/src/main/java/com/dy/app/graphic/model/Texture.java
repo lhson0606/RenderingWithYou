@@ -12,7 +12,6 @@ public class Texture {
         this.bitmap = bitmap;
     }
 
-    //#TODO
     public int getID() {
         return ID;
     }

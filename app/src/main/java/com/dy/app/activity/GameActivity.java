@@ -215,6 +215,8 @@ public class GameActivity extends FragmentHubActivity
                 gameFragment.onMsgFromMain(TAG, t, o1, o2);
                 break;
             case START_GAME:
+                //check if the activity is still alive
+                if(isFinishing()) return;
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
                 //Semaphore semaphore = new Semaphore(0);

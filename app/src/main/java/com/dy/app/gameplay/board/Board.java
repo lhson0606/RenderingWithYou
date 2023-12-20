@@ -249,10 +249,6 @@ public class Board implements GameEntity {
                 if(piece.getPossibleMoves().contains(des) && piece.getNotation().equals(ChessNotation.PAWN)){
                     result.add(piece);
                 }
-
-                if(piece.tilePos().x == 4 && piece.tilePos().y == 1){
-                    Log.d("pawn", "pawn");
-                }
             }
             return result;
         }else if(pieceNotation.length() == 1){
@@ -349,6 +345,7 @@ public class Board implements GameEntity {
     }
 
     public void moveByNotation(String moveNotation, boolean isWhite) throws Exception {
+        Log.d("Board", "Received " + (isWhite? "white":"black") + " move: " + moveNotation);
         if(moveNotation.equals("")) return;
         try {
             mutex.lock();
@@ -377,7 +374,8 @@ public class Board implements GameEntity {
             prevSrcTile = srcTile;
             prevDesTile = desTile;
 
-            changeKingColorInCheckState();
+            //#todo: cannot use this anymore since it will obtain mutex
+            //changeKingColorInCheckState();
 
             //save to move record
             saveMoveRecord(moveNotation);
@@ -390,6 +388,7 @@ public class Board implements GameEntity {
         moveRecord.add(moveNotation);
     }
 
+    //this method is safe to use because the kings will never be removed from the board
     public void changeKingColorInCheckState(){
         int testResult = -1;
         //test for white check
@@ -551,49 +550,57 @@ public class Board implements GameEntity {
      * @return 0 if no check, 1 if check, 2 if checkmate
      */
     public int testForCheck(boolean isWhite){
-        Log.d("Board", "testForCheck");
-        Vector<Tile> controlledTiles = isWhite ? getBlackControlledTile() : getWhiteControlledTile();
-        King king = isWhite ? pieceManager.getWhiteKing() : pieceManager.getBlackKing();
+        try{
+            //when use this method the board will be in inconsistent state, we need to lock mutex to prevent concurrent access
+            mutex.lock();
 
-        if(!controlledTiles.contains(king.getTile())){
-            Log.d("Board", "no check");
-            return NO_CHECK;
-        }
+            Log.d("Board", "testForCheck");
+            Vector<Tile> controlledTiles = isWhite ? getBlackControlledTile() : getWhiteControlledTile();
+            King king = isWhite ? pieceManager.getWhiteKing() : pieceManager.getBlackKing();
 
-        Log.d("Board", "check");
-        boolean isCheckmate = true;
-        Vector<Piece> pieces = isWhite ? pieceManager.getWhitePieces() : pieceManager.getBlackPieces();
-        //we need to try every possible moves of the ally pieces
-        for(Piece piece : pieces){
-            Vector<Tile> currentPossibleMove = new Vector<>(piece.getPossibleMoves());
-            for(Tile tile : currentPossibleMove){
-                //try pseudo move
-                piece.pseudoMove(tile.pos);
-                //update the board state for the pseudo move
-                pseudoUpdateBoardState();
-                //check if the king is still in check
-                Vector<Tile> newControlledTiles = isWhite ? getBlackControlledTile() : getWhiteControlledTile();
-                //there's a move that can get the king out of check
-                if(!newControlledTiles.contains(king.getTile())){
-                    isCheckmate = false;
-                    Log.d("Board", toString());
+            if(!controlledTiles.contains(king.getTile())){
+                Log.d("Board", "no check");
+                return NO_CHECK;
+            }
+
+            Log.d("Board", "check");
+            boolean isCheckmate = true;
+            Vector<Piece> pieces = isWhite ? pieceManager.getWhitePieces() : pieceManager.getBlackPieces();
+            //we need to try every possible moves of the ally pieces
+            for(Piece piece : pieces){
+                Vector<Tile> currentPossibleMove = new Vector<>(piece.getPossibleMoves());
+                for(Tile tile : currentPossibleMove){
+                    //try pseudo move
+                    piece.pseudoMove(tile.pos);
+                    //update the board state for the pseudo move
+                    pseudoUpdateBoardState();
+                    //check if the king is still in check
+                    Vector<Tile> newControlledTiles = isWhite ? getBlackControlledTile() : getWhiteControlledTile();
+                    //there's a move that can get the king out of check
+                    if(!newControlledTiles.contains(king.getTile())){
+                        isCheckmate = false;
+                        Log.d("Board", toString());
+                        piece.rollbackPseudoMove();
+                        pseudoUpdateBoardState();
+                        break;
+                    }
+
                     piece.rollbackPseudoMove();
                     pseudoUpdateBoardState();
-                    break;
                 }
 
-                piece.rollbackPseudoMove();
-                pseudoUpdateBoardState();
+                //no need to continue if we detect there's move to parry the check
+                if(!isCheckmate){
+                    break;
+                }
             }
 
-            //no need to continue if we detect there's move to parry the check
-            if(!isCheckmate){
-                break;
-            }
+            Log.d("Board", "isCheckmate: " + isCheckmate);
+            return isCheckmate ? IS_CHECKMATE : IS_CHECK;
+
+        }finally {
+            mutex.unlock();
         }
-
-        Log.d("Board", "isCheckmate: " + isCheckmate);
-        return isCheckmate ? IS_CHECKMATE : IS_CHECK;
     }
 
     public boolean isStalemate(boolean isWhite){

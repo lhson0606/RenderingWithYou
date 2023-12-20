@@ -203,6 +203,9 @@ public class PGNFile implements Serializable {
         for(int i = 0; i < splitResults.length; i++){
             String curStr = splitResults[i];
             curStr = curStr.trim();
+            if(curStr.equals("1-0") || curStr.equals("0-1") || curStr.equals("1/2-1/2")){
+                break;
+            }
             //check for correct index
             if(i%3 == 0) {
                 int index = -1;
@@ -210,10 +213,6 @@ public class PGNFile implements Serializable {
                 try{
                     index = Integer.parseInt(curStr.substring(0, curStr.length()-1));
                 }catch (NumberFormatException e){
-                    if(curStr.equals("1-0") || curStr.equals("0-1") || curStr.equals("1/2-1/2")){
-                        break;
-                    }
-
                     throw new PGNParseException("Invalid PGN file");
                 }
 

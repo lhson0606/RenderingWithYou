@@ -96,6 +96,12 @@ public class SoundManager {
         }
     }
 
+    public void prepare(Context context){
+        if(context!= currentContext){
+            initInContext(context);
+        }
+    }
+
     public void stopSound(SoundType type){
         final MediaPlayer sound = soundMap.get(type);
 

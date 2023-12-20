@@ -11,8 +11,10 @@ import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNMove;
 import com.dy.app.gameplay.piece.Piece;
+import com.dy.app.gameplay.player.Player;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.setting.GameSetting;
+import com.dy.app.ui.dialog.LoadingDialogWithText;
 import com.dy.app.ui.dialog.MoveControlPanel;
 
 import java.util.Vector;
@@ -43,27 +45,31 @@ public class ScriptsRunner extends Thread{
         void exitWithError(String message);
     }
 
-    public ScriptsRunner(IScriptRunnerCallback activity, PGNFile pgnFile, Board board, Context context){
+    public ScriptsRunner(IScriptRunnerCallback activity, PGNFile pgnFile, Board board, Context context) {
         this.activity = activity;
         this.pgnFile = pgnFile;
         this.board = board;
         this.context = context;
+        SoundManager.getInstance().prepare(context);
     }
 
     @Override
     public void run() {
         isRunning = true;
+        //prevent user from interacting with the board
+        Player.getInstance().setInTurn(false);
 
         try {
             loadAllMove();
         } catch (Exception e) {
             //throw new RuntimeException(e);
-            activity.exitWithError("Cannot load moves");
+            activity.exitWithError(e.getMessage());
             return;
         }
         Vector<PGNMove> moves = pgnFile.getMoves();
 
         jumpToMove(0);
+        SoundManager.getInstance().playSound(context, SoundManager.SoundType.GAME_START);
 
         while(isRunning){
             while(currentMove < pgnFile.getBothSideMoveCount() && isRunning) {
@@ -89,9 +95,10 @@ public class ScriptsRunner extends Thread{
                         isPaused = true;
                         break;
                     }
-                    Piece piece = chessMove.getSrcTile().getPiece();
+                    //Piece piece = chessMove.getSrcTile().getPiece();
                     try {
                         board.moveByNotation(moveNotation, isWhite);
+                        board.changeKingColorInCheckState();
                         handleMoveSoundEffect(moveNotation);
                         Log.d("Debug concurrent", "Worker: on board state update: ");
                         Log.d("Debug concurrent", board.toString());
@@ -123,11 +130,12 @@ public class ScriptsRunner extends Thread{
                 try {
                     Thread.sleep(GameSetting.getInstance().getPlaybackSpeed());
                 } catch (InterruptedException e) {
-                    //no need to handle
+                    // this will be provoked when we notify that playback speed has changed
                 }
             }
-
+            //script has ended
             try{
+                SoundManager.getInstance().playSound(context, SoundManager.SoundType.GAME_OVER);
                 moveLock.lock();
                 Log.d(TAG, "run: waiting for resume");
                 activity.changePlayButtonToContinue();
@@ -165,9 +173,21 @@ public class ScriptsRunner extends Thread{
 
     private void loadAllMove() throws Exception {
         Vector<PGNMove> moves = pgnFile.getMoves();
+        int index = 1;
         for(PGNMove move : moves){
-            loadSingleMove(move.white, true);
-            loadSingleMove(move.black, false);
+            try{
+                loadSingleMove(move.white, true);
+                index++;
+            } catch (Exception e) {
+                throw new RuntimeException("Cannot load move " + move.white + " at position " + index);
+            }
+
+            try{
+                loadSingleMove(move.black, false);
+                index++;
+            } catch (Exception e) {
+                throw new RuntimeException("Cannot load move " + move.black + " at position " + index);
+            }
         }
     }
 

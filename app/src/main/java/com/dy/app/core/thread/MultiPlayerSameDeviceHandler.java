@@ -59,6 +59,7 @@ implements TilePicker.TilePickerListener{
     private void handleFinalMove(String moveNotation){
         try {
             board.moveByNotation(moveNotation, player.isWhitePiece());
+            board.changeKingColorInCheckState();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

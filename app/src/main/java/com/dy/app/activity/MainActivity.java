@@ -42,6 +42,7 @@ import com.dy.app.ui.view.FragmentLogoutForm;
 import com.dy.app.ui.view.FragmentMainMenu;
 import com.dy.app.ui.view.FragmentSetting;
 import com.dy.app.ui.view.FragmentSkinSelection;
+import com.dy.app.ui.view.FragmentSplashScreen1;
 import com.dy.app.utils.DyConst;
 import com.dy.app.utils.Utils;
 import com.firebase.ui.auth.AuthUI;
@@ -61,13 +62,30 @@ public class MainActivity extends FragmentHubActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        fm = getSupportFragmentManager();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         handler = new Handler(getMainLooper());
         attachFragment();
         init();
         attachListener();
         initManager();
+    }
+
+    private FragmentSplashScreen1 fragmentSplashScreen1 = null;
+
+    private void showSplashScreen(){
+        fragmentSplashScreen1 = new FragmentSplashScreen1().newInstance();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.splashScreen, fragmentSplashScreen1);
+        ft.show(fragmentSplashScreen1);
+        ft.commit();
+    }
+
+    private void removeSplashScreen(){
+        if(fragmentSplashScreen1 == null) return;
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.remove(fm.findFragmentById(R.id.splashScreen));
+        fragmentSplashScreen1 = null;
+        ft.commit();
     }
 
     private void init(){
@@ -108,6 +126,15 @@ public class MainActivity extends FragmentHubActivity
     protected void onResume() {
         loadUserData();
         Database.getInstance().addAuthStateListener(this);
+
+        if(firstEnterApp){
+            firstEnterApp = false;
+            showSplashScreen();
+            handler.postDelayed(()->{
+                removeSplashScreen();
+            }, 5000);
+        }
+
         super.onResume();
     }
 
@@ -686,7 +713,7 @@ public class MainActivity extends FragmentHubActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode != Activity.RESULT_OK) {
-            displayAlertMessage("Something went wrong, please try again");
+            displayAlertMessage("You didn't complete the operation!");
             return;
         }
         switch (requestCode){
@@ -760,10 +787,11 @@ public class MainActivity extends FragmentHubActivity
     private FragmentCreateAccount createAccountFragment;
     private FragmentSkinSelection skinSelectionFragment;
     private TextView tvUsername, tvUserCoin, tvUserElo;
-    private FragmentManager fm;
+    private final FragmentManager fm = getSupportFragmentManager();;
     private Handler handler;
     private LottieAnimationView btnConfig, btnHistory, btnAbout, btnAccount, btnChooseSkin, btnSpeaker, btnShop, btnStatistics;
     private LottieAnimationView btnGamePass;
     private Fragment currentFragment;
     private PlayerHistoryDialog playerHistoryDialog;
+    private boolean firstEnterApp = true;
 }

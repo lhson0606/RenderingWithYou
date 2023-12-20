@@ -36,7 +36,7 @@ public class DyConst {
     public static final String pawn = "pawn";
     public static final String tile = "tile";
     public static final String terrain = "terrain";
-    public static final Material default_material = new Material(2f, 0.5f);
+    public static final Material default_material = new Material(50f, 1f);
     public static final Light defulat_light = new Light(new Vec3(1.0f, 1.0f, 1.0f), new Vec3(0.0f, 25.0f, 0.0f), 100.0f);
     public static final Vec3 default_black_cam_pos = new Vec3(-0.007419136f, 3.611991f, 0.6967087f);
     public static final Vec3 default_white_cam_pos = new Vec3(-1.2612155E-4f, 3.611991f, -0.6967087f);
