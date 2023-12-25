@@ -396,7 +396,11 @@ public class MainActivity extends FragmentHubActivity
 
     private void onSignInResult(FirebaseAuthUIAuthenticationResult o) {
         if(o.getResultCode() == RESULT_OK){
-            signUserSignIn();
+            try{
+                signUserSignIn();
+            }catch (Exception e) {
+                displayAlertMessage("Something went wrong, we cannot log you in");
+            }
         }
     }
 
@@ -671,8 +675,14 @@ public class MainActivity extends FragmentHubActivity
     public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
         //login scenario
         if(firebaseAuth.getCurrentUser() != null){
-            if(!Player.getInstance().hasLogin())
-                signUserSignIn();
+            if(!Player.getInstance().hasLogin()) {
+                try{
+                    signUserSignIn();
+                }
+                catch (Exception e){
+                    displayAlertMessage("Something went wrong, we cannot log you in");
+                }
+            }
         //logout scenario
         }else{
             Player.getInstance().reset();

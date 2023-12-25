@@ -196,16 +196,17 @@ public class ReplayActivity extends FragmentHubActivity
                 gameFragment.onMsgFromMain(TAG, t, o1, o2);
                 break;
             case START_GAME:
-                //check if the activity state is still valid
-                if(isFinishing()){
-                    return;
-                }
                 FragmentManager fm = getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
                 //Semaphore semaphore = new Semaphore(0);
                 gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
                 ft.replace(R.id.fl_game_surface, gameFragment);
-                ft.commit();
+                //check if the activity state is still valid
+                if(isFinishing()){
+                    return;
+                }else{
+                    ft.commit();
+                }
                 gameLoop = new GameLoop(gameFragment.getSurfaceView(), gameCore.getEntityManger());
                 Thread worker = new Thread(()->{
                     gameFragment.getSurfaceView().getRenderer().waitForGLInit();
