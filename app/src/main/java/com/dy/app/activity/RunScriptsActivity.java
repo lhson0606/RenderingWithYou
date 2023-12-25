@@ -25,6 +25,9 @@ import com.dy.app.core.thread.GameLoop;
 import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNParseException;
+import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerInventory;
+import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.display.GameFragment;
 import com.dy.app.manager.SoundManager;
 import com.dy.app.ui.dialog.MoveControlPanel;
@@ -46,6 +49,8 @@ implements View.OnClickListener, SeekBar.OnSeekBarChangeListener, ScriptsRunner.
         setContentView(R.layout.run_script_activity);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//https://stackoverflow.com/questions/6922878/how-to-remove-the-battery-icon-in-android-status-bar
         mainHandler = new Handler(getMainLooper());
+        //set rival piece skin to the same as player
+        Rival.getInstance().setPieceSkinIndex((long) Player.getInstance().inventory.get(PlayerInventory.KEY_PIECE_SKIN_INDEX));
         initCore();
         init();
         updateUI();

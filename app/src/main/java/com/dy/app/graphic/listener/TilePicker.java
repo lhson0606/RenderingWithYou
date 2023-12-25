@@ -35,6 +35,10 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
     private void cancelPicking(){
         lastPiece.putDown();
         lastPiece = null;
+
+        if(listener!=null){
+            listener.onNotPossibleMoveDetected();
+        }
     }
 
     @Override

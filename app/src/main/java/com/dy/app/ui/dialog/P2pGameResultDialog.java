@@ -1,8 +1,11 @@
 package com.dy.app.ui.dialog;
 
+import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -46,6 +49,86 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
         super.onCreate(savedInstanceState);
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        trophyAnimator = ValueAnimator.ofInt(0, (int)playerTrophyDiff);
+        goldAnimator = ValueAnimator.ofInt(0, (int)playerGoldDiff);
+        gemAnimator = ValueAnimator.ofInt(0, (int)playerGemDiff);
+        oppoTrophyAnimator = ValueAnimator.ofInt(0, (int)opponentTrophyDiff);
+
+        trophyAnimator.setDuration(ANIMATION_DURATION);
+        goldAnimator.setDuration(ANIMATION_DURATION);
+        gemAnimator.setDuration(ANIMATION_DURATION);
+        oppoTrophyAnimator.setDuration(ANIMATION_DURATION);
+
+        trophyAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int currentValue = (int)animation.getAnimatedValue();
+                setSingleValue(tvTrophyDifference, currentValue);
+            }
+        });
+
+        goldAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int currentValue = (int)animation.getAnimatedValue();
+                setSingleValue(tvGoldDifference, currentValue);
+            }
+        });
+
+        gemAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int currentValue = (int)animation.getAnimatedValue();
+                setSingleValue(tvGemDifference, currentValue);
+            }
+        });
+
+        oppoTrophyAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int currentValue = (int)animation.getAnimatedValue();
+                setSingleValue(tvOppoPlayerTrophyDifference, currentValue);
+            }
+        });
+
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                skipAnimation();
+                return false;
+            }
+        });
+
+
+        animatorSet.playSequentially(trophyAnimator, goldAnimator, gemAnimator, oppoTrophyAnimator);
+
+        super.onViewCreated(view, savedInstanceState);
+    }
+
+    private void skipAnimation(){
+        if(animatorSet.isRunning()){
+            animatorSet.end();
+            //update final value
+            setSingleValue(tvTrophyDifference, (int)playerTrophyDiff);
+            setSingleValue(tvGoldDifference, (int)playerGoldDiff);
+            setSingleValue(tvGemDifference, (int)playerGemDiff);
+            setSingleValue(tvOppoPlayerTrophyDifference, (int)opponentTrophyDiff);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        animatorSet.start();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        skipAnimation();
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -75,10 +158,6 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
 
     private void updateDisplay() {
         setTitle();
-        setSingleValue(tvTrophyDifference, (int)playerTrophyDiff);
-        setSingleValue(tvGoldDifference, (int)playerGoldDiff);
-        setSingleValue(tvGemDifference, (int)playerGemDiff);
-        setSingleValue(tvOppoPlayerTrophyDifference, (int)opponentTrophyDiff);
     }
 
     private void setTitle(){
@@ -125,10 +204,13 @@ public class P2pGameResultDialog extends DialogFragment implements View.OnClickL
         }
     }
 
+    private final AnimatorSet animatorSet = new AnimatorSet();
     private Button btnSavePGN, btnRematch, btnExit;
     private TextView tvShareAsPGN, tvShareAsImage;
     private TextView tvTrophyDifference, tvGoldDifference, tvGemDifference, tvOppoPlayerTrophyDifference;
     long playerTrophyDiff, playerGoldDiff, playerGemDiff, opponentTrophyDiff;
     private int gameResult;
     private TextView tvGameResultTitle;
+    private ValueAnimator trophyAnimator, goldAnimator, gemAnimator, oppoTrophyAnimator;
+    public static final int ANIMATION_DURATION = 500;
 }

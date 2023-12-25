@@ -1,5 +1,7 @@
 package com.dy.app.core;
 
+import androidx.fragment.app.DialogFragment;
+
 import com.dy.app.activity.FragmentHubActivity;
 import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.board.Board;
@@ -12,6 +14,7 @@ import com.dy.app.manager.EntityManger;
 import com.dy.app.manager.ObjManager;
 import com.dy.app.manager.PieceManager;
 import com.dy.app.setting.GameSetting;
+import com.dy.app.ui.dialog.LoadingDialogWithText;
 import com.dy.app.utils.DyConst;
 
 import java.io.IOException;
@@ -37,49 +40,56 @@ public class GameCore {
     }
 
     public void init() {
+        LoadingDialogWithText loadingDialog = LoadingDialogWithText.newInstance();
+        loadingDialog.doWork(gameActivity, ()->{
 
-        //entity manager
-        entityManger = new EntityManger();
+            //entity manager
+            entityManger = new EntityManger();
 
-        //background
-        backgroundManger = new BackgroundManger();
-        backgroundManger.load_loading_bg(gameActivity);
-        gameActivity.onMsgToMain(TAG, -1, TaskType.SET_LOADING_BACKGROUND, backgroundManger.getRandomLoadingBackground());
+            //background
+            backgroundManger = new BackgroundManger();
+            backgroundManger.load_loading_bg(gameActivity);
+            gameActivity.onMsgToMain(TAG, -1, TaskType.SET_LOADING_BACKGROUND, backgroundManger.getRandomLoadingBackground());
 
-        //assets
-        assetManger = new AssetManger(gameActivity);
-        try {
-            assetManger.loadSkin();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            //assets
+            assetManger = new AssetManger(gameActivity);
+            try {
+                assetManger.loadSkin();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            loadingDialog.setTvDisplayText(gameActivity, "Loading skin...");
 
-        //Obj
-        objManager = new ObjManager(gameActivity);
-        objManager.init();
+            //Obj
+            objManager = new ObjManager(gameActivity);
+            objManager.init();
+            loadingDialog.setTvDisplayText(gameActivity, "Loading game models...");
 
-        //board
-        board = new Board(gameActivity, entityManger, objManager, assetManger);
-        board.load();
+            //board
+            board = new Board(gameActivity, entityManger, objManager, assetManger);
+            board.load();
+            loadingDialog.setTvDisplayText(gameActivity, "Initializing board...");
 
-        //terrain
-        Terrain terrain = new Terrain(gameActivity, objManager, assetManger);
-        entityManger.newEntity(terrain);
+            //terrain
+            Terrain terrain = new Terrain(gameActivity, objManager, assetManger);
+            entityManger.newEntity(terrain);
+            loadingDialog.setTvDisplayText(gameActivity, "Initializing terrain...");
 
-        //load board boundary
+            //load board boundary
 
-        //load chess pieces
-        pieceManager = new PieceManager(gameActivity, entityManger, board, objManager, assetManger, GameSetting.getInstance());
-        try {
-            pieceManager.init();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            //load chess pieces
+            pieceManager = new PieceManager(gameActivity, entityManger, board, objManager, assetManger, GameSetting.getInstance());
+            try {
+                pieceManager.init();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
-        board.setPieceManager(pieceManager);
-        board.updateBoardState();
+            board.setPieceManager(pieceManager);
+            board.updateBoardState();
 
-        startGame();
+            startGame();
+        });
     }
 
     public FragmentHubActivity getGameActivity() {

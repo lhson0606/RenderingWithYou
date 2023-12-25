@@ -28,6 +28,7 @@ import com.dy.app.core.thread.ScriptsRunner;
 import com.dy.app.gameplay.pgn.PGNFile;
 import com.dy.app.gameplay.pgn.PGNParseException;
 import com.dy.app.gameplay.player.Player;
+import com.dy.app.gameplay.player.PlayerInventory;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.graphic.display.GameFragment;
 import com.dy.app.manager.SoundManager;
@@ -55,6 +56,8 @@ public class ReplayActivity extends FragmentHubActivity
         moveControlPanel = MoveControlPanel.newInstance(pgnFile);
         Player.getInstance().setWhitePiece(true);
         Rival.getInstance().setWhitePiece(false);
+        //set rival piece skin to the same as player
+        Rival.getInstance().setPieceSkinIndex((long)Player.getInstance().inventory.get(PlayerInventory.KEY_PIECE_SKIN_INDEX));
         initCore();
         init();
         attachListener();
@@ -198,7 +201,12 @@ public class ReplayActivity extends FragmentHubActivity
                 //Semaphore semaphore = new Semaphore(0);
                 gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
                 ft.replace(R.id.fl_game_surface, gameFragment);
-                ft.commit();
+                //check if the activity state is still valid
+                if(isFinishing()){
+                    return;
+                }else{
+                    ft.commit();
+                }
                 gameLoop = new GameLoop(gameFragment.getSurfaceView(), gameCore.getEntityManger());
                 Thread worker = new Thread(()->{
                     gameFragment.getSurfaceView().getRenderer().waitForGLInit();
@@ -218,6 +226,7 @@ public class ReplayActivity extends FragmentHubActivity
         builder.setPositiveButton("OK", (dialog, which) -> {
             quit();
         });
+        builder.show();
     }
 
     @Override

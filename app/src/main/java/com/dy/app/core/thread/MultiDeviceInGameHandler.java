@@ -80,6 +80,7 @@ public class MultiDeviceInGameHandler extends Thread
         player.setInTurn(false);
         try {
             board.moveByNotation(moveNotation, player.isWhitePiece());
+            board.changeKingColorInCheckState();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -108,6 +109,7 @@ public class MultiDeviceInGameHandler extends Thread
                 String tempMoveNotation = promotionMoveNotation.replace("?", pieceName);
                 try {
                     board.moveByNotation(tempMoveNotation, player.isWhitePiece());
+                    board.changeKingColorInCheckState();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -206,6 +208,7 @@ public class MultiDeviceInGameHandler extends Thread
         Log.d(TAG, "handleMessage: moveNotation: " + moveNotation);
         try {
             board.moveByNotation(moveNotation, Rival.getInstance().isWhitePiece());
+            board.changeKingColorInCheckState();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -220,7 +220,12 @@ public class GameActivity extends FragmentHubActivity
                 //Semaphore semaphore = new Semaphore(0);
                 gameFragment = new GameFragment(this, gameCore.getEntityManger(), gameCore.getBoard());
                 ft.replace(R.id.fl_game_surface, gameFragment);
-                ft.commit();
+                //check if the activity state is still valid
+                if(isFinishing()){
+                    return;
+                }else{
+                    ft.commit();
+                }
                 gameLoop = new GameLoop(gameFragment.getSurfaceView(), gameCore.getEntityManger());
                 Thread worker = new Thread(()->{
                     gameFragment.getSurfaceView().getRenderer().waitForGLInit();

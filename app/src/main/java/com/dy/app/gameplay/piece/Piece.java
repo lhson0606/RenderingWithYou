@@ -141,13 +141,18 @@ public class Piece implements GameEntity {
 
     @Override
     public void update(float dt) {
-        if(!isDoingAnimation){
-            if(isPicking) {
-                showPossibleMoves();
+        try{
+            animationLock.lock();
+            if(!isDoingAnimation){
+                if(isPicking) {
+                    showPossibleMoves();
+                }
+            } else {
+                //do animation
+                doAnimation(dt);
             }
-        } else {
-            //do animation
-            doAnimation(dt);
+        }finally {
+            animationLock.unlock();
         }
     }
 
@@ -200,13 +205,6 @@ public class Piece implements GameEntity {
         return tile;
     }
 
-    /**
-     * This method is used to perform a pseudo move to check if it's a checkmate or not
-     * it will not pseudo promote the pawn, because it's only be used when the king is in check so castling is not possible in pseudo move
-     * after check the state of the game, we need to rollback the pseudo move by calling rollbackPseudoMove() of this piece
-     * else the state of the board will be corrupted
-     * @param pos
-     */
     public void pseudoMove(Vec2i pos){
         Tile dstTile = board.getTile(pos);
 
@@ -418,6 +416,9 @@ public class Piece implements GameEntity {
         board.capturePiece(piece);
     }
 
+    /**
+     * Should only be called by game loop thread
+     */
     private void doAnimation(float dt){
         fCurrentAnimationTime+= dt;
         float fProgress = fCurrentAnimationTime/fAnimationDuration;
@@ -436,6 +437,9 @@ public class Piece implements GameEntity {
         obj.setModelMat(tile.getObj().getModelMat().clone());
     }
 
+    /**
+     * should only be called from doAnimation()
+     */
     private void completeAnimation(){
         refreshDisplayPosition();
         // Reset animation variables
@@ -455,12 +459,20 @@ public class Piece implements GameEntity {
         startMoveAnimation(srcTile, dstTile, null);
     }
 
+    private ReentrantLock animationLock = new ReentrantLock();
+
     protected void startMoveAnimation(Tile srcTile, Tile dstTile, OnAnimationFinished onAnimationFinished){
-        //set do animation to true
-        isDoingAnimation = true;
-        this.srcTile = srcTile;
-        this.dstTile = dstTile;
-        this.onAnimationFinished = onAnimationFinished;
+        try{
+            //this can be used by thread different from the game loop thread when doing animation we need to lock it
+            animationLock.lock();
+            //set do animation to true
+            isDoingAnimation = true;
+            this.srcTile = srcTile;
+            this.dstTile = dstTile;
+            this.onAnimationFinished = onAnimationFinished;
+        }finally {
+            animationLock.unlock();
+        }
     }
 
     private interface OnAnimationFinished{

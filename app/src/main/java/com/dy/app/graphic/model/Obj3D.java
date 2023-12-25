@@ -78,9 +78,9 @@ public class Obj3D implements Cloneable{
         VAO.linkBufferAttribute(Obj3DShader.VERTEX_INDEX, VBOpos, 0);
         VAO.linkBufferAttribute(Obj3DShader.TEXTURE_COORD_INDEX, VBOTexCoords, 0);
         VAO.linkBufferAttribute(Obj3DShader.NORMAL_INDEX, VBONormals, 0);
-        GLES30.glEnableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
-        GLES30.glEnableVertexAttribArray(Obj3DShader.TEXTURE_COORD_INDEX);
-        GLES30.glEnableVertexAttribArray(Obj3DShader.NORMAL_INDEX);
+//        GLES30.glEnableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
+//        GLES30.glEnableVertexAttribArray(Obj3DShader.TEXTURE_COORD_INDEX);
+//        GLES30.glEnableVertexAttribArray(Obj3DShader.NORMAL_INDEX);
         VAO.unbind();
 
         VAO.enableElements(EBOIndices);
@@ -95,7 +95,7 @@ public class Obj3D implements Cloneable{
         //load uniforms
         shader.loadUniforms();
 
-        while(VAO == null);
+        //while(VAO == null);
 
         VAO.bind();
         GLES30.glEnableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
@@ -105,11 +105,14 @@ public class Obj3D implements Cloneable{
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  tex.getID());
 
-        //GLES30.glDrawElements(GLES30.GL_TRIANGLES, EBOIndices.length(), EBOIndices.getType(), 0);
+        //GLES30.glDrawElements(GLES30.GL_TRIANGLES, EBOIndices.length(), EBOIndices.getType(), 0)
         GLES30.glDrawElements(GameSetting.getInstance().getDrawMode(), EBOIndices.length(), EBOIndices.getType(), 0);
 
-        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
         GLES30.glDisable(GLES30.GL_TEXTURE_2D);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
+        GLES30.glDisableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
+        GLES30.glDisableVertexAttribArray(Obj3DShader.TEXTURE_COORD_INDEX);
+        GLES30.glDisableVertexAttribArray(Obj3DShader.NORMAL_INDEX);
         shader.stop();
         VAO.unbind();
     }
