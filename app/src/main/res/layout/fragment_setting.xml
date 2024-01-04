@@ -99,10 +99,10 @@
                 android:textColor= "@color/white"/>
 
             <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/swSemanticView"
+                android:id="@+id/swCinematicCamera"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Enable semantic view"
+                android:text="Enable cinematic camera"
                 android:checked="false"
                 android:typeface="monospace"
                 android:gravity="center|left"

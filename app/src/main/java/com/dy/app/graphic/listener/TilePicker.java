@@ -56,7 +56,49 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
 
     }
 
+    private final float pieceFloatHeight = 0.2f;
+
     private boolean handleDragMode(View v, MotionEvent event) {
+        Tile tile = getTile(event.getX(), event.getY());
+        Vec3 mouseWorldPos = getMouseWorldPos(event.getX(), event.getY());
+        switch (event.getAction()){
+
+            case MotionEvent.ACTION_DOWN:
+                if(tile!= null){
+                    if(tile.hasPiece()){
+                        if(tile.getPiece().isOnPlayerSide()){
+                            tile.getPiece().pickUp();
+                            lastPiece = tile.getPiece();
+                            Vec3 tileWorldPos = tile.getWorldPos();
+                            lastPiece.getObj().setTranslation(new Vec3(mouseWorldPos.x, DyConst.board_height + pieceFloatHeight, mouseWorldPos.z));
+                        }
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if(lastPiece == null){
+                    return false;
+                }else{
+                    if(lastPiece.getPossibleMoves().contains(tile)) {
+                        lastPiece.putDown();
+                        if (listener != null)
+                            listener.onMoveDetected(lastPiece.getTile(), tile);
+                        lastPiece = null;
+                    }else{
+                        if(listener!=null) listener.onNotPossibleMoveDetected();
+                        //reset its position
+                        lastPiece.refreshDisplayPosition();
+                        cancelPicking();
+                    }
+                    return false;
+                }
+            case MotionEvent.ACTION_MOVE:
+                if(lastPiece!=null){
+                    lastPiece.getObj().setTranslation(new Vec3(mouseWorldPos.x, DyConst.board_height + pieceFloatHeight, mouseWorldPos.z));
+                }
+                break;
+        }
+
         return false;
     }
 
@@ -139,6 +181,23 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
         return board.getTile(intersection);
     }
 
+    private Vec3 getMouseWorldPos(float mouse_x, float mouse_y){
+        float x = (2.0f * mouse_x) / width - 1.0f;
+        float y = 1.0f - (2.0f * mouse_y) / height;
+        float z = 1.0f;
+        //ray_nds: ray in normalized device coordinates ray
+        Vec3 ray_nds = new Vec3(x, y, z);
+        Vec4 ray_clip = new Vec4(ray_nds.x, ray_nds.y, -1.0f, 1.0f);
+        Vec4 ray_eye = Camera.getInstance().mProjMat.invert().multiply(ray_clip);
+        ray_eye = new Vec4(ray_eye.x, ray_eye.y, -1.0f, 0.0f);
+        Vec3 ray_wor = Camera.getInstance().mViewMat.invert().multiply(ray_eye).xyz();
+        ray_wor = ray_wor.normalize();
+        Vec3 ray_origin = Camera.getInstance().mPos;
+        float ground_height = DyConst.board_height;
+        float t = (ground_height - ray_origin.y) / ray_wor.y;
+        return ray_origin.add(ray_wor.multiply(t));
+    }
+
     private Piece getPiece(float mouse_x, float mouse_y){
         Tile tile = getTile(mouse_x, mouse_y);
         if(tile == null) return null;
@@ -199,6 +258,15 @@ public class TilePicker extends GestureDetector.SimpleOnGestureListener implemen
             lastPiece.putDown();
             lastPiece = null;
         }
+    }
+
+    public void setDragModeEnabled(boolean b) {
+        if(lastPiece != null){
+            lastPiece.putDown();
+            lastPiece = null;
+        }
+
+        isDragModeEnabled = b;
     }
 
     public interface TilePickerListener{

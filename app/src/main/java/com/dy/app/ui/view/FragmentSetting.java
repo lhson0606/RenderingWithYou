@@ -30,6 +30,8 @@ public class FragmentSetting extends Fragment
         CompoundButton.OnCheckedChangeListener{
 
     public static final int CLOSE_PANEL = 0;
+    public static final int CINEMATIC_CAMERA = 1;
+    public static final int ENABLE_DRAG_MODE = 2;
     private LottieAnimationView btnClose;
 
     public final static String TAG = "FragmentSetting";
@@ -39,7 +41,7 @@ public class FragmentSetting extends Fragment
             sldAmbientLight, sldSpectacularLightIntensity, sldSpectacularLightShineDamper, sldSpectacularLightReflectivity,
             slPlaySpeed;
     private Spinner spnGLDrawMode, spnViewPort;
-    private SwitchMaterial swBlockViewPort;
+    private SwitchMaterial swBlockViewPort, swCinematicCamera, swEnableDragMode;
 
     public static FragmentSetting newInstance(){
         FragmentSetting fragment = new FragmentSetting();
@@ -69,6 +71,8 @@ public class FragmentSetting extends Fragment
         slPlaySpeed = view.findViewById(R.id.slPlaySpeed);
         spnViewPort = view.findViewById(R.id.spnViewPort);
         swBlockViewPort = view.findViewById(R.id.swBlockViewPort);
+        swCinematicCamera = view.findViewById(R.id.swCinematicCamera);
+        swEnableDragMode = view.findViewById(R.id.swEnableDragMode);
 
         ArrayAdapter glDrawModeAdapter = new ArrayAdapter<String>(main, android.R.layout.simple_list_item_1, GameSetting.DRAW_MODES);
         spnGLDrawMode.setAdapter(glDrawModeAdapter);
@@ -112,6 +116,8 @@ public class FragmentSetting extends Fragment
             }
         });
         swBlockViewPort.setOnCheckedChangeListener(this);
+        swCinematicCamera.setOnCheckedChangeListener(this);
+        swEnableDragMode.setOnCheckedChangeListener(this);
 
         return view;
     }
@@ -130,6 +136,7 @@ public class FragmentSetting extends Fragment
         sldSpectacularLightReflectivity.setValue(gameSetting.getPieceMaterial().getReflectivity());
         slPlaySpeed.setValue(gameSetting.getPlaybackSpeed());
         swBlockViewPort.setChecked(Camera.getInstance().isMovementLocked());
+        swCinematicCamera.setChecked(gameSetting.isCinematicCameraEnabled);
     }
 
     @Override
@@ -199,6 +206,18 @@ public class FragmentSetting extends Fragment
                 Camera.getInstance().lockMovement();
             }else{
                 Camera.getInstance().unlockMovement();
+            }
+        }else if(swCinematicCamera == buttonView){
+            if(isChecked){
+                main.onMsgToMain(TAG, FragmentSetting.CINEMATIC_CAMERA, true, null);
+            }else{
+                main.onMsgToMain(TAG, FragmentSetting.CINEMATIC_CAMERA, false, null);
+            }
+        }else if(swEnableDragMode == buttonView){
+            if(isChecked){
+                main.onMsgToMain(TAG, FragmentSetting.ENABLE_DRAG_MODE, true, null);
+            }else{
+                main.onMsgToMain(TAG, FragmentSetting.ENABLE_DRAG_MODE, false, null);
             }
         }
     }

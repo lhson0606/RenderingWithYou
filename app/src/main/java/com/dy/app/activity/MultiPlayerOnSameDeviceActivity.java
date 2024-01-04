@@ -30,8 +30,11 @@ import com.dy.app.gameplay.player.PlayerGameHistory;
 import com.dy.app.gameplay.player.PlayerInventory;
 import com.dy.app.gameplay.player.Rival;
 import com.dy.app.gameplay.screenshot.ITakeScreenshot;
+import com.dy.app.graphic.camera.CameraEntity;
 import com.dy.app.graphic.display.GameFragment;
+import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.SoundManager;
+import com.dy.app.setting.GameSetting;
 import com.dy.app.ui.dialog.LoadingDialog;
 import com.dy.app.ui.dialog.MultiPlayerSameDeviceGameResultDialog;
 import com.dy.app.ui.dialog.PromotionSelectionDialog;
@@ -130,6 +133,23 @@ implements View.OnClickListener, ITakeScreenshot {
         switch (type){
             case 0:
                 hideFragment(fragmentSetting);
+                break;
+            case FragmentSetting.CINEMATIC_CAMERA:
+                boolean isEnabled = (boolean) o1;
+                GameSetting.getInstance().isCinematicCameraEnabled = isEnabled;
+                if(isEnabled){
+                    gameCore.getEntityManger().newEntity(CameraEntity.getInstance());
+                }else{
+                    try{
+                        gameCore.getEntityManger().removeEntity(CameraEntity.getInstance());
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case FragmentSetting.ENABLE_DRAG_MODE:
+                boolean isDragModeEnabled = (boolean) o1;
+                gameFragment.getSurfaceView().getRenderer().getTilePicker().setDragModeEnabled(isDragModeEnabled);
                 break;
         }
     }
