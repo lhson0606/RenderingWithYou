@@ -9,6 +9,7 @@ import com.dy.app.utils.DyConst;
 public class Light implements Cloneable{
     private Vec3 color;
     private Vec3 pos;
+    private Vec3 up;
     private float intensity;
     private Mat4 modelMat;
 
@@ -21,6 +22,7 @@ public class Light implements Cloneable{
         this.pos = pos;
         this.intensity = intensity;
         modelMat = Mat4.createIdentityMatrix();
+        up = new Vec3(0, 1, 0);
     }
 
     public Vec3 getColor() {
@@ -54,7 +56,9 @@ public class Light implements Cloneable{
     @NonNull
     @Override
     public Light clone() throws CloneNotSupportedException {
-        return new Light(color.clone(), pos.clone(), intensity);
+        Light res = new Light(color.clone(), pos.clone(), intensity);
+        res.setUp(this.up.clone());
+        return res;
     }
 
     public void setRed(float val) {
@@ -83,5 +87,13 @@ public class Light implements Cloneable{
 
     public float getBlue() {
         return color.z;
+    }
+
+    public Vec3 getUp() {
+        return up;
+    }
+
+    public void setUp(Vec3 up) {
+        this.up = up;
     }
 }

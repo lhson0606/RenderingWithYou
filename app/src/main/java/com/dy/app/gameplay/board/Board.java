@@ -898,4 +898,16 @@ public class Board implements GameEntity {
             mutex.unlock();
         }
     }
+
+    public Vector<Tile> getAllTiles() {
+        Vector<Tile> res = new Vector<>(64);
+
+        for(int i = 0; i<DyConst.row_count; i++){
+            for(int j= 0; j<DyConst.col_count; j++){
+                res.add(tiles[i][j]);
+            }
+        }
+
+        return res;
+    }
 }

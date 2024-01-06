@@ -128,9 +128,27 @@ public class GLHelper {
         return texID.get(0);
     }
 
+    public static int createFrameBuffer(){
+        int[] fboId = {-1};
+        GLES30.glGenFramebuffers(1, fboId, 0);
 
+        if(fboId[0] <=0){
+            handleException(TAG, "failed to gen FBO");
+        }
 
+        return fboId[0];
+    }
 
+    public static int createNewTexture(){
+        int[] newTexId = {-1};
+        GLES30.glGenTextures(1, newTexId, 0);
+
+        if(newTexId[0] <=0){
+            handleException(TAG, "failed to gen new texture");
+        }
+
+        return newTexId[0];
+    }
 
     public static void handleException(String tag, Exception e){
         handleException(tag, e.getMessage());

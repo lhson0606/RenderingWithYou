@@ -2,6 +2,7 @@ package com.dy.app.gameplay.board;
 
 import androidx.annotation.NonNull;
 
+import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec2i;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.gameplay.algebraicNotation.ChessNotation;
@@ -10,6 +11,8 @@ import com.dy.app.graphic.Material;
 import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.model.Texture;
+import com.dy.app.graphic.shadow.ShadowFrameBuffer;
+import com.dy.app.graphic.shadow.ShadowMapTechnique;
 import com.dy.app.manager.AssetManger;
 import com.dy.app.utils.DyConst;
 
@@ -19,12 +22,23 @@ public class Tile {
 
     private Obj3D obj;
 
+    private ShadowMapTechnique shadowMapTechnique;
+    private ShadowFrameBuffer shadowFrameBuffer;
+
     enum TileColor{
         WHITE,
         BLACK
     }
 
     private TileColor color;
+
+    public void setShadowMapTechnique(ShadowMapTechnique shadowMapTechnique){
+        this.shadowMapTechnique = shadowMapTechnique;
+    }
+
+    public void setShadowFrameBuffer(ShadowFrameBuffer shadowFrameBuffer){
+        this.shadowFrameBuffer = shadowFrameBuffer;
+    }
 
     public Tile(Obj3D obj, Vec2i pos, Piece piece){
         this.obj = obj;

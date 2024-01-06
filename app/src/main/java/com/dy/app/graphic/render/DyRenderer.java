@@ -5,17 +5,29 @@ import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.view.GestureDetector;
 
+import com.dy.app.common.maths.Mat4;
 import com.dy.app.core.GameEntity;
 import com.dy.app.gameplay.board.Board;
+import com.dy.app.gameplay.board.Tile;
+import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.display.GameSurface;
 import com.dy.app.graphic.listener.TilePicker;
+import com.dy.app.graphic.model.Obj3D;
+import com.dy.app.graphic.shader.Obj3DShader;
+import com.dy.app.graphic.shader.ShaderHelper;
+import com.dy.app.graphic.shader.ShadowMapShader;
+import com.dy.app.graphic.shadow.ShadowFrameBuffer;
+import com.dy.app.graphic.shadow.ShadowMapTechnique;
 import com.dy.app.manager.EntityManger;
+import com.dy.app.setting.GameSetting;
 import com.dy.app.utils.GLHelper;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
+import java.util.Vector;
 import java.util.concurrent.Semaphore;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -25,18 +37,35 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     private GameSurface gameSurface;
     private TilePicker tilePicker;
     private boolean pickerIsSet = false;
-    private Board board;
     private EntityManger entityManger;
     private Bitmap screenShot = null;
     private Semaphore screenShotSem = new Semaphore(0);
     private boolean isScreenShotRequested = false;
-
+    private ShadowFrameBuffer shadowFbo = new ShadowFrameBuffer();
+    private ShadowMapShader shadowMapShader;
+    private final ShadowMapTechnique shadowMapTechnique = new ShadowMapTechnique(GameSetting.getInstance().getLight());
+    private Board board;
     public DyRenderer(GameSurface gameSurface, EntityManger entityManger, Board board) {
         this.entityManger = entityManger;
         this.gameSurface = gameSurface;
+        this.board = board;
         tilePicker = new TilePicker(0,0, board);
         gameSurface.setGestureDetector(new GestureDetector(gameSurface.getContext(), tilePicker));
         entityManger.setRenderer(this);
+        try {
+            shadowMapShader = new ShadowMapShader(
+                    ShaderHelper.getInstance().readShader(gameSurface.getContext().getAssets().open(ShadowMapTechnique.SHADOW_MAP_VER)),
+                    ShaderHelper.getInstance().readShader(gameSurface.getContext().getAssets().open(ShadowMapTechnique.SHADOW_MAP_FRAG)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        Vector<Tile> tileList = board.getAllTiles();
+
+        for(Tile t: tileList){
+            t.setShadowFrameBuffer(shadowFbo);
+            t.setShadowMapTechnique(shadowMapTechnique);
+        }
     }
 
     @Override
@@ -53,6 +82,8 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     private void init() {
         entityManger.initEntities();
         sem.release();
+        shadowFbo.init(gameSurface.getWidth(), gameSurface.getHeight());
+        shadowMapShader.init();
     }
 
     @Override
@@ -62,18 +93,64 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         Camera.getInstance().getInstance().setHeight(h);
         tilePicker.setScreenSize(w, h);
         if(!pickerIsSet) gameSurface.setOnTouchListener(tilePicker);
+        shadowFbo.cleanUp();
+        shadowFbo.init(w,h);
+        shadowMapTechnique.updateView(w,h);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
-        entityManger.drawEntities();
-
+        shadowPass();
+        lightPass();
         //after all entities are drawn, check if screenshot is requested
         if(isScreenShotRequested){
             screenShot = takeScreenShot();
             screenShotSem.release();
         }
+    }
+
+    private void lightPass(){
+        GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
+        GLES30.glViewport ( 0, 0, gameSurface.getWidth(), gameSurface.getHeight() );
+        GLES30.glClear ( GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
+        entityManger.drawEntities();
+    }
+
+    private void shadowPass(){
+        GLES30.glClear(GLES30.GL_DEPTH_BUFFER_BIT);
+        GLES30.glViewport ( 0, 0, shadowFbo.getWidth(), shadowFbo.getHeight());
+        //user shadow map program
+        shadowMapShader.start();
+        Vector<Piece> pieceList = board.getPieceManager().getActivePieces();
+        Vector<Tile> tileList = board.getAllTiles();
+        Vector<Obj3D> objList = new Vector<>(33);
+
+        for(Piece p: pieceList){
+            objList.add(p.getObj());
+        }
+
+        for(Tile t: tileList){
+            objList.add(t.getObj());
+        }
+
+        //binding fbo as the draw target
+        shadowFbo.bindForWriting();
+        //draw to shadow buffer
+        for(Obj3D obj:objList){
+            Mat4 lightTransform = shadowMapTechnique.getLightTransformMatrix();
+            Mat4 modelMat = obj.getModelMat();
+            Mat4 gMVP = lightTransform.multiplyMM(modelMat);
+            shadowMapShader.loadMvp(gMVP);
+            obj.getVAO().bind();
+            GLES30.glEnableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
+            GLES30.glDrawElements(GameSetting.getInstance().getDrawMode(),
+                    obj.getEBOIndices().length(),
+                    obj.getEBOIndices().getType(), 0);
+            obj.getVAO().unbind();
+        }
+
+        shadowMapShader.stop();
+        //stop shadow map program
     }
 
     private Bitmap takeScreenShot(){

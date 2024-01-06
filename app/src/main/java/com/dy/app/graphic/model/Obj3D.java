@@ -33,6 +33,10 @@ public class Obj3D implements Cloneable{
     private Vec4 highlightColor;
     private final Map<State, Vec4> highlightColors;
 
+    public EBO getEBOIndices() {
+        return EBOIndices;
+    }
+
 /*    public Obj3D(Obj3D o) {
         this = (Obj)
     }*/
