@@ -1,5 +1,8 @@
 package com.dy.app.gameplay.board;
 
+import android.graphics.Shader;
+import android.opengl.GLES30;
+
 import androidx.annotation.NonNull;
 
 import com.dy.app.common.maths.Mat4;
@@ -9,11 +12,16 @@ import com.dy.app.gameplay.algebraicNotation.ChessNotation;
 import com.dy.app.gameplay.piece.Piece;
 import com.dy.app.graphic.Material;
 import com.dy.app.graphic.Skin;
+import com.dy.app.graphic.gl.EBO;
+import com.dy.app.graphic.gl.VAO;
 import com.dy.app.graphic.model.Obj3D;
 import com.dy.app.graphic.model.Texture;
+import com.dy.app.graphic.shader.BaseShader;
+import com.dy.app.graphic.shader.Obj3DShader;
 import com.dy.app.graphic.shadow.ShadowFrameBuffer;
 import com.dy.app.graphic.shadow.ShadowMapTechnique;
 import com.dy.app.manager.AssetManger;
+import com.dy.app.setting.GameSetting;
 import com.dy.app.utils.DyConst;
 
 public class Tile {
@@ -22,23 +30,12 @@ public class Tile {
 
     private Obj3D obj;
 
-    private ShadowMapTechnique shadowMapTechnique;
-    private ShadowFrameBuffer shadowFrameBuffer;
-
     enum TileColor{
         WHITE,
         BLACK
     }
 
     private TileColor color;
-
-    public void setShadowMapTechnique(ShadowMapTechnique shadowMapTechnique){
-        this.shadowMapTechnique = shadowMapTechnique;
-    }
-
-    public void setShadowFrameBuffer(ShadowFrameBuffer shadowFrameBuffer){
-        this.shadowFrameBuffer = shadowFrameBuffer;
-    }
 
     public Tile(Obj3D obj, Vec2i pos, Piece piece){
         this.obj = obj;
@@ -52,6 +49,29 @@ public class Tile {
         synchronized (this){
             return piece != null;
         }
+    }
+
+    private ShadowFrameBuffer shadowFrameBuffer;
+    private ShadowMapTechnique shadowMapTechnique;
+
+    public void setShadowFrameBuffer(ShadowFrameBuffer shadowFbo) {
+        this.shadowFrameBuffer = shadowFbo;
+    }
+
+    public void setShadowMapTechnique(ShadowMapTechnique shadowMapTechnique) {
+        this.shadowMapTechnique = shadowMapTechnique;
+    }
+
+    public ShadowFrameBuffer getShadowFrameBuffer() {
+        return shadowFrameBuffer;
+    }
+
+    public ShadowMapTechnique getShadowMapTechnique() {
+        return shadowMapTechnique;
+    }
+
+    public Mat4 getLightMvp() {
+        return shadowMapTechnique.getLightTransformMatrix().multiplyMM(obj.getModelMat());
     }
 
     public Piece getPiece(){

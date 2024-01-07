@@ -45,6 +45,16 @@ public class PieceShader extends Obj3DShader{
         loadReflectivity(mPiece.getObj().getMaterial().getReflectivity());
         loadAmbient(gameSetting.getAmbientFactor());
         loadHighlightColor(mPiece.getObj().getHighlightColor());
+        loadLightMVP(mPiece.getLightMvp());
+    }
+
+    @Override
+    public void loadExtraTexture() {
+        mPiece.getShadowFrameBuffer().bindForReading(GLES30.GL_TEXTURE1);
+    }
+
+    private void loadLightMVP(Mat4 mat4){
+        loadMat4(mLightMVPLoc, mat4);
     }
 
     @Override
@@ -62,7 +72,10 @@ public class PieceShader extends Obj3DShader{
         //mAttenLinearLoc = GLHelper.getUniLocation(mProgram, ATTEN_LINEAR_NAME);
         //mAttenQuadraticLoc = GLHelper.getUniLocation(mProgram, ATTEN_QUADRATIC_NAME);
         mHighlightColorLoc = GLHelper.getUniLocation(mProgram, HIGHLIGHT_COLOR_NAME);
+        mLightMVPLoc = GLHelper.getUniLocation(mProgram, LIGHT_MVP_MAT_NAME);
     }
+
+
 
     public void loadLight(Light light){
         loadMat4(mLightModelMatLoc, light.getModelMat());
@@ -72,6 +85,7 @@ public class PieceShader extends Obj3DShader{
         //GLES30.glUniform1f(mAttenConstLoc, light.getAttenuationConstant());
         //GLES30.glUniform1f(mAttenLinearLoc, light.getAttenuationLinear());
         //GLES30.glUniform1f(mAttenQuadraticLoc, light.getAttenuationQuadratic());
+
     }
 
     public void loadShineDamper(float Damper){
@@ -110,5 +124,7 @@ public class PieceShader extends Obj3DShader{
     private int mAttenQuadraticLoc;
     private final String HIGHLIGHT_COLOR_NAME = "uHighlightColor";
     private int mHighlightColorLoc;
+    private final String LIGHT_MVP_MAT_NAME = "uLightMVP";
+    private int mLightMVPLoc = -1;
 
 }

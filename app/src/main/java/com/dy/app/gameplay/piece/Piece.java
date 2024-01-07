@@ -13,6 +13,8 @@ import com.dy.app.gameplay.player.Player;
 import com.dy.app.graphic.Skin;
 import com.dy.app.graphic.camera.Camera;
 import com.dy.app.graphic.model.Obj3D;
+import com.dy.app.graphic.shadow.ShadowFrameBuffer;
+import com.dy.app.graphic.shadow.ShadowMapTechnique;
 import com.dy.app.manager.AssetManger;
 import com.dy.app.manager.EntityManger;
 import com.dy.app.manager.PieceManager;
@@ -49,6 +51,29 @@ public class Piece implements GameEntity {
     public void putDown(){
         isPicking = false;
         unhighlightPossibleMoves();
+    }
+
+    private ShadowFrameBuffer shadowFrameBuffer;
+    private ShadowMapTechnique shadowMapTechnique;
+
+    public void setShadowFrameBuffer(ShadowFrameBuffer shadowFbo) {
+        this.shadowFrameBuffer = shadowFbo;
+    }
+
+    public void setShadowMapTechnique(ShadowMapTechnique shadowMapTechnique) {
+        this.shadowMapTechnique = shadowMapTechnique;
+    }
+
+    public ShadowFrameBuffer getShadowFrameBuffer() {
+        return shadowFrameBuffer;
+    }
+
+    public ShadowMapTechnique getShadowMapTechnique() {
+        return shadowMapTechnique;
+    }
+
+    public Mat4 getLightMvp() {
+        return shadowMapTechnique.getLightTransformMatrix().multiplyMM(obj.getModelMat());
     }
 
     public enum PieceColor{

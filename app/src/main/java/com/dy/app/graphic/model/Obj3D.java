@@ -1,5 +1,6 @@
 package com.dy.app.graphic.model;
 
+import android.graphics.Shader;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
 
@@ -10,6 +11,7 @@ import com.dy.app.graphic.Material;
 import com.dy.app.graphic.gl.EBO;
 import com.dy.app.graphic.gl.VAO;
 import com.dy.app.graphic.gl.VBO;
+import com.dy.app.graphic.shader.BaseShader;
 import com.dy.app.graphic.shader.Obj3DShader;
 import com.dy.app.graphic.shader.TileShader;
 import com.dy.app.setting.GameSetting;
@@ -35,6 +37,10 @@ public class Obj3D implements Cloneable{
 
     public EBO getEBOIndices() {
         return EBOIndices;
+    }
+
+    public BaseShader getShader() {
+        return shader;
     }
 
 /*    public Obj3D(Obj3D o) {
@@ -108,6 +114,7 @@ public class Obj3D implements Cloneable{
 
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  tex.getID());
+        shader.loadExtraTexture();
 
         //GLES30.glDrawElements(GLES30.GL_TRIANGLES, EBOIndices.length(), EBOIndices.getType(), 0)
         GLES30.glDrawElements(GameSetting.getInstance().getDrawMode(), EBOIndices.length(), EBOIndices.getType(), 0);

@@ -1,6 +1,7 @@
 package com.dy.app.graphic.shader;
 
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 
 import com.dy.app.common.maths.Vec4;
 import com.dy.app.core.GameCore;
@@ -27,6 +28,11 @@ public class TileShader extends Obj3DShader{
     }
 
     @Override
+    public void loadExtraTexture() {
+        tile.getShadowFrameBuffer().bindForReading(GLES30.GL_TEXTURE1);
+    }
+
+    @Override
     public void loadUniforms(){
         //load uniforms
         super.loadUniforms();
@@ -41,8 +47,11 @@ public class TileShader extends Obj3DShader{
     public void getAllUniLocations(){
         super.getAllUniLocations();
         mHighlightColorLoc = GLHelper.getUniLocation(mProgram, HIGHLIGHT_COLOR_NAME);
+        mLightMVPLoc = GLHelper.getUniLocation(mProgram, LIGHT_MVP_MAT_NAME);
     }
 
     public static final String HIGHLIGHT_COLOR_NAME = "uHighlightColor";
     private int mHighlightColorLoc = -1;
+    private final String LIGHT_MVP_MAT_NAME = "uLightMVP";
+    private int mLightMVPLoc = -1;
 }

@@ -34,6 +34,8 @@ public class Obj3DShader extends BaseShader implements Cloneable{
 
     }
 
+    public void loadExtraTexture(){};
+
     public void loadProjectionMat(float[] proMat){
         loadMat4(mProMatLoc, proMat);
     }

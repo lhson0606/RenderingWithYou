@@ -60,9 +60,14 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
             throw new RuntimeException(e);
         }
 
-        Vector<Tile> tileList = board.getAllTiles();
+        Vector<Piece> pieceList = board.getPieceManager().getActivePieces();
 
-        for(Tile t: tileList){
+        for(Piece p: pieceList){
+            p.setShadowFrameBuffer(shadowFbo);
+            p.setShadowMapTechnique(shadowMapTechnique);
+        }
+
+        for(Tile t: board.getAllTiles()){
             t.setShadowFrameBuffer(shadowFbo);
             t.setShadowMapTechnique(shadowMapTechnique);
         }
@@ -75,14 +80,13 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         GLES30.glEnable(GLES30.GL_DEPTH_TEST);
         GLES30.glEnable(GLES30.GL_BLEND);
         GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA);
-        gl.glFrontFace(GL10.GL_CCW);
     }
 
 
     private void init() {
         entityManger.initEntities();
         sem.release();
-        shadowFbo.init(gameSurface.getWidth(), gameSurface.getHeight());
+        shadowFbo.init(3000, 3000);
         shadowMapShader.init();
     }
 
@@ -95,7 +99,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         if(!pickerIsSet) gameSurface.setOnTouchListener(tilePicker);
         shadowFbo.cleanUp();
         shadowFbo.init(w,h);
-        shadowMapTechnique.updateView(w,h);
+        shadowMapTechnique.updateView(3000,3000);
     }
 
     @Override
@@ -129,9 +133,9 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
             objList.add(p.getObj());
         }
 
-        for(Tile t: tileList){
-            objList.add(t.getObj());
-        }
+//        for(Tile t: tileList){
+//            objList.add(t.getObj());
+//        }
 
         //binding fbo as the draw target
         shadowFbo.bindForWriting();
@@ -143,7 +147,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
             shadowMapShader.loadMvp(gMVP);
             obj.getVAO().bind();
             GLES30.glEnableVertexAttribArray(Obj3DShader.VERTEX_INDEX);
-            GLES30.glDrawElements(GameSetting.getInstance().getDrawMode(),
+            GLES30.glDrawElements(GLES30.GL_TRIANGLES,
                     obj.getEBOIndices().length(),
                     obj.getEBOIndices().getType(), 0);
             obj.getVAO().unbind();
