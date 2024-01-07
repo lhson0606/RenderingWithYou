@@ -18,7 +18,7 @@ public class ShadowMapTechnique {
     private float mBottom = -1;
     private float mTop = 1;
     private float mNear = 1f;
-    private float mFar = 50;
+    private float mFar = 1000;
     public ShadowMapTechnique(Light lightSrc){
         this.lightSrc = lightSrc;
     }

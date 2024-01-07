@@ -3,6 +3,7 @@ package com.dy.app.graphic.shader;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 
+import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec4;
 import com.dy.app.core.GameCore;
 import com.dy.app.gameplay.board.Tile;
@@ -22,6 +23,13 @@ public class TileShader extends Obj3DShader{
         super(verCode, fragCode);
     }
 
+    @Override
+    public void loadTexUnit() {
+        super.loadTexUnit();
+        int shadowTexLoc = GLHelper.getUniLocation(mProgram, "shadowSampler");
+        GLES20.glUniform1i(shadowTexLoc, 1);
+    }
+
     public void setTile(Tile tile){
         this.tile = tile;
         super.setObj3D(tile.getObj());
@@ -37,6 +45,11 @@ public class TileShader extends Obj3DShader{
         //load uniforms
         super.loadUniforms();
         loadHighlightColor(tile.getObj().getHighlightColor());
+        loadLightMVP(tile.getLightMvp());
+    }
+
+    private void loadLightMVP(Mat4 mat4){
+        loadMat4(mLightMVPLoc, mat4);
     }
 
     private void loadHighlightColor(Vec4 highlightColor) {

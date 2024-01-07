@@ -112,6 +112,7 @@ public class Obj3D implements Cloneable{
         GLES30.glEnableVertexAttribArray(Obj3DShader.TEXTURE_COORD_INDEX);
         GLES30.glEnableVertexAttribArray(Obj3DShader.NORMAL_INDEX);
 
+        shader.loadTexUnit();
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,  tex.getID());
         shader.loadExtraTexture();

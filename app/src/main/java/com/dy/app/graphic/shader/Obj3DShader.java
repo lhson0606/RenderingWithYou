@@ -1,5 +1,7 @@
 package com.dy.app.graphic.shader;
 
+import android.opengl.GLES20;
+
 import com.dy.app.common.maths.Mat4;
 import com.dy.app.common.maths.Vec3;
 import com.dy.app.gameplay.board.Tile;
@@ -32,6 +34,11 @@ public class Obj3DShader extends BaseShader implements Cloneable{
         loadViewMat(Camera.getInstance().mViewMat.mData);
         loadProjectionMat(Camera.getInstance().mProjMat.mData);
 
+    }
+
+    public void loadTexUnit(){
+        int texPos = GLHelper.getUniLocation(mProgram,"uTex2D0");
+        GLES20.glUniform1i(texPos, 0);
     }
 
     public void loadExtraTexture(){};

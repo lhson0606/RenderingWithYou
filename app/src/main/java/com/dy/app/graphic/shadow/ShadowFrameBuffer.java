@@ -1,5 +1,7 @@
 package com.dy.app.graphic.shadow;
 
+import static android.opengl.GLES20.GL_NONE;
+
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 
@@ -39,17 +41,16 @@ public class ShadowFrameBuffer {
                 GLES30.GL_TEXTURE_2D, shadowMap, 0);//0 here is our mip level, with 0 is the highest resolution and our only mip level
 
         //disables
-        //glDrawBuffer(GL_NONE); couldn't be resolved in GL 30
-        GLES30.glReadBuffer(GLES30.GL_NONE);
-
-        GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
-        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, 0);
+        //glBuffer(GL_NONE); //couldn't be resolved in GL 30
+        GLES30.glReadBuffer(GL_NONE);
 
         int status = GLES30.glCheckFramebufferStatus(GLES30.GL_FRAMEBUFFER);
 
         if (status != GLES30.GL_FRAMEBUFFER_COMPLETE) {
             GLHelper.handleException(TAG, "something went wrong :)");
         }
+
+        GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
     }
 
     public void cleanUp(){

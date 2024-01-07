@@ -86,7 +86,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     private void init() {
         entityManger.initEntities();
         sem.release();
-        shadowFbo.init(3000, 3000);
+        shadowFbo.init(gameSurface.getWidth(), gameSurface.getHeight());
         shadowMapShader.init();
     }
 
@@ -99,7 +99,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
         if(!pickerIsSet) gameSurface.setOnTouchListener(tilePicker);
         shadowFbo.cleanUp();
         shadowFbo.init(w,h);
-        shadowMapTechnique.updateView(3000,3000);
+        shadowMapTechnique.updateView(w,h);
     }
 
     @Override
@@ -121,13 +121,15 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
     }
 
     private void shadowPass(){
-        GLES30.glClear(GLES30.GL_DEPTH_BUFFER_BIT);
+
         GLES30.glViewport ( 0, 0, shadowFbo.getWidth(), shadowFbo.getHeight());
+        //binding fbo as the draw target
+        shadowFbo.bindForWriting();
         //user shadow map program
         shadowMapShader.start();
         Vector<Piece> pieceList = board.getPieceManager().getActivePieces();
         Vector<Tile> tileList = board.getAllTiles();
-        Vector<Obj3D> objList = new Vector<>(33);
+        Vector<Obj3D> objList = new Vector<>();
 
         for(Piece p: pieceList){
             objList.add(p.getObj());
@@ -136,9 +138,7 @@ public class DyRenderer implements android.opengl.GLSurfaceView.Renderer{
 //        for(Tile t: tileList){
 //            objList.add(t.getObj());
 //        }
-
-        //binding fbo as the draw target
-        shadowFbo.bindForWriting();
+        GLES30.glClear(GLES30.GL_DEPTH_BUFFER_BIT);
         //draw to shadow buffer
         for(Obj3D obj:objList){
             Mat4 lightTransform = shadowMapTechnique.getLightTransformMatrix();

@@ -16,7 +16,7 @@ float calculateShadowFactor(vec4 lightSpacePos){
 	uvCoord.x = 0.5*proPos.x+0.5;
 	uvCoord.y = 0.5*proPos.y+0.5;
 	float z = 0.5*proPos.z + 0.5;
-	float bias = 0.0001;
+	float bias = 0.0025;
 	float depth = texture(shadowSampler, uvCoord).x;
 	if(depth < z + bias){
 		return 0.2;
@@ -28,6 +28,6 @@ float calculateShadowFactor(vec4 lightSpacePos){
 void main()
 {
 	float shadowFactor = calculateShadowFactor(bLightSpacePos);
-	//finalColor = vec4(texture(uTex2D0, bTexCoords).xyz*shadowFactor,(1.0-uHighlightColor.w) )+ vec4(uHighlightColor.xyz, uHighlightColor.w);
-	finalColor = vec4(shadowFactor,shadowFactor,shadowFactor,(1.0-uHighlightColor.w) )+ vec4(uHighlightColor.xyz, uHighlightColor.w);
+	finalColor = vec4(texture(uTex2D0, bTexCoords).xyz*shadowFactor,(1.0-uHighlightColor.w) )+ vec4(uHighlightColor.xyz, uHighlightColor.w);
+	//finalColor = vec4(shadowFactor,shadowFactor,shadowFactor,(1.0-uHighlightColor.w) )+ vec4(uHighlightColor.xyz, uHighlightColor.w);
 }

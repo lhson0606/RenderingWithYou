@@ -10,14 +10,12 @@ out vec2 bTexCoords;
 out vec3 bNormalVec;
 out vec3 bToLightDirVec;
 out vec3 bToCameraVec;
-out vec4 bLightSpacePos;
 
 uniform mat4 uModelMat;
 uniform mat4 uViewMat;
 uniform mat4 uProMat;
 uniform mat4 uLightModelMat;
 uniform vec3 uLightPos;
-uniform mat4 uLightMVP;
 
 void main()
 {
@@ -29,5 +27,4 @@ void main()
 	bToLightDirVec = (uLightModelMat*vec4(uLightPos,1.0) - worldPos).xyz;
 
 	bToCameraVec = (inverse(uViewMat)*vec4(0.0, 0.0, 0.0, 1.0)).xyz - worldPos.xyz;
-	bLightSpacePos = uLightMVP*vec4(aVerPos, 1.0);
 }
