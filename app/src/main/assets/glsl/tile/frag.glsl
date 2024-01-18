@@ -28,6 +28,6 @@ float calculateShadowFactor(vec4 lightSpacePos){
 void main()
 {
 	float shadowFactor = calculateShadowFactor(bLightSpacePos);
-	finalColor = vec4(texture(uTex2D0, bTexCoords).xyz*shadowFactor,(1.0-uHighlightColor.w) )+ vec4(uHighlightColor.xyz, uHighlightColor.w);
+	finalColor = vec4(texture(uTex2D0, bTexCoords).xyz*shadowFactor,(1.0-uHighlightColor.w) )+ vec4(uHighlightColor.xyz*shadowFactor, uHighlightColor.w);
 	//finalColor = vec4(shadowFactor,shadowFactor,shadowFactor,(1.0-uHighlightColor.w) )+ vec4(uHighlightColor.xyz, uHighlightColor.w);
 }
