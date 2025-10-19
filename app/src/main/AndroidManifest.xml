@@ -94,6 +94,11 @@
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:exported="true"/>
 
+        <activity android:name=".activity.PVEActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:exported="true"/>
+
         <activity android:name=".activity.ShopActivity"
             android:screenOrientation="landscape"
             android:configChanges="orientation|screenSize|keyboardHidden"
