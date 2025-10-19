@@ -27,6 +27,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    sourceSets {
+        getByName("main") {
+            jniLibs.srcDirs("libs")
+        }
+    }
 }
 
 dependencies {
@@ -84,5 +90,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-analytics")
 
     //Anychart for graphs
-    implementation ("com.github.AnyChart:AnyChart-Android:1.0.1")
+    implementation ("com.github.AnyChart:AnyChart-Android:1.1.5")
+
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.so"))))
 }

@@ -21,10 +21,10 @@ implements TilePicker.TilePickerListener{
     private boolean isRunning = false;
     //15 mins
     //private long blackTimeRemainingMS = 3000;
-    private long blackTimeRemainingMS = 15 * 60 * 1000;
-    private long whiteTimeRemainingMS = 15 * 60 * 1000;
+    protected long blackTimeRemainingMS = 15 * 60 * 1000;
+    protected long whiteTimeRemainingMS = 15 * 60 * 1000;
     private MultiPlayerOnSameDeviceActivity activity;
-    private Boolean gameEnd = false;
+    protected Boolean gameEnd = false;
     private TilePicker tilePicker;
     private int continuousWhiteCheckCount = 0;
     private int continuousBlackCheckCount = 0;
@@ -58,7 +58,7 @@ implements TilePicker.TilePickerListener{
         }
     }
 
-    private void handleFinalMove(String moveNotation){
+    protected void handleFinalMove(String moveNotation){
         try {
             board.moveByNotation(moveNotation, player.isWhitePiece());
             board.changeKingColorInCheckState();

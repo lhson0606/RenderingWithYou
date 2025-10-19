@@ -20,6 +20,7 @@ public class FragmentMainMenu extends Fragment
     private LottieAnimationView ltvFindRoom;
     private LottieAnimationView ltvTwoPlayersOnSameDevice;
     private LottieAnimationView ltvRunScripts;
+    private LottieAnimationView ltvPVE;
     private LottieAnimationView ltvCredits;
     private LottieAnimationView ltvQuit;
 
@@ -42,11 +43,13 @@ public class FragmentMainMenu extends Fragment
         ltvCredits = mainMenuView.findViewById(R.id.ltvCredits);
         ltvQuit = mainMenuView.findViewById(R.id.ltvQuit);
         ltvRunScripts = mainMenuView.findViewById(R.id.ltvRunScripts);
+        ltvPVE = mainMenuView.findViewById(R.id.ltvPVE);
         ltvFindRoom.setOnClickListener(this);
         ltvTwoPlayersOnSameDevice.setOnClickListener(this);
         ltvCredits.setOnClickListener(this);
         ltvQuit.setOnClickListener(this);
         ltvRunScripts.setOnClickListener(this);
+        ltvPVE.setOnClickListener(this);
         return mainMenuView;
     }
 
@@ -67,6 +70,10 @@ public class FragmentMainMenu extends Fragment
         else if (v.getId() == R.id.ltvRunScripts) {
             ltvRunScripts.playAnimation();
             main.onMsgToMain(TAG, 3, null, null);
+        }
+        else if (v.getId() == R.id.ltvPVE) {
+            ltvPVE.playAnimation();
+            main.onMsgToMain(TAG, 5, null, null);
         }
         else if(v.getId() == R.id.ltvCredits) {
             ltvCredits.playAnimation();

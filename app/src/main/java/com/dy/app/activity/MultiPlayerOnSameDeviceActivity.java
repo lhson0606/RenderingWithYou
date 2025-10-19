@@ -179,12 +179,16 @@ implements View.OnClickListener, ITakeScreenshot {
                 Thread worker = new Thread(()->{
                     gameFragment.getSurfaceView().getRenderer().waitForGLInit();
                     gameLoop.start();
-                    multiPlayerSameDeviceHandler = new MultiPlayerSameDeviceHandler(this, gameCore.getBoard(), gameFragment.getSurfaceView().getRenderer().getTilePicker());
-                    multiPlayerSameDeviceHandler.start();
+                    setGameHandler();
                 });
                 worker.start();
                 break;
         }
+    }
+
+    protected void setGameHandler() {
+        multiPlayerSameDeviceHandler = new MultiPlayerSameDeviceHandler(this, gameCore.getBoard(), gameFragment.getSurfaceView().getRenderer().getTilePicker());
+        multiPlayerSameDeviceHandler.start();
     }
 
     @Override
@@ -477,10 +481,10 @@ implements View.OnClickListener, ITakeScreenshot {
     private Fragment currentFragment;
     private final FragmentManager fm = getSupportFragmentManager();
     private Handler mainHandler;
-    private GameFragment gameFragment;
+    protected GameFragment gameFragment;
     private GameLoop gameLoop;
-    private GameCore gameCore;
-    private MultiPlayerSameDeviceHandler multiPlayerSameDeviceHandler;
+    protected GameCore gameCore;
+    protected MultiPlayerSameDeviceHandler multiPlayerSameDeviceHandler;
     private LottieAnimationView btnConfig, btnSpeaker;
     private FragmentSetting fragmentSetting;
     private TextView tvWhiteTimeRemain, tvBlackTimeRemain;
