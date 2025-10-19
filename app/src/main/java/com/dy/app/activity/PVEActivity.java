@@ -3,6 +3,9 @@ package com.dy.app.activity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.dy.app.core.thread.MultiPlayerSameDeviceHandler;
+import com.dy.app.core.thread.PVEHandler;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +13,7 @@ import java.io.InputStreamReader;
 import java.io.InputStream;
 import java.io.FileOutputStream;
 
-public class PVEActivity extends FragmentHubActivity {
+public class PVEActivity extends MultiPlayerOnSameDeviceActivity {
     public static final String TAG = "PVEActivity";
 
     private Process process;
@@ -23,7 +26,18 @@ public class PVEActivity extends FragmentHubActivity {
         super.onCreate(savedInstanceState);
         startEngine();
         setUp();
-        doTest();
+        initEngine();
+        startNewGame();
+    }
+
+    @Override
+    protected void setGameHandler() {
+        multiPlayerSameDeviceHandler = new PVEHandler(this, gameCore.getBoard(), gameFragment.getSurfaceView().getRenderer().getTilePicker());
+        multiPlayerSameDeviceHandler.start();
+    }
+
+    private void startNewGame() {
+        sendEngineCommand("ucinewgame");
     }
 
     private void setUp() {
@@ -40,6 +54,13 @@ public class PVEActivity extends FragmentHubActivity {
         }
     }
 
+    private void initEngine() {
+        sendEngineCommand("uci");
+        sendEngineCommand("isready");
+        sendEngineCommand("ucinewgame");
+        sendEngineCommand("position startpos");
+    }
+
     private void doTest() {
         setEngineMessageListener(line -> {
             Log.d(TAG, "ENGINE: [RECEIVED]\t" + line);
@@ -47,13 +68,6 @@ public class PVEActivity extends FragmentHubActivity {
 
         Thread tester = new Thread(() -> {
             try {
-                sendEngineCommand("uci");
-                Thread.sleep(200);
-                sendEngineCommand("isready");
-                Thread.sleep(200);
-                sendEngineCommand("ucinewgame");
-                Thread.sleep(100);
-                sendEngineCommand("position startpos");
                 Thread.sleep(100);
                 sendEngineCommand("go movetime 1000");
             } catch (InterruptedException ignored) {}

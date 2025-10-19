@@ -50,6 +50,7 @@ public class Board implements GameEntity {
     public static int IS_CHECKMATE = 2;
     private int moveCount = 0;
     private final Vector<String> moveRecord = new Vector<>();
+    private final Vector<String> engineMoveRecord = new Vector<>(); // uci moves
 
     public Board(Context context, EntityManger entityManger, ObjManager objManager, AssetManger assetManger){
         this.context = context;
@@ -379,6 +380,7 @@ public class Board implements GameEntity {
 
             //save to move record
             saveMoveRecord(moveNotation);
+            saveEngineMoveRecord(srcTile.pos, desTile.pos);
         }finally {
             mutex.unlock();
         }
@@ -386,6 +388,16 @@ public class Board implements GameEntity {
 
     private void saveMoveRecord(String moveNotation){
         moveRecord.add(moveNotation);
+    }
+
+    private void saveEngineMoveRecord(Vec2i srcTilePos, Vec2i desTilePos){
+        // convert to tile and rank
+        char srcFile = (char) ('a' + (7 - srcTilePos.x));
+        char srcRank = (char) ('1' + srcTilePos.y);
+        char desFile = (char) ('a' + (7 - desTilePos.x));
+        char desRank = (char) ('1' + desTilePos.y);
+
+        engineMoveRecord.add("" + srcFile + srcRank + desFile + desRank);
     }
 
     //this method is safe to use because the kings will never be removed from the board
@@ -801,6 +813,15 @@ public class Board implements GameEntity {
         return builder.toString();
     }
 
+    // Used to send to engine
+    public String getEngineMoveHistory(){
+        StringBuilder builder = new StringBuilder();
+        for(String move : engineMoveRecord){
+            builder.append(move + " ");
+        }
+        return builder.toString();
+    }
+
     public boolean hasPossibleMove(boolean isWhite){
         Vector<Piece> pieces = isWhite ? pieceManager.getWhitePieces() : pieceManager.getBlackPieces();
         for(Piece piece : pieces){
@@ -837,6 +858,7 @@ public class Board implements GameEntity {
             //we have to lock mutex to prevent concurrent access
             mutex.lock();
             moveRecord.remove(moveRecord.size() - 1);
+            engineMoveRecord.remove(engineMoveRecord.size() - 1);
             int moveNumber = moveCount - 2;
             Log.d("Board", String.format(Locale.ENGLISH, "run: %d", moveNumber));
             if(moveNumber < 0){
