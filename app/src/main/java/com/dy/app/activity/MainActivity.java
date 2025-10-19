@@ -453,11 +453,21 @@ public class MainActivity extends FragmentHubActivity
             case 4:{
                 startTwoPlayerSameDeviceGame();
             }
+            case 5:{
+                startPVEGame();
+                break;
+            }
         }
     }
 
     private void startTwoPlayerSameDeviceGame() {
         Intent intent = new Intent(this, MultiPlayerOnSameDeviceActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        startActivity(intent);
+    }
+
+    private void startPVEGame(){
+        Intent intent = new Intent(this, PVEActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(intent);
     }

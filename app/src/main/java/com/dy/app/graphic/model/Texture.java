@@ -16,7 +16,8 @@ public class Texture {
         return ID;
     }
 
-    public void destroy(){}
+    public void destroy(){
+    }
 
     public void init() {
         ID = GLHelper.loadTexture(bitmap);

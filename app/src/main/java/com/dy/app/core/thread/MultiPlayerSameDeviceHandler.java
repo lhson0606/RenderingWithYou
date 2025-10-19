@@ -7,9 +7,11 @@ import com.dy.app.gameplay.board.Tile;
 import com.dy.app.gameplay.move.ChessMove;
 import com.dy.app.gameplay.player.Player;
 import com.dy.app.gameplay.player.Rival;
+import com.dy.app.graphic.camera.CameraEntity;
 import com.dy.app.graphic.listener.TilePicker;
 import com.dy.app.manager.ConnectionManager;
 import com.dy.app.manager.SoundManager;
+import com.dy.app.setting.GameSetting;
 import com.dy.app.utils.DyConst;
 
 public class MultiPlayerSameDeviceHandler extends Thread
@@ -19,10 +21,10 @@ implements TilePicker.TilePickerListener{
     private boolean isRunning = false;
     //15 mins
     //private long blackTimeRemainingMS = 3000;
-    private long blackTimeRemainingMS = 15 * 60 * 1000;
-    private long whiteTimeRemainingMS = 15 * 60 * 1000;
+    protected long blackTimeRemainingMS = 15 * 60 * 1000;
+    protected long whiteTimeRemainingMS = 15 * 60 * 1000;
     private MultiPlayerOnSameDeviceActivity activity;
-    private Boolean gameEnd = false;
+    protected Boolean gameEnd = false;
     private TilePicker tilePicker;
     private int continuousWhiteCheckCount = 0;
     private int continuousBlackCheckCount = 0;
@@ -56,7 +58,7 @@ implements TilePicker.TilePickerListener{
         }
     }
 
-    private void handleFinalMove(String moveNotation){
+    protected void handleFinalMove(String moveNotation){
         try {
             board.moveByNotation(moveNotation, player.isWhitePiece());
             board.changeKingColorInCheckState();
@@ -90,6 +92,12 @@ implements TilePicker.TilePickerListener{
         player.setWhitePiece(!player.isWhitePiece());
         checkForDrawByStaleMate(player.isWhitePiece());
         handleMoveSoundEffect(moveNotation);
+        //do camera animation if needed
+        if(GameSetting.getInstance().isCinematicCameraEnabled){
+            CameraEntity.getInstance().setState(
+                    player.isWhitePiece()? CameraEntity.CameraState.BLACK_TO_WHITE: CameraEntity.CameraState.WHITE_TO_BLACK
+            );
+        }
     }
 
     private boolean checkForSpecialMove(String moveNotation) {

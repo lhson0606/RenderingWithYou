@@ -74,6 +74,7 @@ public class GameSetting {
     public int getDrawModeIndex() {
         return drawMode;
     }
+    public boolean isCinematicCameraEnabled = false;
 
     public int getDrawMode() {
         switch (DRAW_MODES[drawMode]){
@@ -122,5 +123,4 @@ public class GameSetting {
     public void setPlaybackSpeed(int playbackSpeed) {
         this.playbackSpeed = playbackSpeed;
     }
-
 }
